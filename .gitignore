@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+*.whl
+
+# Environment and credentials — never commit
+.env
+.env.*
+!.env.example
+*.local
+*.key
+*.pem
+credentials*
+secrets/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test and coverage
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Data artifacts (generated, not source)
+*.csv
+*.xlsx
+*.parquet
+!tests/fixtures/*.csv
