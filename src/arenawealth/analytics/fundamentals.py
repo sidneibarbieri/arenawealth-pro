@@ -254,8 +254,8 @@ def build_fundamentals_provider(keys: ProviderKeys | None = None) -> Fundamental
     loaded_keys = keys or load_provider_keys()
     if loaded_keys.fmp_api_key:
         return FMPFundamentalsProvider(loaded_keys.fmp_api_key)
-    if loaded_keys.finnhub_api_key:
-        return FinnhubFundamentalsProvider(loaded_keys.finnhub_api_key)
+    # Yahoo serves real multi-year statements. Finnhub's free tier does not, so it
+    # would approximate them and distort the moat scores; prefer Yahoo for accuracy.
     return YahooFundamentalsProvider()
 
 

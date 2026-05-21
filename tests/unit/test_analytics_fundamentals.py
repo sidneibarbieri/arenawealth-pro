@@ -112,11 +112,10 @@ def test_factory_uses_fmp_when_key_is_available():
     provider.close()
 
 
-def test_factory_uses_finnhub_when_fmp_is_absent():
+def test_factory_prefers_yahoo_over_finnhub_for_statements():
     provider = build_fundamentals_provider(ProviderKeys(finnhub_api_key="test-key"))
 
-    assert isinstance(provider, FinnhubFundamentalsProvider)
-    provider.close()
+    assert isinstance(provider, YahooFundamentalsProvider)
 
 
 def test_fmp_provider_maps_structured_payloads():
