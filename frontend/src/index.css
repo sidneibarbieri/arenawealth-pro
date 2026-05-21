@@ -281,6 +281,34 @@ h3 {
   color: #1f7a4d;
 }
 
+.mode-hint {
+  margin: 10px 0 0;
+  max-width: 60ch;
+  color: #6b6b61;
+  font-size: 0.82rem;
+}
+
+.th-sort {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.th-sort:hover {
+  color: #1f1f1c;
+}
+
+th.numeric .th-sort {
+  width: 100%;
+  text-align: right;
+}
+
 .deployment-band,
 .data-section {
   margin-top: 34px;

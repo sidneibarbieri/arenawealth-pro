@@ -19,6 +19,7 @@ import {
   type RecommendationResponse,
 } from './api';
 import { formatDateTime, formatMoney, formatNumber, formatPercent } from './format';
+import { type TableSort, useTableSort } from './useTableSort';
 
 const DEFAULT_CASH = 1511.18;
 
@@ -124,6 +125,17 @@ function App() {
   const recommendedCapital =
     recommendation?.orders.reduce((total, order) => total + order.amount, 0) ?? 0;
   const topRanked = recommendation?.ranked_positions[0];
+
+  const rankedRows = useMemo(
+    () =>
+      (recommendation?.ranked_positions ?? []).map((position, index) => ({
+        ...position,
+        rank: index + 1,
+      })),
+    [recommendation],
+  );
+  const rankingSort = useTableSort(rankedRows, 'composite_score', 'desc');
+  const positionSort = useTableSort(positions, 'market_value', 'desc');
 
   function refreshRecommendation() {
     const parsedCash = parseCashInput(cashInput);
@@ -233,6 +245,12 @@ function App() {
                 </button>
               </div>
 
+              <p className="mode-hint">
+                Live data drives real recommendations. Reviewer mode swaps in synthetic,
+                reproducible fundamentals for offline demos, so its picks differ and are not
+                actionable.
+              </p>
+
               {isRecommendationLoading && (
                 <div className="loading-row">Loading recommendation...</div>
               )}
@@ -243,7 +261,10 @@ function App() {
                     <div className="provider-line">
                       <CheckCircle2 size={17} />
                       <span>
-                        {recommendation.provider_mode} · {formatMoney(recommendedCapital)} queued
+                        {recommendation.provider_mode === 'offline-demo'
+                          ? 'Reviewer demo (synthetic)'
+                          : 'Live data'}{' '}
+                        · {formatMoney(recommendedCapital)} queued
                       </span>
                     </div>
                     {recommendation.orders.map((order) => (
@@ -281,19 +302,40 @@ function App() {
                   <table>
                     <thead>
                       <tr>
-                        <th>Ticker</th>
-                        <th>Theme</th>
-                        <th className="numeric">Weight</th>
-                        <th>Moat</th>
-                        <th>Compounding</th>
-                        <th className="numeric">Score</th>
-                        <th className="numeric">Valuation</th>
-                        <th className="numeric">fPE</th>
+                        <SortHeader label="#" columnKey="rank" sort={rankingSort} numeric />
+                        <SortHeader label="Ticker" columnKey="ticker" sort={rankingSort} />
+                        <SortHeader label="Theme" columnKey="theme" sort={rankingSort} />
+                        <SortHeader
+                          label="Weight"
+                          columnKey="weight_pct"
+                          sort={rankingSort}
+                          numeric
+                        />
+                        <SortHeader label="Moat" columnKey="moat_class" sort={rankingSort} />
+                        <SortHeader
+                          label="Compounding"
+                          columnKey="compounding_class"
+                          sort={rankingSort}
+                        />
+                        <SortHeader
+                          label="Score"
+                          columnKey="composite_score"
+                          sort={rankingSort}
+                          numeric
+                        />
+                        <SortHeader
+                          label="Valuation"
+                          columnKey="valuation_points"
+                          sort={rankingSort}
+                          numeric
+                        />
+                        <SortHeader label="fPE" columnKey="forward_pe" sort={rankingSort} numeric />
                       </tr>
                     </thead>
                     <tbody>
-                      {recommendation.ranked_positions.map((rankedPosition) => (
+                      {rankingSort.sortedRows.map((rankedPosition) => (
                         <tr key={rankedPosition.ticker}>
+                          <td className="numeric">{rankedPosition.rank}</td>
                           <td className="ticker-cell">{rankedPosition.ticker}</td>
                           <td>{rankedPosition.theme}</td>
                           <td className="numeric">{formatPercent(rankedPosition.weight_pct)}</td>
@@ -332,18 +374,28 @@ function App() {
                 <table>
                   <thead>
                     <tr>
-                      <th>Ticker</th>
-                      <th>Name</th>
-                      <th className="numeric">Shares</th>
-                      <th className="numeric">Price</th>
-                      <th className="numeric">Day</th>
-                      <th className="numeric">Value</th>
-                      <th className="numeric">Weight</th>
-                      <th className="numeric">P/L</th>
+                      <SortHeader label="Ticker" columnKey="ticker" sort={positionSort} />
+                      <SortHeader label="Name" columnKey="name" sort={positionSort} />
+                      <SortHeader label="Shares" columnKey="shares" sort={positionSort} numeric />
+                      <SortHeader
+                        label="Price"
+                        columnKey="current_price"
+                        sort={positionSort}
+                        numeric
+                      />
+                      <SortHeader label="Day" columnKey="change_pct" sort={positionSort} numeric />
+                      <SortHeader
+                        label="Value"
+                        columnKey="market_value"
+                        sort={positionSort}
+                        numeric
+                      />
+                      <SortHeader label="Weight" columnKey="weight_pct" sort={positionSort} numeric />
+                      <SortHeader label="P/L" columnKey="gain_loss" sort={positionSort} numeric />
                     </tr>
                   </thead>
                   <tbody>
-                    {positions.map((position) => (
+                    {positionSort.sortedRows.map((position) => (
                       <PositionRow key={position.ticker} position={position} />
                     ))}
                   </tbody>
@@ -438,6 +490,29 @@ function PositionRow({ position }: PositionRowProps) {
         {formatMoney(position.gain_loss)} ({formatPercent(position.gain_loss_pct)})
       </td>
     </tr>
+  );
+}
+
+interface SortHeaderProps<Row> {
+  label: string;
+  columnKey: keyof Row;
+  sort: TableSort<Row>;
+  numeric?: boolean;
+}
+
+function SortHeader<Row>({ label, columnKey, sort, numeric = false }: SortHeaderProps<Row>) {
+  const isActive = sort.sortKey === columnKey;
+  let indicator = '';
+  if (isActive) {
+    indicator = sort.sortDirection === 'asc' ? ' ▲' : ' ▼';
+  }
+  return (
+    <th className={numeric ? 'numeric' : undefined}>
+      <button type="button" className="th-sort" onClick={() => sort.toggleSort(columnKey)}>
+        {label}
+        {indicator}
+      </button>
+    </th>
   );
 }
 
