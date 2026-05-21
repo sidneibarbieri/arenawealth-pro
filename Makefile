@@ -31,7 +31,7 @@ app:
 	bash scripts/start.sh
 
 paper:
-	cd paper/acm-icaif && latexmk -pdf main.tex
+	cd paper && latexmk -pdf main.tex
 
 clean:
 	rm -rf .pytest_cache .ruff_cache frontend/dist frontend/test-results frontend/playwright-report exports logs

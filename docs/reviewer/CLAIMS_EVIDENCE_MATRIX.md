@@ -8,7 +8,6 @@
 | The app exposes a live cash-deployment endpoint. | `GET /api/v1/portfolio/user/recommendation` | Supported |
 | The live recommendation uses external data when provider keys are available. | Provider mode in CLI/API output | Supported with provider availability |
 | The method beats market or advisor baselines. | Backtests and baselines are not implemented yet. | Not supported |
-| The artifact executes MITRE campaigns. | No MITRE executor exists in this repository. | Not supported |
 | The system is ready for regulated commercial advice. | Compliance, licensing, audit, and suitability workflows remain open. | Not supported |
 
 ## Required Before Performance Claims

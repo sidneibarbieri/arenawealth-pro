@@ -60,10 +60,6 @@ mode avoids external providers entirely.
 
 ## Known Limits
 
-This repository does not include `sticks-docker`, MITRE campaign execution, or
-security experiment measurements. Those measurements must come from the external
-artifact that actually implements them.
-
-The current artifact also does not yet include investment backtests, benchmark
-baselines, ablations, paper table generation, or manuscript-value
-synchronization.
+The current artifact does not yet include investment backtests, benchmark
+baselines, ablations, or paper table generation. Performance claims require that
+empirical work first.

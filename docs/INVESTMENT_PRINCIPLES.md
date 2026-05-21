@@ -29,6 +29,5 @@ positions from the same theme, and sizes orders so fee tiers remain explicit.
 - No portfolio-wide correlation matrix is implemented.
 - No tax optimization is implemented.
 - No liquidity or market-impact model is implemented.
-- No external `sticks-docker` measurements are present in this repository.
 
 These gaps should be described as future work unless implemented and tested.

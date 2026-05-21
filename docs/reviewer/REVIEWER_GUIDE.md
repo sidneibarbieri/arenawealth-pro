@@ -56,5 +56,4 @@ running.
 ## Scope
 
 The artifact supports portfolio analysis, cash-deployment recommendations, and
-reviewer metrics. It does not run security campaigns and does not include the
-external `sticks-docker` environment.
+reviewer metrics.
