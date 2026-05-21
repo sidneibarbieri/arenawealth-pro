@@ -54,6 +54,7 @@ paper/**/*.pdf
 data/carteira_atual.csv
 data/arenawealth_universe.db
 data/*.db
+data/snapshots/
 
 # Secrets
 .env

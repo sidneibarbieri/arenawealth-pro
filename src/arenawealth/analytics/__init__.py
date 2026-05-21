@@ -26,6 +26,7 @@ from arenawealth.analytics.portfolio_review import (
 )
 from arenawealth.analytics.scoring import analyze, score_fundamentals
 from arenawealth.analytics.screening import CandidateAnalysis, screen_candidates
+from arenawealth.analytics.snapshots import SnapshotProvider, load_snapshot, record_snapshot
 from arenawealth.analytics.workflow import analyze_holdings, fetch_fundamentals
 
 __all__ = [
@@ -43,14 +44,17 @@ __all__ = [
     "PortfolioReview",
     "PositionAnalysis",
     "ReplacementReview",
+    "SnapshotProvider",
     "TrimReview",
     "YahooFundamentalsProvider",
     "analyze",
     "analyze_holdings",
     "build_fundamentals_provider",
     "fetch_fundamentals",
+    "load_snapshot",
     "order_fee",
     "plan_deployment",
+    "record_snapshot",
     "review_portfolio",
     "score_fundamentals",
     "screen_candidates",
