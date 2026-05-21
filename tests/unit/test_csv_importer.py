@@ -45,3 +45,9 @@ class TestCsvImporter:
         csv.write_text("wrong_col,shares\nAAPL,10\n")
         with pytest.raises(ValueError, match="No ticker column found"):
             import_csv(csv)
+
+    def test_current_price_optional_falls_back_to_cost_basis(self, tmp_path: Path) -> None:
+        csv = tmp_path / "holdings.csv"
+        csv.write_text("ticker,shares,cost_basis_per_share\nAAPL,10,150\n")
+        positions = import_csv(csv)
+        assert positions[0].current_price == Decimal("150")

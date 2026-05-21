@@ -91,7 +91,10 @@ def import_csv(
             if raw:
                 cost_basis = Decimal(raw)
 
-        current_price = Decimal("0")
+        # current_price is optional: live pricing overrides it. When the column
+        # is absent we fall back to cost basis so an offline snapshot reads flat
+        # instead of -100%.
+        current_price = cost_basis
         if current_price_col and row[current_price_col]:
             raw = str(row[current_price_col]).replace(",", "").replace("$", "").strip()
             if raw:
