@@ -86,6 +86,17 @@ python scripts/reviewer_metrics.py
 This writes a JSON report under `exports/` with lint status, test status, source
 file counts, and line counts. Generated reports are not committed.
 
+## Price Backtest
+
+```bash
+make price-backtest
+```
+
+This compares the current basket against `SPY` using free adjusted closes from
+Yahoo Finance and writes JSON under `exports/`. It is a current-basket price
+backtest, not a point-in-time stock-selection study. The data limitations are
+listed in `docs/DATA_SOURCES.md`.
+
 ## API
 
 ```bash

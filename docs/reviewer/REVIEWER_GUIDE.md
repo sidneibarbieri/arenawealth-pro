@@ -26,6 +26,16 @@ make metrics
 
 This path is deterministic and does not need API keys.
 
+## Free Price Backtest
+
+```bash
+make price-backtest
+```
+
+This path uses free adjusted closes and writes a JSON report under `exports/`.
+It is useful for checking risk and benchmark behavior of the current basket. It
+does not claim point-in-time stock-selection performance.
+
 ## Local App
 
 Terminal 1:
