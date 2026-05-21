@@ -12,18 +12,22 @@ from arenawealth.analytics.fundamentals import (
 from arenawealth.analytics.models import (
     DeploymentPlan,
     Fundamentals,
+    FundamentalScore,
     Holding,
     Order,
     PositionAnalysis,
 )
-from arenawealth.analytics.scoring import analyze
+from arenawealth.analytics.scoring import analyze, score_fundamentals
+from arenawealth.analytics.screening import CandidateAnalysis, screen_candidates
 from arenawealth.analytics.workflow import analyze_holdings, fetch_fundamentals
 
 __all__ = [
+    "CandidateAnalysis",
     "DemoFundamentalsProvider",
     "DeploymentPlan",
     "FMPFundamentalsProvider",
     "FinnhubFundamentalsProvider",
+    "FundamentalScore",
     "Fundamentals",
     "FundamentalsProvider",
     "Holding",
@@ -36,4 +40,6 @@ __all__ = [
     "fetch_fundamentals",
     "order_fee",
     "plan_deployment",
+    "score_fundamentals",
+    "screen_candidates",
 ]
