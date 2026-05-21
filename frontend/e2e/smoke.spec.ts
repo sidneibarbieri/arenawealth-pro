@@ -1,8 +1,11 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('ArenaWealth workbench', () => {
+  test.describe.configure({ mode: 'serial' });
+
   test.beforeEach(async ({ page }) => {
     await page.goto('/?offline_demo=true');
+    await expect(page.getByText('Allocation queue')).toBeVisible({ timeout: 15_000 });
   });
 
   test('loads the reviewer workbench', async ({ page }) => {
@@ -21,7 +24,14 @@ test.describe('ArenaWealth workbench', () => {
   test('shows deterministic reviewer mode', async ({ page }) => {
     await page.getByLabel('Deterministic reviewer mode').check();
     await page.getByRole('button', { name: 'Analyze' }).click();
-    await expect(page.getByText('offline-demo')).toBeVisible();
+    await expect(page.getByText('Reviewer demo (synthetic)')).toBeVisible();
+  });
+
+  test('screens external candidates on demand', async ({ page }) => {
+    await page.getByRole('button', { name: 'Screen universe' }).click();
+    const candidateSection = page.locator('#candidates');
+    await expect(candidateSection.getByText('Reviewer demo (synthetic)')).toBeVisible();
+    await expect(candidateSection.getByText('12 candidates')).toBeVisible();
   });
 
   test('renders on a mobile viewport', async ({ page }) => {

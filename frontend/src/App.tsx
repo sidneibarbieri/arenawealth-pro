@@ -5,14 +5,19 @@ import {
   CheckCircle2,
   CircleDollarSign,
   RefreshCw,
+  Search,
   ShieldCheck,
   WalletCards,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 import {
+  fetchCandidates,
   fetchPortfolio,
   fetchRecommendation,
+  type Candidate,
+  type CandidatesResponse,
+  type PortfolioReview,
   type PortfolioResponse,
   type Position,
   type RecommendationOrder,
@@ -51,10 +56,13 @@ function isAbortError(error: unknown): boolean {
 function App() {
   const [portfolio, setPortfolio] = useState<PortfolioResponse | null>(null);
   const [recommendation, setRecommendation] = useState<RecommendationResponse | null>(null);
+  const [candidates, setCandidates] = useState<CandidatesResponse | null>(null);
   const [portfolioError, setPortfolioError] = useState<string | null>(null);
   const [recommendationError, setRecommendationError] = useState<string | null>(null);
+  const [candidateError, setCandidateError] = useState<string | null>(null);
   const [isPortfolioLoading, setIsPortfolioLoading] = useState(true);
   const [isRecommendationLoading, setIsRecommendationLoading] = useState(true);
+  const [isCandidateLoading, setIsCandidateLoading] = useState(false);
   const [cashInput, setCashInput] = useState(() => readInitialCash().toFixed(2));
   const [cashToAnalyze, setCashToAnalyze] = useState(() => readInitialCash());
   const [offlineDemo, setOfflineDemo] = useState(() => readInitialOfflineDemo());
@@ -66,7 +74,7 @@ function App() {
     async function loadPortfolio() {
       setIsPortfolioLoading(true);
       setPortfolioError(null);
-      const payload = await fetchPortfolio(controller.signal);
+      const payload = await fetchPortfolio(!offlineDemo, controller.signal);
       setPortfolio(payload);
       setIsPortfolioLoading(false);
     }
@@ -80,7 +88,7 @@ function App() {
     });
 
     return () => controller.abort();
-  }, [refreshIndex]);
+  }, [offlineDemo, refreshIndex]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -105,6 +113,11 @@ function App() {
 
     return () => controller.abort();
   }, [cashToAnalyze, offlineDemo, refreshIndex]);
+
+  useEffect(() => {
+    setCandidates(null);
+    setCandidateError(null);
+  }, [offlineDemo]);
 
   const positions = useMemo(() => {
     if (!portfolio) {
@@ -136,11 +149,34 @@ function App() {
   );
   const rankingSort = useTableSort(rankedRows, 'composite_score', 'desc');
   const positionSort = useTableSort(positions, 'market_value', 'desc');
+  const candidateRows = useMemo(
+    () =>
+      (candidates?.candidates ?? []).map((candidate, index) => ({
+        ...candidate,
+        rank: index + 1,
+      })),
+    [candidates],
+  );
+  const candidateSort = useTableSort(candidateRows, 'composite_score', 'desc');
 
   function refreshRecommendation() {
     const parsedCash = parseCashInput(cashInput);
     setCashToAnalyze(parsedCash);
     setRefreshIndex((currentIndex) => currentIndex + 1);
+  }
+
+  async function screenUniverse(): Promise<void> {
+    const controller = new AbortController();
+    setIsCandidateLoading(true);
+    setCandidateError(null);
+    try {
+      const payload = await fetchCandidates(offlineDemo, 12, controller.signal);
+      setCandidates(payload);
+    } catch (error: unknown) {
+      setCandidateError(error instanceof Error ? error.message : 'Unknown candidate error');
+    } finally {
+      setIsCandidateLoading(false);
+    }
   }
 
   return (
@@ -161,6 +197,10 @@ function App() {
           <a href="#rankings">
             <BarChart3 size={17} />
             Quality rank
+          </a>
+          <a href="#candidates">
+            <Search size={17} />
+            Candidates
           </a>
           <a href="#positions">
             <WalletCards size={17} />
@@ -187,6 +227,7 @@ function App() {
 
         {portfolioError && <StatusBlock tone="danger" message={portfolioError} />}
         {recommendationError && <StatusBlock tone="warning" message={recommendationError} />}
+        {candidateError && <StatusBlock tone="warning" message={candidateError} />}
 
         {portfolio && (
           <>
@@ -360,6 +401,90 @@ function App() {
               </section>
             )}
 
+            <section className="data-section" id="candidates">
+              <div className="section-heading">
+                <div>
+                  <p className="eyebrow">External universe</p>
+                  <h2>Candidate screen</h2>
+                </div>
+                <button
+                  className="secondary-button"
+                  type="button"
+                  onClick={() => {
+                    void screenUniverse();
+                  }}
+                  disabled={isCandidateLoading}
+                >
+                  <Search size={17} />
+                  {isCandidateLoading ? 'Screening...' : 'Screen universe'}
+                </button>
+              </div>
+              <p className="mode-hint">
+                Screens a curated list of high-quality stocks, ADRs, and REITs not currently held.
+                Use live mode for market data; reviewer mode is synthetic and reproducible.
+              </p>
+
+              {candidates && (
+                <div className="candidate-meta">
+                  <CheckCircle2 size={17} />
+                  <span>
+                    {candidates.provider_mode === 'offline-demo'
+                      ? 'Reviewer demo (synthetic)'
+                      : 'Live data'}{' '}
+                    · {candidateRows.length} candidates · generated{' '}
+                    {formatDateTime(candidates.generated_at)}
+                  </span>
+                </div>
+              )}
+
+              {candidates && <PortfolioReviewPanel review={candidates.review} />}
+
+              {candidates && (
+                <div className="table-frame">
+                  <table>
+                    <thead>
+                      <tr>
+                        <SortHeader label="#" columnKey="rank" sort={candidateSort} numeric />
+                        <SortHeader label="Ticker" columnKey="ticker" sort={candidateSort} />
+                        <SortHeader label="Theme" columnKey="theme" sort={candidateSort} />
+                        <SortHeader
+                          label="Price"
+                          columnKey="live_price"
+                          sort={candidateSort}
+                          numeric
+                        />
+                        <SortHeader label="Moat" columnKey="moat_class" sort={candidateSort} />
+                        <SortHeader
+                          label="Compounding"
+                          columnKey="compounding_class"
+                          sort={candidateSort}
+                        />
+                        <SortHeader
+                          label="Score"
+                          columnKey="composite_score"
+                          sort={candidateSort}
+                          numeric
+                        />
+                        <SortHeader
+                          label="Valuation"
+                          columnKey="valuation_points"
+                          sort={candidateSort}
+                          numeric
+                        />
+                        <SortHeader label="ROIC" columnKey="roic" sort={candidateSort} numeric />
+                        <SortHeader label="fPE" columnKey="forward_pe" sort={candidateSort} numeric />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {candidateSort.sortedRows.map((candidate) => (
+                        <CandidateRow key={candidate.ticker} candidate={candidate} />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+
             <section className="data-section" id="positions">
               <div className="section-heading">
                 <div>
@@ -460,6 +585,112 @@ function OrderRow({ order }: OrderRowProps) {
         <span>{formatMoney(order.fee)} fee</span>
       </div>
     </article>
+  );
+}
+
+interface PortfolioReviewPanelProps {
+  review: PortfolioReview;
+}
+
+function PortfolioReviewPanel({ review }: PortfolioReviewPanelProps) {
+  const targetRange = `${review.target_min_positions}-${review.target_max_positions}`;
+  return (
+    <div className="review-grid" aria-label="Deterministic portfolio review">
+      <div className="review-column">
+        <span className="review-label">Portfolio size</span>
+        <strong>
+          {review.current_positions} holdings · target {targetRange}
+        </strong>
+        <small>
+          {review.additions_needed > 0
+            ? `${review.additions_needed} addition needed to reach the range.`
+            : 'Within the target range.'}
+        </small>
+      </div>
+      <div className="review-column">
+        <span className="review-label">Addition watch</span>
+        <ReviewList
+          emptyLabel="No external candidate cleared the current screen."
+          items={review.add_candidates.map((candidate) => ({
+            key: candidate.ticker,
+            label: `${candidate.ticker} · ${formatNumber(candidate.composite_score)} pts`,
+            detail: candidate.theme,
+          }))}
+        />
+      </div>
+      <div className="review-column">
+        <span className="review-label">Upgrade watch</span>
+        <ReviewList
+          emptyLabel="No deterministic replacement signal."
+          items={review.replacement_watch.map((replacement) => ({
+            key: `${replacement.current_ticker}-${replacement.candidate_ticker}`,
+            label: `${replacement.current_ticker} -> ${replacement.candidate_ticker}`,
+            detail: `+${formatNumber(replacement.score_gap)} score gap`,
+          }))}
+        />
+      </div>
+      <div className="review-column">
+        <span className="review-label">Trim watch</span>
+        <ReviewList
+          emptyLabel="No overweight lower-score position."
+          items={review.trim_watch.map((trim) => ({
+            key: trim.ticker,
+            label: `${trim.ticker} · ${formatPercent(trim.weight_pct)}`,
+            detail: `${formatNumber(trim.composite_score)} pts`,
+          }))}
+        />
+      </div>
+    </div>
+  );
+}
+
+interface ReviewListItem {
+  key: string;
+  label: string;
+  detail: string;
+}
+
+interface ReviewListProps {
+  emptyLabel: string;
+  items: ReviewListItem[];
+}
+
+function ReviewList({ emptyLabel, items }: ReviewListProps) {
+  if (items.length === 0) {
+    return <small>{emptyLabel}</small>;
+  }
+  return (
+    <ul className="review-list">
+      {items.slice(0, 3).map((item) => (
+        <li key={item.key}>
+          <strong>{item.label}</strong>
+          <span>{item.detail}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+interface CandidateRowProps {
+  candidate: Candidate & { rank: number };
+}
+
+function CandidateRow({ candidate }: CandidateRowProps) {
+  return (
+    <tr>
+      <td className="numeric">{candidate.rank}</td>
+      <td className="ticker-cell">{candidate.ticker}</td>
+      <td>{candidate.theme}</td>
+      <td className="numeric">{formatMoney(candidate.live_price)}</td>
+      <td>{candidate.moat_class}</td>
+      <td>{candidate.compounding_class}</td>
+      <td className="numeric">{formatNumber(candidate.composite_score)}</td>
+      <td className="numeric">{formatNumber(candidate.valuation_points)}</td>
+      <td className="numeric">{candidate.roic === null ? 'n/a' : formatPercent(candidate.roic)}</td>
+      <td className="numeric">
+        {candidate.forward_pe === null ? 'n/a' : formatNumber(candidate.forward_pe)}
+      </td>
+    </tr>
   );
 }
 

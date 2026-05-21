@@ -16,9 +16,11 @@ from arenawealth.analytics import (
     DemoFundamentalsProvider,
     FundamentalsProvider,
     Holding,
+    PortfolioReview,
     analyze_holdings,
     build_fundamentals_provider,
     plan_deployment,
+    review_portfolio,
     screen_candidates,
 )
 from arenawealth.analytics.universe import (
@@ -113,9 +115,43 @@ class CandidateResponse(BaseModel):
     roic: float | None
 
 
+class ReviewAdditionResponse(BaseModel):
+    ticker: str
+    name: str
+    theme: str
+    composite_score: float
+    reason: str
+
+
+class ReviewReplacementResponse(BaseModel):
+    current_ticker: str
+    candidate_ticker: str
+    candidate_name: str
+    score_gap: float
+    reason: str
+
+
+class ReviewTrimResponse(BaseModel):
+    ticker: str
+    weight_pct: float
+    composite_score: float
+    reason: str
+
+
+class PortfolioReviewResponse(BaseModel):
+    current_positions: int
+    target_min_positions: int
+    target_max_positions: int
+    additions_needed: int
+    add_candidates: list[ReviewAdditionResponse]
+    replacement_watch: list[ReviewReplacementResponse]
+    trim_watch: list[ReviewTrimResponse]
+
+
 class CandidatesResponse(BaseModel):
     provider_mode: str
     generated_at: str
+    review: PortfolioReviewResponse
     candidates: list[CandidateResponse]
 
 
@@ -289,6 +325,44 @@ def build_recommendation_response(
     )
 
 
+def review_to_response(review: PortfolioReview) -> PortfolioReviewResponse:
+    return PortfolioReviewResponse(
+        current_positions=review.current_positions,
+        target_min_positions=review.target_min_positions,
+        target_max_positions=review.target_max_positions,
+        additions_needed=review.additions_needed,
+        add_candidates=[
+            ReviewAdditionResponse(
+                ticker=item.ticker,
+                name=item.name,
+                theme=item.theme,
+                composite_score=item.composite_score,
+                reason=item.reason,
+            )
+            for item in review.add_candidates
+        ],
+        replacement_watch=[
+            ReviewReplacementResponse(
+                current_ticker=item.current_ticker,
+                candidate_ticker=item.candidate_ticker,
+                candidate_name=item.candidate_name,
+                score_gap=item.score_gap,
+                reason=item.reason,
+            )
+            for item in review.replacement_watch
+        ],
+        trim_watch=[
+            ReviewTrimResponse(
+                ticker=item.ticker,
+                weight_pct=item.weight_pct,
+                composite_score=item.composite_score,
+                reason=item.reason,
+            )
+            for item in review.trim_watch
+        ],
+    )
+
+
 @router.get("/user", response_model=PortfolioResponse)
 async def get_user_portfolio(live: bool = Query(default=True)) -> PortfolioResponse:
     return build_snapshot(live=live)
@@ -333,17 +407,23 @@ def candidate_holdings() -> tuple[Holding, ...]:
 
 
 def build_candidates_response(offline_demo: bool, limit: int) -> CandidatesResponse:
-    owned = [position.ticker for position in load_positions()]
+    holdings = positions_to_holdings(load_positions())
+    owned = [holding.ticker for holding in holdings]
     if offline_demo:
-        provider: FundamentalsProvider = DemoFundamentalsProvider(candidate_holdings())
+        provider: FundamentalsProvider = DemoFundamentalsProvider(
+            holdings + candidate_holdings()
+        )
         provider_mode = "offline-demo"
     else:
         provider = build_fundamentals_provider()
         provider_mode = "live-auto"
+    held_analyses = analyze_holdings(holdings, provider)
     candidates = screen_candidates(provider, owned=owned)[:limit]
+    review = review_portfolio(held_analyses, candidates)
     return CandidatesResponse(
         provider_mode=provider_mode,
         generated_at=datetime.now(UTC).isoformat(),
+        review=review_to_response(review),
         candidates=[
             CandidateResponse(
                 ticker=candidate.ticker,

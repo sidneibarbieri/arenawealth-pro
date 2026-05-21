@@ -149,6 +149,7 @@ td {
 }
 
 .workspace {
+  min-width: 0;
   width: min(100%, 1320px);
   padding: 32px clamp(20px, 4vw, 56px) 56px;
 }
@@ -191,7 +192,8 @@ h3 {
 }
 
 .icon-button,
-.primary-button {
+.primary-button,
+.secondary-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -216,11 +218,23 @@ h3 {
   padding: 0 18px;
 }
 
+.secondary-button {
+  align-self: center;
+  padding: 0 16px;
+}
+
 .icon-button:hover,
-.primary-button:hover {
+.primary-button:hover,
+.secondary-button:hover {
   transform: translateY(-1px);
   background: #2f5f4f;
   border-color: #2f5f4f;
+}
+
+.secondary-button:disabled {
+  cursor: progress;
+  opacity: 0.62;
+  transform: none;
 }
 
 .metric-strip {
@@ -288,6 +302,68 @@ h3 {
   font-size: 0.82rem;
 }
 
+.candidate-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 18px 0 12px;
+  color: #2f5f4f;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.review-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 14px 0 16px;
+  border: 1px solid #d8d6cd;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.review-column {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+  padding: 16px;
+  border-right: 1px solid #d8d6cd;
+}
+
+.review-column:last-child {
+  border-right: 0;
+}
+
+.review-label {
+  color: #6b6b61;
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.review-column strong {
+  color: #111113;
+}
+
+.review-column small,
+.review-list span {
+  color: #6b6b61;
+  font-size: 0.82rem;
+}
+
+.review-list {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.review-list li {
+  display: grid;
+  gap: 2px;
+}
+
 .th-sort {
   margin: 0;
   padding: 0;
@@ -311,6 +387,7 @@ th.numeric .th-sort {
 
 .deployment-band,
 .data-section {
+  min-width: 0;
   margin-top: 34px;
 }
 
@@ -442,6 +519,8 @@ th.numeric .th-sort {
 }
 
 .table-frame {
+  max-width: 100%;
+  min-width: 0;
   overflow-x: auto;
   border: 1px solid #d8d6cd;
   background: #ffffff;
@@ -542,7 +621,8 @@ tbody tr:last-child td {
 
   .metric-strip,
   .deployment-layout,
-  .control-row {
+  .control-row,
+  .review-grid {
     grid-template-columns: 1fr;
   }
 
@@ -559,11 +639,24 @@ tbody tr:last-child td {
     width: 100%;
   }
 
+  .secondary-button {
+    width: 100%;
+  }
+
   .decision-notes {
     padding-left: 0;
     padding-top: 18px;
     border-left: 0;
     border-top: 1px solid #d8d6cd;
+  }
+
+  .review-column {
+    border-right: 0;
+    border-bottom: 1px solid #d8d6cd;
+  }
+
+  .review-column:last-child {
+    border-bottom: 0;
   }
 }
 

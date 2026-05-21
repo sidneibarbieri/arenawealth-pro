@@ -54,6 +54,59 @@ export interface RecommendationResponse {
   ranked_positions: RankedPosition[];
 }
 
+export interface Candidate {
+  ticker: string;
+  name: string;
+  theme: string;
+  live_price: number;
+  moat_class: string;
+  compounding_class: string;
+  composite_score: number;
+  valuation_points: number;
+  forward_pe: number | null;
+  roic: number | null;
+}
+
+export interface ReviewAddition {
+  ticker: string;
+  name: string;
+  theme: string;
+  composite_score: number;
+  reason: string;
+}
+
+export interface ReviewReplacement {
+  current_ticker: string;
+  candidate_ticker: string;
+  candidate_name: string;
+  score_gap: number;
+  reason: string;
+}
+
+export interface ReviewTrim {
+  ticker: string;
+  weight_pct: number;
+  composite_score: number;
+  reason: string;
+}
+
+export interface PortfolioReview {
+  current_positions: number;
+  target_min_positions: number;
+  target_max_positions: number;
+  additions_needed: number;
+  add_candidates: ReviewAddition[];
+  replacement_watch: ReviewReplacement[];
+  trim_watch: ReviewTrim[];
+}
+
+export interface CandidatesResponse {
+  provider_mode: string;
+  generated_at: string;
+  review: PortfolioReview;
+  candidates: Candidate[];
+}
+
 async function parseJsonResponse<ResponsePayload>(
   response: Response,
   resourceName: string,
@@ -64,8 +117,12 @@ async function parseJsonResponse<ResponsePayload>(
   return (await response.json()) as ResponsePayload;
 }
 
-export async function fetchPortfolio(signal: AbortSignal): Promise<PortfolioResponse> {
-  const response = await fetch('/api/v1/portfolio/user', { signal });
+export async function fetchPortfolio(
+  live: boolean,
+  signal: AbortSignal,
+): Promise<PortfolioResponse> {
+  const parameters = new URLSearchParams({ live: String(live) });
+  const response = await fetch(`/api/v1/portfolio/user?${parameters}`, { signal });
   return parseJsonResponse<PortfolioResponse>(response, 'Portfolio');
 }
 
@@ -82,4 +139,17 @@ export async function fetchRecommendation(
     signal,
   });
   return parseJsonResponse<RecommendationResponse>(response, 'Recommendation');
+}
+
+export async function fetchCandidates(
+  offlineDemo: boolean,
+  limit: number,
+  signal: AbortSignal,
+): Promise<CandidatesResponse> {
+  const parameters = new URLSearchParams({
+    offline_demo: String(offlineDemo),
+    limit: String(limit),
+  });
+  const response = await fetch(`/api/v1/portfolio/user/candidates?${parameters}`, { signal });
+  return parseJsonResponse<CandidatesResponse>(response, 'Candidates');
 }

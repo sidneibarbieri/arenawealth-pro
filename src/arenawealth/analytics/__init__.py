@@ -17,11 +17,19 @@ from arenawealth.analytics.models import (
     Order,
     PositionAnalysis,
 )
+from arenawealth.analytics.portfolio_review import (
+    AdditionReview,
+    PortfolioReview,
+    ReplacementReview,
+    TrimReview,
+    review_portfolio,
+)
 from arenawealth.analytics.scoring import analyze, score_fundamentals
 from arenawealth.analytics.screening import CandidateAnalysis, screen_candidates
 from arenawealth.analytics.workflow import analyze_holdings, fetch_fundamentals
 
 __all__ = [
+    "AdditionReview",
     "CandidateAnalysis",
     "DemoFundamentalsProvider",
     "DeploymentPlan",
@@ -32,7 +40,10 @@ __all__ = [
     "FundamentalsProvider",
     "Holding",
     "Order",
+    "PortfolioReview",
     "PositionAnalysis",
+    "ReplacementReview",
+    "TrimReview",
     "YahooFundamentalsProvider",
     "analyze",
     "analyze_holdings",
@@ -40,6 +51,7 @@ __all__ = [
     "fetch_fundamentals",
     "order_fee",
     "plan_deployment",
+    "review_portfolio",
     "score_fundamentals",
     "screen_candidates",
 ]

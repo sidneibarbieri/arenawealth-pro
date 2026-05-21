@@ -2,6 +2,7 @@
 
 from arenawealth.analytics.models import Fundamentals
 from arenawealth.analytics.screening import CandidateAnalysis, screen_candidates
+from arenawealth.analytics.universe import CANDIDATE_UNIVERSE
 
 
 def fundamentals(quality: str, price: float) -> Fundamentals:
@@ -61,3 +62,9 @@ def test_screen_ranks_by_composite_and_excludes_owned():
 def test_screen_empty_when_all_owned():
     provider = FakeProvider({"V": fundamentals("strong", 280.0)})
     assert screen_candidates(provider, tickers=["V"], owned=["V"]) == []
+
+
+def test_candidate_universe_includes_requested_adr_reit_and_energy_names():
+    assert {"AAPL", "NVDA", "V", "LVMUY", "VICI", "EQNR", "ENB"}.issubset(
+        CANDIDATE_UNIVERSE
+    )

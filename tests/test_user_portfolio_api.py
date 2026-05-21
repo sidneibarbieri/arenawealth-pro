@@ -50,6 +50,8 @@ def test_portfolio_candidates_offline_demo(api_client: TestClient) -> None:
     assert response.status_code == 200
     body = response.json()
     assert body["provider_mode"] == "offline-demo"
+    assert body["review"]["current_positions"] >= 1
+    assert body["review"]["target_min_positions"] == 18
     assert 1 <= len(body["candidates"]) <= 5
     scores = [candidate["composite_score"] for candidate in body["candidates"]]
     assert scores == sorted(scores, reverse=True)
