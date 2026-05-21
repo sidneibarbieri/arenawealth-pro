@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
@@ -21,6 +22,7 @@ from arenawealth.analytics import (
 from arenawealth.analytics.universe import FINANCIAL_TICKERS, THEME_BY_TICKER
 from arenawealth.domain.position import Position
 from arenawealth.importers.csv_importer import import_csv
+from arenawealth.providers.yahoo import YahooProvider
 
 ROOT = Path(__file__).resolve().parents[4]
 PRIVATE_HOLDINGS = ROOT / "data" / "carteira_atual.csv"
@@ -58,6 +60,7 @@ class PortfolioSummaryResponse(BaseModel):
 class PortfolioResponse(BaseModel):
     summary: PortfolioSummaryResponse
     positions: list[PositionResponse]
+    price_source: str
     analysis: dict[str, Any]
     last_updated: str
 
@@ -119,9 +122,31 @@ def decimal_to_float(value: Decimal) -> float:
     return float(value)
 
 
-def build_snapshot() -> PortfolioResponse:
+def fetch_live_prices(tickers: list[str]) -> dict[str, float]:
+    quotes = YahooProvider().get_quotes(tickers)
+    return {quote.ticker: float(quote.price) for quote in quotes}
+
+
+def price_for(position: Position, live_prices: dict[str, float]) -> Decimal:
+    live_price = live_prices.get(position.ticker)
+    return Decimal(str(live_price)) if live_price is not None else position.current_price
+
+
+def build_snapshot(
+    live: bool = True,
+    price_lookup: Callable[[list[str]], dict[str, float]] | None = None,
+) -> PortfolioResponse:
     positions = load_positions()
-    total_market_value = sum(position.market_value.amount for position in positions)
+    live_prices: dict[str, float] = {}
+    if live:
+        lookup = price_lookup or fetch_live_prices
+        live_prices = lookup([position.ticker for position in positions])
+    price_source = "live" if live_prices else "stored"
+
+    prices = {position.ticker: price_for(position, live_prices) for position in positions}
+    total_market_value = sum(
+        position.shares * prices[position.ticker] for position in positions
+    )
     total_cost_basis = sum(position.cost_basis_total.amount for position in positions)
     total_gain_loss = total_market_value - total_cost_basis
     total_gain_loss_pct = (
@@ -129,26 +154,36 @@ def build_snapshot() -> PortfolioResponse:
         if total_cost_basis
         else Decimal("0")
     )
-    position_rows = [
-        PositionResponse(
-            ticker=position.ticker,
-            name=position.name,
-            shares=decimal_to_float(position.shares),
-            current_price=decimal_to_float(position.current_price),
-            cost_basis_per_share=decimal_to_float(position.cost_basis_per_share),
-            market_value=decimal_to_float(position.market_value.amount),
-            cost_basis_total=decimal_to_float(position.cost_basis_total.amount),
-            gain_loss=decimal_to_float(position.gain_loss.amount),
-            gain_loss_pct=decimal_to_float(position.gain_loss_pct),
-            weight_pct=decimal_to_float(
-                (position.market_value.amount / total_market_value * Decimal("100"))
-                if total_market_value
-                else Decimal("0")
-            ),
-            currency=position.currency.value,
+
+    position_rows = []
+    for position in positions:
+        price = prices[position.ticker]
+        market_value = position.shares * price
+        cost_basis_total = position.cost_basis_total.amount
+        gain_loss = market_value - cost_basis_total
+        position_rows.append(
+            PositionResponse(
+                ticker=position.ticker,
+                name=position.name,
+                shares=decimal_to_float(position.shares),
+                current_price=decimal_to_float(price),
+                cost_basis_per_share=decimal_to_float(position.cost_basis_per_share),
+                market_value=decimal_to_float(market_value),
+                cost_basis_total=decimal_to_float(cost_basis_total),
+                gain_loss=decimal_to_float(gain_loss),
+                gain_loss_pct=decimal_to_float(
+                    (gain_loss / cost_basis_total * Decimal("100"))
+                    if cost_basis_total
+                    else Decimal("0")
+                ),
+                weight_pct=decimal_to_float(
+                    (market_value / total_market_value * Decimal("100"))
+                    if total_market_value
+                    else Decimal("0")
+                ),
+                currency=position.currency.value,
+            )
         )
-        for position in positions
-    ]
 
     return PortfolioResponse(
         summary=PortfolioSummaryResponse(
@@ -160,6 +195,7 @@ def build_snapshot() -> PortfolioResponse:
             currency="USD",
         ),
         positions=position_rows,
+        price_source=price_source,
         analysis={
             "source": str(holdings_path().relative_to(ROOT)),
             "largest_position": max(position_rows, key=lambda row: row.market_value).ticker
@@ -218,18 +254,18 @@ def build_recommendation_response(
 
 
 @router.get("/user", response_model=PortfolioResponse)
-async def get_user_portfolio() -> PortfolioResponse:
-    return build_snapshot()
+async def get_user_portfolio(live: bool = Query(default=True)) -> PortfolioResponse:
+    return build_snapshot(live=live)
 
 
 @router.get("/user/summary", response_model=PortfolioSummaryResponse)
-async def get_user_portfolio_summary() -> PortfolioSummaryResponse:
-    return build_snapshot().summary
+async def get_user_portfolio_summary(live: bool = Query(default=True)) -> PortfolioSummaryResponse:
+    return build_snapshot(live=live).summary
 
 
 @router.get("/user/positions")
-async def get_user_positions() -> dict[str, Any]:
-    snapshot = build_snapshot()
+async def get_user_positions(live: bool = Query(default=True)) -> dict[str, Any]:
+    snapshot = build_snapshot(live=live)
     positions = [position.model_dump() for position in snapshot.positions]
     ranked = sorted(positions, key=lambda row: row["market_value"], reverse=True)
     return {
@@ -242,7 +278,7 @@ async def get_user_positions() -> dict[str, Any]:
 
 @router.get("/user/analysis")
 async def get_user_analysis() -> dict[str, Any]:
-    return build_snapshot().analysis
+    return build_snapshot(live=False).analysis
 
 
 @router.get("/user/recommendation", response_model=RecommendationResponse)
@@ -255,7 +291,7 @@ async def get_user_recommendation(
 
 @router.get("/user/health")
 async def portfolio_health_check() -> dict[str, Any]:
-    snapshot = build_snapshot()
+    snapshot = build_snapshot(live=False)
     return {
         "status": "healthy",
         "service": "user-portfolio",

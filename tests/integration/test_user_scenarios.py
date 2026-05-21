@@ -17,7 +17,7 @@ def test_scenario_operator_health(api_client: TestClient) -> None:
 
 def test_scenario_dashboard_portfolio_snapshot(api_client: TestClient) -> None:
     """The dashboard can read the aggregate portfolio snapshot."""
-    response = api_client.get("/api/v1/portfolio/user")
+    response = api_client.get("/api/v1/portfolio/user?live=false")
     assert response.status_code == 200
     body = response.json()
     assert body["summary"]["position_count"] >= 1
@@ -26,7 +26,7 @@ def test_scenario_dashboard_portfolio_snapshot(api_client: TestClient) -> None:
 
 def test_scenario_dashboard_portfolio_summary_only(api_client: TestClient) -> None:
     """The dashboard can read summary totals only."""
-    response = api_client.get("/api/v1/portfolio/user/summary")
+    response = api_client.get("/api/v1/portfolio/user/summary?live=false")
     assert response.status_code == 200
     assert "total_market_value" in response.json()
 
