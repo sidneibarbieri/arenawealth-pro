@@ -9,7 +9,12 @@ from __future__ import annotations
 import math
 from collections.abc import Callable, Sequence
 
-from arenawealth.analytics.models import Fundamentals, Holding, PositionAnalysis
+from arenawealth.analytics.models import (
+    Fundamentals,
+    FundamentalScore,
+    Holding,
+    PositionAnalysis,
+)
 
 MOAT_WEIGHT = 0.40
 COMPOUNDING_WEIGHT = 0.35
@@ -99,13 +104,13 @@ def fcf_yield(fund: Fundamentals, exchange_rate: Callable[[str, str], float]) ->
 
 
 def moat_classification(
-    holding: Holding,
+    is_financial: bool,
     roic: float | None,
     roe: float | None,
     margin_cv: float | None,
     pricing_power: float,
 ) -> str:
-    if holding.is_financial:
+    if is_financial:
         return "STRONG" if roe is not None and roe >= 0.15 else "MODERATE"
     if roic is None:
         return "INSUFFICIENT_DATA"
@@ -177,14 +182,11 @@ def valuation_points(
     return 0.40 * yield_component + 0.35 * pe_component + 0.25 * peg_component
 
 
-def analyze(
-    holding: Holding,
+def score_fundamentals(
     fund: Fundamentals,
-    total_market_value: float,
+    is_financial: bool,
     exchange_rate: Callable[[str, str], float],
-) -> PositionAnalysis:
-    market_value = holding.shares * fund.live_price
-    cost_basis = holding.shares * holding.average_cost
+) -> FundamentalScore:
     roic_history = roic_values(fund)
     roic = mean(roic_history) if roic_history else None
     margin_cv = coefficient_of_variation(operating_margin_series(fund))
@@ -206,13 +208,7 @@ def analyze(
         + VALUATION_WEIGHT * valuation
     )
 
-    return PositionAnalysis(
-        holding=holding,
-        live_price=fund.live_price,
-        market_value=market_value,
-        weight_pct=market_value / total_market_value * 100 if total_market_value else 0.0,
-        pnl_pct=(market_value - cost_basis) / cost_basis * 100 if cost_basis else 0.0,
-        price_gap_pct=(fund.live_price - holding.broker_price) / holding.broker_price * 100,
+    return FundamentalScore(
         roic=roic,
         roe=fund.return_on_equity,
         margin_cv=margin_cv,
@@ -224,11 +220,50 @@ def analyze(
         forward_pe=fund.forward_pe,
         peg=peg,
         moat_class=moat_classification(
-            holding, roic, fund.return_on_equity, margin_cv, fraction_at_least(roic_history, 0.15)
+            is_financial,
+            roic,
+            fund.return_on_equity,
+            margin_cv,
+            fraction_at_least(roic_history, 0.15),
         ),
         compounding_class=compounding_classification(fcf_cagr, eps_cagr, share_count_change),
         moat_points=moat,
         compounding_points=compounding,
         valuation_points=valuation,
         composite_score=composite,
+    )
+
+
+def analyze(
+    holding: Holding,
+    fund: Fundamentals,
+    total_market_value: float,
+    exchange_rate: Callable[[str, str], float],
+) -> PositionAnalysis:
+    market_value = holding.shares * fund.live_price
+    cost_basis = holding.shares * holding.average_cost
+    score = score_fundamentals(fund, holding.is_financial, exchange_rate)
+    return PositionAnalysis(
+        holding=holding,
+        live_price=fund.live_price,
+        market_value=market_value,
+        weight_pct=market_value / total_market_value * 100 if total_market_value else 0.0,
+        pnl_pct=(market_value - cost_basis) / cost_basis * 100 if cost_basis else 0.0,
+        price_gap_pct=(fund.live_price - holding.broker_price) / holding.broker_price * 100,
+        roic=score.roic,
+        roe=score.roe,
+        margin_cv=score.margin_cv,
+        revenue_cagr=score.revenue_cagr,
+        eps_cagr=score.eps_cagr,
+        fcf_cagr=score.fcf_cagr,
+        shares_change=score.shares_change,
+        fcf_yield=score.fcf_yield,
+        forward_pe=score.forward_pe,
+        peg=score.peg,
+        moat_class=score.moat_class,
+        compounding_class=score.compounding_class,
+        moat_points=score.moat_points,
+        compounding_points=score.compounding_points,
+        valuation_points=score.valuation_points,
+        composite_score=score.composite_score,
     )

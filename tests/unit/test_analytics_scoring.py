@@ -11,6 +11,7 @@ from arenawealth.analytics.scoring import (
     compounding_classification,
     fcf_yield,
     moat_classification,
+    score_fundamentals,
 )
 
 
@@ -87,15 +88,13 @@ def test_fcf_yield_currency_adjusted():
 
 
 def test_moat_classification_strong_and_weak():
-    holding = make_holding()
-    assert moat_classification(holding, 0.20, 0.30, 0.05, 0.80) == "STRONG"
-    assert moat_classification(holding, 0.05, 0.10, 0.05, 0.80) == "WEAK"
+    assert moat_classification(False, 0.20, 0.30, 0.05, 0.80) == "STRONG"
+    assert moat_classification(False, 0.05, 0.10, 0.05, 0.80) == "WEAK"
 
 
 def test_moat_classification_financial_uses_roe():
-    bank = make_holding(is_financial=True)
-    assert moat_classification(bank, None, 0.20, None, 0.0) == "STRONG"
-    assert moat_classification(bank, None, None, None, 0.0) == "MODERATE"
+    assert moat_classification(True, None, 0.20, None, 0.0) == "STRONG"
+    assert moat_classification(True, None, None, None, 0.0) == "MODERATE"
 
 
 def test_compounding_classification_tiers():
@@ -115,3 +114,13 @@ def test_analyze_integration():
     assert result.moat_class == "STRONG"
     assert result.compounding_class == "STRONG"
     assert 0.0 <= result.composite_score <= 100.0
+
+
+def test_score_fundamentals_matches_analyze():
+    fund = make_fundamentals()
+    score = score_fundamentals(fund, is_financial=False, exchange_rate=lambda base, quote: 1.0)
+    analysis = analyze(make_holding(), fund, 500.0, lambda base, quote: 1.0)
+
+    assert score.moat_class == analysis.moat_class
+    assert score.composite_score == analysis.composite_score
+    assert score.roic == analysis.roic

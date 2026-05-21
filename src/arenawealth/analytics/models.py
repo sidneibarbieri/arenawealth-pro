@@ -44,6 +44,26 @@ class Fundamentals:
 
 
 @dataclass(frozen=True)
+class FundamentalScore:
+    roic: float | None
+    roe: float | None
+    margin_cv: float | None
+    revenue_cagr: float | None
+    eps_cagr: float | None
+    fcf_cagr: float | None
+    shares_change: float | None
+    fcf_yield: float | None
+    forward_pe: float | None
+    peg: float | None
+    moat_class: str
+    compounding_class: str
+    moat_points: float
+    compounding_points: float
+    valuation_points: float
+    composite_score: float
+
+
+@dataclass(frozen=True)
 class PositionAnalysis:
     holding: Holding
     live_price: float
