@@ -54,9 +54,8 @@ exports are ignored by Git because they may contain private portfolio data.
 
 ## Optional Data Providers
 
-Yahoo Finance is the default provider and does not require a key. If
-`FMP_API_KEY` is configured, the fundamentals provider uses Financial Modeling
-Prep for structured statements.
+Provider priority is FMP, then Finnhub, then Yahoo Finance. The offline demo
+mode avoids external providers entirely.
 
 ## Known Limits
 

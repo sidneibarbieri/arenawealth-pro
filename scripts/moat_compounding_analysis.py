@@ -18,68 +18,20 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 from arenawealth.analytics import (
+    DemoFundamentalsProvider,
     DeploymentPlan,
-    Fundamentals,
     FundamentalsProvider,
     Holding,
     PositionAnalysis,
-    analyze,
+    analyze_holdings,
     build_fundamentals_provider,
     plan_deployment,
 )
 from arenawealth.analytics.scoring import COMPOUNDING_WEIGHT, MOAT_WEIGHT, VALUATION_WEIGHT
+from arenawealth.analytics.universe import FINANCIAL_TICKERS, THEME_BY_TICKER
 
 HOLDINGS_CSV = Path("data/carteira_atual.csv")
 EXPORT_DIR = Path("exports")
-
-THEME_BY_TICKER = {
-    "ASML": "Semiconductors", "AVGO": "Semiconductors", "TSM": "Semiconductors",
-    "MSFT": "Platforms", "GOOGL": "Platforms",
-    "LLY": "Pharma", "NVO": "Pharma",
-    "ISRG": "MedTech", "UNH": "Managed Care",
-    "JPM": "Banks",
-    "SPGI": "Data & Analytics", "RELX": "Data & Analytics",
-    "ROP": "Vertical Software", "TDG": "Aerospace", "LIN": "Industrial Gases",
-    "EQIX": "Real Estate", "PLD": "Real Estate",
-}
-FINANCIAL_TICKERS = {"JPM"}
-
-
-class OfflineDemoProvider:
-    """Deterministic provider for reviewer runs without network access."""
-
-    def __init__(self, holdings: Sequence[Holding]) -> None:
-        self._holdings = {holding.ticker: holding for holding in holdings}
-
-    def get_fundamentals(self, ticker: str) -> Fundamentals:
-        holding = self._holdings[ticker]
-        ordinal = sum(ord(character) for character in ticker)
-        growth = 1.0 + (ordinal % 7) / 100
-        live_price = holding.broker_price * (1.0 + (ordinal % 5 - 2) / 100)
-        return Fundamentals(
-            live_price=live_price,
-            market_cap=250_000_000_000.0 + ordinal * 1_000_000.0,
-            return_on_equity=0.14 + (ordinal % 8) / 100,
-            gross_margin=0.45 + (ordinal % 12) / 100,
-            operating_margin=0.20 + (ordinal % 7) / 100,
-            forward_pe=18.0 + (ordinal % 18),
-            fifty_two_week_high=live_price * 1.2,
-            analyst_target=live_price * 1.1,
-            free_cash_flow=12_000_000_000.0 + ordinal * 10_000_000.0,
-            financial_currency="USD",
-            trading_currency="USD",
-            revenue_series=(100.0, 100.0 * growth, 100.0 * growth**2),
-            ebit_series=(22.0, 22.0 * growth, 22.0 * growth**2),
-            tax_rate_series=(0.21, 0.21, 0.21),
-            operating_income_series=(20.0, 20.0 * growth, 20.0 * growth**2),
-            eps_series=(5.0, 5.0 * growth, 5.0 * growth**2),
-            fcf_series=(8.0, 8.0 * growth, 8.0 * growth**2),
-            diluted_shares_series=(100.0, 99.0, 98.0),
-            invested_capital_series=(90.0, 92.0, 94.0),
-        )
-
-    def exchange_rate(self, base: str, quote: str) -> float:
-        return 1.0
 
 
 def load_holdings(path: Path) -> tuple[Holding, ...]:
@@ -217,7 +169,7 @@ def select_provider(
     arguments: argparse.Namespace, holdings: Sequence[Holding]
 ) -> FundamentalsProvider:
     if arguments.offline_demo:
-        return OfflineDemoProvider(holdings)
+        return DemoFundamentalsProvider(holdings)
     return build_fundamentals_provider()
 
 
@@ -227,17 +179,7 @@ def main() -> None:
     holdings = load_holdings(arguments.holdings)
     provider = select_provider(arguments, holdings)
 
-    fundamentals = {
-        holding.ticker: provider.get_fundamentals(holding.ticker) for holding in holdings
-    }
-    total_market_value = sum(
-        holding.shares * fundamentals[holding.ticker].live_price for holding in holdings
-    )
-    analyses = [
-        analyze(holding, fundamentals[holding.ticker], total_market_value, provider.exchange_rate)
-        for holding in holdings
-    ]
-
+    analyses = analyze_holdings(holdings, provider)
     plan = plan_deployment(analyses, arguments.cash)
     render_report(analyses, plan, arguments.cash)
     snapshot = write_snapshot(analyses, plan, arguments.cash)

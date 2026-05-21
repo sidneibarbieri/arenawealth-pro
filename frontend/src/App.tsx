@@ -26,10 +26,38 @@ interface PortfolioResponse {
   last_updated: string;
 }
 
+interface RecommendationOrder {
+  ticker: string;
+  amount: number;
+  shares: number;
+  fee: number;
+}
+
+interface RankedPosition {
+  ticker: string;
+  theme: string;
+  weight_pct: number;
+  moat_class: string;
+  compounding_class: string;
+  composite_score: number;
+  valuation_points: number;
+  forward_pe: number | null;
+}
+
+interface RecommendationResponse {
+  cash: number;
+  provider_mode: string;
+  generated_at: string;
+  orders: RecommendationOrder[];
+  excluded_overweight: string[];
+  excluded_theme: string[];
+  ranked_positions: RankedPosition[];
+}
+
 const money = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
-  maximumFractionDigits: 0,
+  maximumFractionDigits: 2,
 });
 
 const number = new Intl.NumberFormat('en-US', {
@@ -38,8 +66,11 @@ const number = new Intl.NumberFormat('en-US', {
 
 function App() {
   const [data, setData] = useState<PortfolioResponse | null>(null);
+  const [recommendation, setRecommendation] = useState<RecommendationResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [recommendationError, setRecommendationError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRecommendationLoading, setIsRecommendationLoading] = useState(true);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -64,6 +95,34 @@ function App() {
       }
       setError(loadError instanceof Error ? loadError.message : 'Unknown error');
       setIsLoading(false);
+    });
+
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadRecommendation() {
+      setIsRecommendationLoading(true);
+      setRecommendationError(null);
+      const response = await fetch('/api/v1/portfolio/user/recommendation?cash=1511.18', {
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        throw new Error(`Recommendation request failed: ${response.status}`);
+      }
+      const payload = (await response.json()) as RecommendationResponse;
+      setRecommendation(payload);
+      setIsRecommendationLoading(false);
+    }
+
+    loadRecommendation().catch((loadError: unknown) => {
+      if (loadError instanceof DOMException && loadError.name === 'AbortError') {
+        return;
+      }
+      setRecommendationError(loadError instanceof Error ? loadError.message : 'Unknown error');
+      setIsRecommendationLoading(false);
     });
 
     return () => controller.abort();
@@ -121,6 +180,91 @@ function App() {
               />
               <Metric label="Positions" value={String(data.summary.position_count)} />
             </div>
+
+            <section className="border border-slate-200 bg-white p-5">
+              <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold">Cash Deployment</h2>
+                  <p className="text-sm text-slate-500">
+                    Moat, compounding, valuation, concentration, and theme-aware sizing.
+                  </p>
+                </div>
+                {recommendation && (
+                  <p className="text-sm text-slate-500">
+                    Provider: {recommendation.provider_mode} · Cash:{' '}
+                    {money.format(recommendation.cash)}
+                  </p>
+                )}
+              </div>
+
+              {isRecommendationLoading && (
+                <p className="mt-4 text-sm text-slate-600">Loading recommendation...</p>
+              )}
+
+              {recommendationError && (
+                <div className="mt-4 border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+                  {recommendationError}
+                </div>
+              )}
+
+              {recommendation && (
+                <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_1.4fr]">
+                  <div className="space-y-3">
+                    {recommendation.orders.map((order) => (
+                      <div key={order.ticker} className="border border-slate-200 p-4">
+                        <p className="text-sm text-slate-500">Buy</p>
+                        <p className="mt-1 text-2xl font-semibold">{order.ticker}</p>
+                        <p className="mt-2 text-sm text-slate-700">
+                          {money.format(order.amount)} · {number.format(order.shares)} shares ·{' '}
+                          {money.format(order.fee)} fee
+                        </p>
+                      </div>
+                    ))}
+                    <p className="text-xs text-slate-500">
+                      Overweight skipped: {recommendation.excluded_overweight.join(', ') || 'none'}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      Theme skipped: {recommendation.excluded_theme.join(', ') || 'none'}
+                    </p>
+                  </div>
+
+                  <div className="overflow-hidden border border-slate-200">
+                    <table className="min-w-full divide-y divide-slate-200">
+                      <thead className="bg-slate-100 text-left text-xs font-semibold uppercase text-slate-600">
+                        <tr>
+                          <th className="px-3 py-2">Ticker</th>
+                          <th className="px-3 py-2">Theme</th>
+                          <th className="px-3 py-2 text-right">Weight</th>
+                          <th className="px-3 py-2 text-right">Score</th>
+                          <th className="px-3 py-2 text-right">Valuation</th>
+                          <th className="px-3 py-2 text-right">fPE</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 text-sm">
+                        {recommendation.ranked_positions.slice(0, 8).map((position) => (
+                          <tr key={position.ticker}>
+                            <td className="px-3 py-2 font-semibold">{position.ticker}</td>
+                            <td className="px-3 py-2 text-slate-600">{position.theme}</td>
+                            <td className="px-3 py-2 text-right">
+                              {number.format(position.weight_pct)}%
+                            </td>
+                            <td className="px-3 py-2 text-right">
+                              {number.format(position.composite_score)}
+                            </td>
+                            <td className="px-3 py-2 text-right">
+                              {number.format(position.valuation_points)}
+                            </td>
+                            <td className="px-3 py-2 text-right">
+                              {position.forward_pe ? number.format(position.forward_pe) : 'n/a'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </section>
 
             <div className="overflow-hidden border border-slate-200 bg-white">
               <table className="min-w-full divide-y divide-slate-200">

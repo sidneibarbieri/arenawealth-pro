@@ -1,6 +1,7 @@
 """Unit tests for fundamentals provider selection and parsing."""
 
 from arenawealth.analytics.fundamentals import (
+    FinnhubFundamentalsProvider,
     FMPFundamentalsProvider,
     YahooFundamentalsProvider,
     build_fundamentals_provider,
@@ -9,13 +10,13 @@ from arenawealth.config.settings import ProviderKeys
 
 
 class FakeResponse:
-    def __init__(self, payload: list[dict[str, object]]) -> None:
+    def __init__(self, payload: object) -> None:
         self._payload = payload
 
     def raise_for_status(self) -> None:
         return None
 
-    def json(self) -> list[dict[str, object]]:
+    def json(self) -> object:
         return self._payload
 
 
@@ -75,6 +76,29 @@ class FakeClient:
         return FakeResponse(payloads[endpoint])
 
 
+class FakeFinnhubClient:
+    def get(self, endpoint: str, params: dict[str, object]) -> FakeResponse:
+        if endpoint == "/quote":
+            return FakeResponse({"c": 421.0})
+        if endpoint == "/stock/metric":
+            return FakeResponse(
+                {
+                    "metric": {
+                        "roeTTM": 33.0,
+                        "grossMarginTTM": 68.0,
+                        "operatingMarginTTM": 46.0,
+                        "forwardPE": 22.0,
+                        "pfcfShareTTM": 42.0,
+                        "revenueShareGrowth5Y": 15.0,
+                        "epsGrowth5Y": 18.0,
+                        "cashFlowPerShareTTM": 12.0,
+                        "bookValuePerShareQuarterly": 55.0,
+                    }
+                }
+            )
+        raise AssertionError(f"unexpected endpoint {endpoint}")
+
+
 def test_factory_uses_yahoo_without_fmp_key():
     provider = build_fundamentals_provider(ProviderKeys())
 
@@ -85,6 +109,13 @@ def test_factory_uses_fmp_when_key_is_available():
     provider = build_fundamentals_provider(ProviderKeys(fmp_api_key="test-key"))
 
     assert isinstance(provider, FMPFundamentalsProvider)
+    provider.close()
+
+
+def test_factory_uses_finnhub_when_fmp_is_absent():
+    provider = build_fundamentals_provider(ProviderKeys(finnhub_api_key="test-key"))
+
+    assert isinstance(provider, FinnhubFundamentalsProvider)
     provider.close()
 
 
@@ -103,3 +134,18 @@ def test_fmp_provider_maps_structured_payloads():
     assert fundamentals.revenue_series == (100.0, 120.0)
     assert fundamentals.tax_rate_series == (0.20, 0.20)
     assert fundamentals.invested_capital_series == (80.0, 90.0)
+
+
+def test_finnhub_provider_maps_metric_payloads():
+    provider = FinnhubFundamentalsProvider("test-key", client=FakeFinnhubClient())
+
+    fundamentals = provider.get_fundamentals("MSFT")
+
+    assert fundamentals.live_price == 421.0
+    assert fundamentals.return_on_equity == 0.33
+    assert fundamentals.gross_margin == 0.68
+    assert fundamentals.operating_margin == 0.46
+    assert fundamentals.forward_pe == 22.0
+    assert fundamentals.free_cash_flow == 1 / 42.0
+    assert len(fundamentals.revenue_series) == 6
+    assert fundamentals.revenue_series[-1] == 100.0

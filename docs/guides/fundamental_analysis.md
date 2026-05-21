@@ -33,5 +33,8 @@ python scripts/moat_compounding_analysis.py \
 
 ## Provider Selection
 
-Yahoo Finance is the default provider. If `FMP_API_KEY` is configured,
-`FMPFundamentalsProvider` is used for structured statement data.
+Provider priority is:
+
+1. `FMP_API_KEY` for structured statements.
+2. `FINNHUB_API_KEY` for live quotes and metrics.
+3. Yahoo Finance as a no-key fallback.

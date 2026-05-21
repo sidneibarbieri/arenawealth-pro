@@ -7,9 +7,18 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 
+from arenawealth.analytics import (
+    DemoFundamentalsProvider,
+    FundamentalsProvider,
+    Holding,
+    analyze_holdings,
+    build_fundamentals_provider,
+    plan_deployment,
+)
+from arenawealth.analytics.universe import FINANCIAL_TICKERS, THEME_BY_TICKER
 from arenawealth.domain.position import Position
 from arenawealth.importers.csv_importer import import_csv
 
@@ -53,6 +62,34 @@ class PortfolioResponse(BaseModel):
     last_updated: str
 
 
+class RecommendationPositionResponse(BaseModel):
+    ticker: str
+    theme: str
+    weight_pct: float
+    moat_class: str
+    compounding_class: str
+    composite_score: float
+    valuation_points: float
+    forward_pe: float | None
+
+
+class RecommendationOrderResponse(BaseModel):
+    ticker: str
+    amount: float
+    shares: float
+    fee: float
+
+
+class RecommendationResponse(BaseModel):
+    cash: float
+    provider_mode: str
+    generated_at: str
+    orders: list[RecommendationOrderResponse]
+    excluded_overweight: list[str]
+    excluded_theme: list[str]
+    ranked_positions: list[RecommendationPositionResponse]
+
+
 def holdings_path() -> Path:
     if PRIVATE_HOLDINGS.exists():
         return PRIVATE_HOLDINGS
@@ -61,6 +98,21 @@ def holdings_path() -> Path:
 
 def load_positions() -> list[Position]:
     return import_csv(holdings_path())
+
+
+def positions_to_holdings(positions: list[Position]) -> tuple[Holding, ...]:
+    return tuple(
+        Holding(
+            ticker=position.ticker,
+            name=position.name,
+            shares=float(position.shares),
+            average_cost=float(position.cost_basis_per_share),
+            broker_price=float(position.current_price),
+            theme=THEME_BY_TICKER.get(position.ticker, "Other"),
+            is_financial=position.ticker in FINANCIAL_TICKERS,
+        )
+        for position in positions
+    )
 
 
 def decimal_to_float(value: Decimal) -> float:
@@ -77,7 +129,6 @@ def build_snapshot() -> PortfolioResponse:
         if total_cost_basis
         else Decimal("0")
     )
-
     position_rows = [
         PositionResponse(
             ticker=position.ticker,
@@ -119,6 +170,53 @@ def build_snapshot() -> PortfolioResponse:
     )
 
 
+def select_recommendation_provider(
+    holdings: tuple[Holding, ...], offline_demo: bool
+) -> tuple[FundamentalsProvider, str]:
+    if offline_demo:
+        return DemoFundamentalsProvider(holdings), "offline-demo"
+    return build_fundamentals_provider(), "live-auto"
+
+
+def build_recommendation_response(
+    cash: float, offline_demo: bool
+) -> RecommendationResponse:
+    holdings = positions_to_holdings(load_positions())
+    provider, provider_mode = select_recommendation_provider(holdings, offline_demo)
+    analyses = analyze_holdings(holdings, provider)
+    plan = plan_deployment(analyses, cash)
+    ranked = sorted(analyses, key=lambda analysis: analysis.composite_score, reverse=True)
+    return RecommendationResponse(
+        cash=cash,
+        provider_mode=provider_mode,
+        generated_at=datetime.now(UTC).isoformat(),
+        orders=[
+            RecommendationOrderResponse(
+                ticker=order.ticker,
+                amount=order.amount,
+                shares=order.shares,
+                fee=order.fee,
+            )
+            for order in plan.orders
+        ],
+        excluded_overweight=list(plan.excluded_overweight),
+        excluded_theme=list(plan.excluded_theme),
+        ranked_positions=[
+            RecommendationPositionResponse(
+                ticker=analysis.holding.ticker,
+                theme=analysis.holding.theme,
+                weight_pct=analysis.weight_pct,
+                moat_class=analysis.moat_class,
+                compounding_class=analysis.compounding_class,
+                composite_score=analysis.composite_score,
+                valuation_points=analysis.valuation_points,
+                forward_pe=analysis.forward_pe,
+            )
+            for analysis in ranked
+        ],
+    )
+
+
 @router.get("/user", response_model=PortfolioResponse)
 async def get_user_portfolio() -> PortfolioResponse:
     return build_snapshot()
@@ -145,6 +243,20 @@ async def get_user_positions() -> dict[str, Any]:
 @router.get("/user/analysis")
 async def get_user_analysis() -> dict[str, Any]:
     return build_snapshot().analysis
+
+
+@router.get("/user/recommendation", response_model=RecommendationResponse)
+async def get_user_recommendation(
+    cash: float = Query(default=1511.18, gt=0),
+    offline_demo: bool = Query(default=False),
+) -> RecommendationResponse:
+    try:
+        return build_recommendation_response(cash, offline_demo)
+    except Exception as error:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Recommendation provider failed: {error}",
+        ) from error
 
 
 @router.get("/user/health")
