@@ -264,6 +264,23 @@ h3 {
   color: #a33a3a;
 }
 
+.price-badge {
+  align-self: center;
+  padding: 4px 10px;
+  border: 1px solid #d8d6cc;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b6b61;
+}
+
+.price-badge.live {
+  border-color: #1f7a4d;
+  color: #1f7a4d;
+}
+
 .deployment-band,
 .data-section {
   margin-top: 34px;

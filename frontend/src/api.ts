@@ -12,6 +12,7 @@ export interface Position {
   name: string;
   shares: number;
   current_price: number;
+  change_pct?: number | null;
   market_value: number;
   gain_loss: number;
   gain_loss_pct: number;
@@ -21,6 +22,7 @@ export interface Position {
 export interface PortfolioResponse {
   summary: PortfolioSummary;
   positions: Position[];
+  price_source?: string;
   last_updated: string;
 }
 

@@ -324,6 +324,9 @@ function App() {
                   <p className="eyebrow">Current holdings</p>
                   <h2>Portfolio positions</h2>
                 </div>
+                <span className={`price-badge ${portfolio.price_source === 'live' ? 'live' : ''}`}>
+                  {portfolio.price_source === 'live' ? 'Live prices' : 'Stored prices'}
+                </span>
               </div>
               <div className="table-frame">
                 <table>
@@ -333,6 +336,7 @@ function App() {
                       <th>Name</th>
                       <th className="numeric">Shares</th>
                       <th className="numeric">Price</th>
+                      <th className="numeric">Day</th>
                       <th className="numeric">Value</th>
                       <th className="numeric">Weight</th>
                       <th className="numeric">P/L</th>
@@ -414,12 +418,20 @@ interface PositionRowProps {
 function PositionRow({ position }: PositionRowProps) {
   const weight = position.weight_pct ?? 0;
   const gainClass = position.gain_loss >= 0 ? 'positive' : 'negative';
+  const dayChange = position.change_pct ?? null;
+  let dayClass = '';
+  if (dayChange !== null) {
+    dayClass = dayChange >= 0 ? 'positive' : 'negative';
+  }
   return (
     <tr>
       <td className="ticker-cell">{position.ticker}</td>
       <td>{position.name}</td>
       <td className="numeric">{formatNumber(position.shares)}</td>
       <td className="numeric">{formatMoney(position.current_price)}</td>
+      <td className={`numeric ${dayClass}`}>
+        {dayChange === null ? '—' : formatPercent(dayChange)}
+      </td>
       <td className="numeric">{formatMoney(position.market_value)}</td>
       <td className="numeric">{formatPercent(weight)}</td>
       <td className={`numeric ${gainClass}`}>

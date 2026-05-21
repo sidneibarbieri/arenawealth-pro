@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
@@ -39,6 +40,7 @@ class PositionResponse(BaseModel):
     name: str
     shares: float
     current_price: float
+    change_pct: float | None = None
     cost_basis_per_share: float
     market_value: float
     cost_basis_total: float
@@ -122,31 +124,39 @@ def decimal_to_float(value: Decimal) -> float:
     return float(value)
 
 
-def fetch_live_prices(tickers: list[str]) -> dict[str, float]:
+@dataclass(frozen=True)
+class LiveQuote:
+    price: float
+    change_pct: float | None
+
+
+def fetch_live_quotes(tickers: list[str]) -> dict[str, LiveQuote]:
     quotes = YahooProvider().get_quotes(tickers)
-    return {quote.ticker: float(quote.price) for quote in quotes}
-
-
-def price_for(position: Position, live_prices: dict[str, float]) -> Decimal:
-    live_price = live_prices.get(position.ticker)
-    return Decimal(str(live_price)) if live_price is not None else position.current_price
+    return {
+        quote.ticker: LiveQuote(
+            price=float(quote.price),
+            change_pct=float(quote.change_pct) if quote.change_pct is not None else None,
+        )
+        for quote in quotes
+    }
 
 
 def build_snapshot(
     live: bool = True,
-    price_lookup: Callable[[list[str]], dict[str, float]] | None = None,
+    quote_lookup: Callable[[list[str]], dict[str, LiveQuote]] | None = None,
 ) -> PortfolioResponse:
     positions = load_positions()
-    live_prices: dict[str, float] = {}
+    quotes: dict[str, LiveQuote] = {}
     if live:
-        lookup = price_lookup or fetch_live_prices
-        live_prices = lookup([position.ticker for position in positions])
-    price_source = "live" if live_prices else "stored"
+        lookup = quote_lookup or fetch_live_quotes
+        quotes = lookup([position.ticker for position in positions])
+    price_source = "live" if quotes else "stored"
 
-    prices = {position.ticker: price_for(position, live_prices) for position in positions}
-    total_market_value = sum(
-        position.shares * prices[position.ticker] for position in positions
-    )
+    def price_of(position: Position) -> Decimal:
+        quote = quotes.get(position.ticker)
+        return Decimal(str(quote.price)) if quote else position.current_price
+
+    total_market_value = sum(position.shares * price_of(position) for position in positions)
     total_cost_basis = sum(position.cost_basis_total.amount for position in positions)
     total_gain_loss = total_market_value - total_cost_basis
     total_gain_loss_pct = (
@@ -157,7 +167,8 @@ def build_snapshot(
 
     position_rows = []
     for position in positions:
-        price = prices[position.ticker]
+        price = price_of(position)
+        quote = quotes.get(position.ticker)
         market_value = position.shares * price
         cost_basis_total = position.cost_basis_total.amount
         gain_loss = market_value - cost_basis_total
@@ -167,6 +178,7 @@ def build_snapshot(
                 name=position.name,
                 shares=decimal_to_float(position.shares),
                 current_price=decimal_to_float(price),
+                change_pct=quote.change_pct if quote else None,
                 cost_basis_per_share=decimal_to_float(position.cost_basis_per_share),
                 market_value=decimal_to_float(market_value),
                 cost_basis_total=decimal_to_float(cost_basis_total),
