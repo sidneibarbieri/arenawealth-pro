@@ -37,14 +37,12 @@ CURRENT_PRICE_ALIASES = {
     "cotação",
 }
 
-
 def _find_column(columns: list[str], aliases: set[str]) -> str | None:
     normalized = {col.lower().strip().replace(" ", "_"): col for col in columns}
     for alias in aliases:
         if alias in normalized:
             return normalized[alias]
     return None
-
 
 def import_csv(
     path: Path | str,

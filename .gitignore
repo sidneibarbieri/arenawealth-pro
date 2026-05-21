@@ -1,42 +1,75 @@
 # Python
 __pycache__/
 *.py[cod]
-*.egg-info/
-dist/
+*$py.class
+*.so
+.Python
 build/
-.venv/
-*.whl
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# Environment and credentials — never commit
+# Development
+venv/
+.venv/
+env/
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# System
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.bak
+system_test_results_*.json
+organization_results_*.json
+academic_*_report_*.md
+
+# LaTeX artifacts
+*.cache
+*.out
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+
+# Local / sensitive data
+data/carteira_atual.csv
+data/arenawealth_universe.db
+data/*.db
+
+# Secrets
 .env
 .env.*
 !.env.example
-*.local
-*.key
-*.pem
-credentials*
-secrets/
 
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Test and coverage
+# Local environments and generated output
+venv311/
+exports/
+frontend/test-results/
+frontend/playwright-report/
 .coverage
 htmlcov/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
-
-# Data artifacts (generated, not source)
-*.csv
-*.xlsx
-*.parquet
-!tests/fixtures/*.csv
+*.db
+*_test_results_*.json
+*_excellence_report_*.md
+archive/

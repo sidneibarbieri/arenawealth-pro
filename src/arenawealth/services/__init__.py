@@ -1,1 +1,7 @@
-"""Application services — orchestration layer between domain and providers."""
+"""Application services."""
+
+from .portfolio_service import PortfolioService
+
+__all__ = [
+    "PortfolioService",
+]

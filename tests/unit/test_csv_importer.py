@@ -10,7 +10,6 @@ from arenawealth.importers.csv_importer import import_csv
 FIXTURES_DIR = Path(__file__).parent.parent / "fixtures"
 AVENUE_CSV = FIXTURES_DIR / "seed_portfolio_avenue.csv"
 
-
 class TestCsvImporter:
     def test_reads_avenue_fixture(self) -> None:
         positions = import_csv(AVENUE_CSV)

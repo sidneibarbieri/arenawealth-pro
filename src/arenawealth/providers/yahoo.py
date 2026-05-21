@@ -25,7 +25,6 @@ _INFO = ProviderInfo(
     requires_api_key=False,
 )
 
-
 class YahooProvider:
     @property
     def info(self) -> ProviderInfo:

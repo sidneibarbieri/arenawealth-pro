@@ -16,12 +16,10 @@ class Currency(StrEnum):
     BRL = "BRL"
     EUR = "EUR"
 
-
 DISPLAY_DECIMALS = 2
 INTERNAL_DECIMALS = 8
 _QUANTIZE_DISPLAY = Decimal(10) ** -DISPLAY_DECIMALS
 _QUANTIZE_INTERNAL = Decimal(10) ** -INTERNAL_DECIMALS
-
 
 class Money(BaseModel, frozen=True):
     """Immutable monetary amount with currency enforcement.

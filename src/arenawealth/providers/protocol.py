@@ -18,14 +18,12 @@ class ProviderTier(StrEnum):
     BASIC = "basic"
     PREMIUM = "premium"
 
-
 class Capability(StrEnum):
     QUOTES = "quotes"
     FUNDAMENTALS = "fundamentals"
     HISTORICAL_PRICES = "historical_prices"
     MACRO = "macro"
     NEWS = "news"
-
 
 @dataclass(frozen=True)
 class ProviderInfo:
@@ -34,7 +32,6 @@ class ProviderInfo:
     tier: ProviderTier
     capabilities: frozenset[Capability]
     requires_api_key: bool
-
 
 class QuoteProvider(Protocol):
     """Any source that can return current quotes for a list of tickers."""

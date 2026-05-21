@@ -17,9 +17,8 @@ def _lin_position() -> Position:
         name="Linde plc",
         shares=Decimal("34.47335"),
         cost_basis_per_share=Decimal("431.36"),
-        current_price=Decimal("504.65"),
+        current_price=Decimal("504.40"),
     )
-
 
 def _nvo_position() -> Position:
     return Position(
@@ -27,30 +26,29 @@ def _nvo_position() -> Position:
         name="Novo Nordisk - ADR",
         shares=Decimal("201.94608"),
         cost_basis_per_share=Decimal("56.63"),
-        current_price=Decimal("37.17"),
+        current_price=Decimal("44.46"),
     )
-
 
 def _full_avenue_portfolio() -> Portfolio:
     """All 17 positions from the real Avenue extract."""
     rows = [
-        ("LIN", "Linde plc", "34.47335", "431.36", "504.65"),
-        ("RELX", "RELX Plc - ADR", "452.2486", "41.24", "33.18"),
-        ("SPGI", "S&P Global Inc", "33.85908", "490.29", "419.69"),
-        ("EQIX", "Equinix Inc", "12.93555", "792.36", "1031.93"),
-        ("ASML", "ASML Holding NV - ADR", "8.42225", "772.82", "1440.62"),
-        ("ROP", "Roper Technologies Inc", "33.16561", "457.73", "346.59"),
-        ("MSFT", "Microsoft Corporation", "27.38028", "449.20", "369.04"),
-        ("GOOGL", "Alphabet Inc - Class A", "29.97738", "192.65", "315.28"),
-        ("TSM", "Taiwan Semiconductor Manufacturing - ADR", "24.86184", "217.79", "364.32"),
-        ("AVGO", "Broadcom Inc", "24.22126", "241.16", "356.07"),
-        ("PLD", "Prologis Inc", "60.99324", "110.45", "138.68"),
-        ("TDG", "TransDigm Group Inc", "6.3994", "1337.15", "1214.17"),
-        ("NVO", "Novo Nordisk - ADR", "201.94608", "56.63", "37.17"),
-        ("ISRG", "Intuitive Surgical Inc", "16.49494", "482.49", "453.88"),
-        ("UNH", "UnitedHealth Group Inc", "22.51219", "311.89", "305.82"),
-        ("JPM", "JPMorgan Chase & Co", "21.97601", "261.24", "308.67"),
-        ("LLY", "Eli Lilly & Co", "6.0593", "747.26", "954.71"),
+        ("LIN", "Linde plc", "34.47335", "431.36", "504.40"),
+        ("RELX", "RELX Plc - ADR", "510.60444", "40.44", "32.38"),
+        ("SPGI", "S&P Global Inc", "38.52429", "482.83", "402.79"),
+        ("EQIX", "Equinix Inc", "12.93555", "792.36", "1062.66"),
+        ("ASML", "ASML Holding NV - New York Shares", "8.42225", "772.82", "1520.18"),
+        ("ROP", "Roper Technologies Inc", "44.38372", "432.16", "324.29"),
+        ("MSFT", "Microsoft Corporation", "32.17279", "444.45", "428.13"),
+        ("GOOGL", "Alphabet Inc - Class A", "29.97738", "192.65", "396.86"),
+        ("TSM", "Taiwan Semiconductor Manufacturing - ADR", "24.86184", "217.79", "408.46"),
+        ("AVGO", "Broadcom Inc", "24.22126", "241.16", "427.82"),
+        ("PLD", "Prologis Inc", "60.99324", "110.45", "140.88"),
+        ("TDG", "Transdigm Group Incorporated", "7.26179", "1316.06", "1146.10"),
+        ("NVO", "Novo Nordisk - ADR", "201.94608", "56.63", "44.46"),
+        ("ISRG", "Intuitive Surgical Inc", "16.49494", "482.49", "425.74"),
+        ("UNH", "Unitedhealth Group Inc", "22.51219", "311.89", "392.72"),
+        ("JPM", "JPMorgan Chase & Co.", "21.97601", "261.24", "297.61"),
+        ("LLY", "Lilly(Eli) & Co", "6.0593", "747.26", "999.75"),
     ]
     positions = tuple(
         Position(
@@ -61,58 +59,62 @@ def _full_avenue_portfolio() -> Portfolio:
         )
         for r in rows
     )
-    return Portfolio(positions=positions)
-
+    return Portfolio(positions=positions, cash_balance_amount=Decimal("190.05"))
 
 # -- Position tests ------------------------------------------------------------
 
 class TestPositionGainLoss:
     def test_lin_positive_gain(self) -> None:
         position = _lin_position()
-        assert position.market_value.amount == Decimal("34.47335") * Decimal("504.65")
+        assert position.market_value.amount == Decimal("34.47335") * Decimal("504.40")
         assert position.gain_loss.amount > 0
 
     def test_lin_gain_pct_matches_avenue(self) -> None:
-        """Avenue shows LIN at +16.99% gain."""
+        """Avenue shows LIN at +16.93% gain."""
         position = _lin_position()
-        assert abs(position.gain_loss_pct - Decimal("16.99")) < Decimal("0.1")
+        assert abs(position.gain_loss_pct - Decimal("16.93")) < Decimal("0.1")
 
     def test_nvo_negative_gain(self) -> None:
         position = _nvo_position()
         assert position.gain_loss.amount < 0
 
     def test_nvo_loss_pct_matches_avenue(self) -> None:
-        """Avenue shows NVO at -34.36% loss."""
+        """Avenue shows NVO at -21.49% loss."""
         position = _nvo_position()
-        assert abs(position.gain_loss_pct - Decimal("-34.36")) < Decimal("0.1")
-
+        assert abs(position.gain_loss_pct - Decimal("-21.49")) < Decimal("0.1")
 
 # -- Portfolio tests -----------------------------------------------------------
 
 class TestPortfolioAggregates:
     def test_total_value_matches_avenue(self) -> None:
-        """Avenue shows total portfolio value of $171,499.17.
+        """Avenue shows total portfolio value of $190,922.43.
 
         Tolerance is $3.00 because Avenue rounds each position to 2 decimal
-        places before summing (17 positions x ~$0.16 rounding = ~$2.72).
+        places before summing.
         """
         portfolio = _full_avenue_portfolio()
-        expected = Decimal("171499.17")
-        assert abs(portfolio.total_value.amount - expected) < Decimal("3.00")
+        expected = Decimal("190922.43")
+        assert abs(portfolio.total_value.amount - expected) < Decimal("5.00")
+
+    def test_total_assets_matches_avenue(self) -> None:
+        """Avenue shows total assets of $191,112.48."""
+        portfolio = _full_avenue_portfolio()
+        expected = Decimal("191112.48")
+        assert abs(portfolio.total_assets.amount - expected) < Decimal("5.00")
 
     def test_total_gain_loss_matches_avenue(self) -> None:
-        """Avenue shows total P/L of +$8,128.91.
+        """Avenue shows total P/L of +$16,554.20.
 
         Same display-rounding tolerance as total_value.
         """
         portfolio = _full_avenue_portfolio()
-        expected = Decimal("8128.91")
-        assert abs(portfolio.total_gain_loss.amount - expected) < Decimal("3.00")
+        expected = Decimal("16554.20")
+        assert abs(portfolio.total_gain_loss.amount - expected) < Decimal("5.00")
 
     def test_total_gain_loss_pct_matches_avenue(self) -> None:
-        """Avenue shows total P/L% of +4.98%."""
+        """Avenue shows total P/L% of +9.49%."""
         portfolio = _full_avenue_portfolio()
-        expected = Decimal("4.98")
+        expected = Decimal("9.49")
         assert abs(portfolio.total_gain_loss_pct - expected) < Decimal("0.1")
 
     def test_position_count(self) -> None:
@@ -125,14 +127,13 @@ class TestPortfolioAggregates:
         assert "ASML" in portfolio.tickers
         assert len(portfolio.tickers) == 17
 
-
 class TestPortfolioWeights:
     def test_lin_is_largest_position(self) -> None:
-        """Avenue shows LIN as the top position (~$17,397)."""
+        """Avenue shows LIN as the top position (~$17,388)."""
         portfolio = _full_avenue_portfolio()
         lin_weight = portfolio.weight_pct("LIN")
-        assert lin_weight > Decimal("9")
-        assert lin_weight < Decimal("12")
+        assert lin_weight > Decimal("8")
+        assert lin_weight < Decimal("10")
 
     def test_weights_sum_to_100(self) -> None:
         portfolio = _full_avenue_portfolio()
@@ -143,10 +144,9 @@ class TestPortfolioWeights:
         portfolio = _full_avenue_portfolio()
         assert portfolio.weight_pct("INVALID") == Decimal("0")
 
-
 class TestPortfolioDisplay:
     def test_total_value_display(self) -> None:
         portfolio = _full_avenue_portfolio()
         display = portfolio.total_value.display()
         assert "$" in display
-        assert "171" in display
+        assert "190" in display

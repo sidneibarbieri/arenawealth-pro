@@ -15,13 +15,11 @@ from arenawealth.providers.types import QuoteResult
 
 logger = logging.getLogger(__name__)
 
-
 @dataclass(frozen=True)
 class ProviderAttempt:
     provider_id: str
     success: bool
     error: str | None = None
-
 
 @dataclass
 class FallbackResult:
@@ -34,7 +32,6 @@ class FallbackResult:
             if attempt.success:
                 return attempt.provider_id
         return None
-
 
 class FallbackChain:
     """Ordered list of providers for a given capability. First success wins."""

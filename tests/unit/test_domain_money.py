@@ -31,7 +31,6 @@ class TestMoneyArithmetic:
         money = Money.usd("100")
         assert (-money).amount == Decimal("-100")
 
-
 class TestMoneyDisplay:
     def test_usd_display(self) -> None:
         assert Money.usd("171499.17").display() == "$ 171,499.17"
@@ -42,14 +41,12 @@ class TestMoneyDisplay:
     def test_negative_display(self) -> None:
         assert Money.usd("-3930.01").display() == "$ -3,930.01"
 
-
 class TestMoneyConversion:
     def test_usd_to_brl(self) -> None:
         usd = Money.usd("1000")
         brl = usd.convert(Currency.BRL, rate="5.75")
         assert brl.currency == Currency.BRL
         assert brl.amount == Decimal("5750.00000000")
-
 
 class TestMoneyComparison:
     def test_greater_than(self) -> None:

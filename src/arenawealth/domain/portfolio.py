@@ -18,7 +18,18 @@ class Portfolio(BaseModel, frozen=True):
     """
 
     positions: tuple[Position, ...] = Field(default=())
+    cash_balance_amount: Decimal = Field(default=Decimal("0"))
     currency: Currency = Currency.USD
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def cash_balance(self) -> Money:
+        return Money(amount=self.cash_balance_amount, currency=self.currency)
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def total_assets(self) -> Money:
+        return self.total_value + self.cash_balance
 
     @computed_field  # type: ignore[prop-decorator]
     @property

@@ -10,21 +10,25 @@ authors = [{ name = "Sidnei Barbieri" }]
 dependencies = [
     "pydantic>=2.11",
     "httpx>=0.28",
+    "requests>=2.32",
     "yfinance>=0.2",
     "polars>=1.0",
     "python-dotenv>=1.1",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.34",
+    "python-multipart>=0.0.20",
+    "sqlmodel>=0.0.22",
 ]
 
 [project.optional-dependencies]
+postgres = [
+    "psycopg2-binary>=2.9",
+]
 dev = [
     "pytest>=8.0",
     "pytest-cov>=6.0",
     "ruff>=0.11",
     "mypy>=1.15",
-]
-api = [
-    "fastapi>=0.115",
-    "uvicorn[standard]>=0.34",
 ]
 quant = [
     "cvxpy>=1.6",
@@ -41,15 +45,23 @@ packages = ["src/arenawealth"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = ["src", "."]
 markers = [
-    "integration: tests requiring network or real API keys",
+    "integration: API scenario or integration tests (may use TestClient + SQLite)",
 ]
 
 [tool.ruff]
 target-version = "py311"
 line-length = 99
 src = ["src", "tests"]
+extend-exclude = [
+    "archive",
+    "data",
+    "exports",
+    "frontend",
+    "src/api",
+    "src/services",
+]
 
 [tool.ruff.lint]
 select = [

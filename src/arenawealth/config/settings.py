@@ -12,13 +12,13 @@ from pydantic import BaseModel
 
 CREDENTIAL_VAULT = Path.home() / ".arenawealth" / "credentials.env"
 
-
 class ProviderKeys(BaseModel):
     """API keys for market data providers. Every field is optional."""
 
     fred_api_key: str = ""
     openfigi_api_key: str = ""
     alphavantage_api_key: str = ""
+    fmp_api_key: str = ""
     finnhub_api_key: str = ""
     patentsview_api_key: str = ""
     openalex_mailto: str = ""
@@ -27,7 +27,6 @@ class ProviderKeys(BaseModel):
     def has_key(self, provider_id: str) -> bool:
         field_name = f"{provider_id}_api_key"
         return bool(getattr(self, field_name, ""))
-
 
 def load_provider_keys() -> ProviderKeys:
     """Load keys from environment, falling back to the credential vault file."""
@@ -46,6 +45,7 @@ def load_provider_keys() -> ProviderKeys:
         fred_api_key=os.getenv("FRED_API_KEY", ""),
         openfigi_api_key=os.getenv("OPENFIGI_API_KEY", ""),
         alphavantage_api_key=os.getenv("ALPHAVANTAGE_API_KEY", ""),
+        fmp_api_key=os.getenv("FMP_API_KEY", ""),
         finnhub_api_key=os.getenv("FINNHUB_API_KEY", ""),
         patentsview_api_key=os.getenv("PATENTSVIEW_API_KEY", ""),
         openalex_mailto=os.getenv("OPENALEX_MAILTO", ""),
