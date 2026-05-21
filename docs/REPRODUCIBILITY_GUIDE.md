@@ -8,6 +8,7 @@ This guide describes the supported reviewer workflow for ArenaWealth Pro.
 python3.11 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
+cd frontend && npm install && cd ..
 ```
 
 No API keys are required for the unit and integration tests.
@@ -15,17 +16,16 @@ No API keys are required for the unit and integration tests.
 ## Validation
 
 ```bash
-ruff check .
-pytest -q
+make verify
 ```
 
-Expected result in the current artifact: lint passes and the Python test suite
-passes.
+Expected result in the current artifact: Python lint, Python tests, frontend
+build, and frontend lint pass.
 
 ## Metrics
 
 ```bash
-python scripts/reviewer_metrics.py
+make metrics
 ```
 
 The script records:
@@ -36,6 +36,7 @@ The script records:
 - Python source file count
 - test file count
 - source and test line counts
+- deterministic offline recommendation command status
 
 The output is written to `exports/reviewer_metrics_<timestamp>.json`.
 
@@ -62,3 +63,7 @@ mode avoids external providers entirely.
 This repository does not include `sticks-docker`, MITRE campaign execution, or
 security experiment measurements. Those measurements must come from the external
 artifact that actually implements them.
+
+The current artifact also does not yet include investment backtests, benchmark
+baselines, ablations, paper table generation, or manuscript-value
+synchronization.

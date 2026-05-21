@@ -14,9 +14,9 @@ def test_portfolio_user_returns_payload(api_client: TestClient) -> None:
 
 
 def test_health_aggregate_exists(api_client: TestClient) -> None:
-    r = api_client.get("/api/v1/health")
-    assert r.status_code == 200
-    assert r.json().get("status") == "healthy"
+    response = api_client.get("/api/v1/health")
+    assert response.status_code == 200
+    assert response.json().get("status") == "healthy"
 
 
 def test_portfolio_recommendation_offline_demo(api_client: TestClient) -> None:

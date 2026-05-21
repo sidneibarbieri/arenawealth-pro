@@ -1,8 +1,4 @@
-"""Data Transfer Objects for API layer.
-
-DTOs decouple internal models from API contracts.
-All monetary values use Decimal for precision.
-"""
+"""Pydantic DTOs for API requests and responses."""
 
 from datetime import datetime
 from decimal import Decimal
@@ -10,20 +6,7 @@ from decimal import Decimal
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class MoneyDecimal(Decimal):
-    """Custom Decimal type for monetary values."""
-
-    @classmethod
-    def __get_pydantic_json_schema__(cls, _handler, _info):
-        return {"type": "number", "format": "decimal"}
-
-# ============================================================================
-# Position DTOs
-# ============================================================================
-
 class PositionCreateRequest(BaseModel):
-    """Request to create a new position."""
-
     model_config = ConfigDict(frozen=True)
 
     ticker: str = Field(..., min_length=1, max_length=20)
@@ -33,17 +16,15 @@ class PositionCreateRequest(BaseModel):
     average_cost_basis: Decimal = Field(..., gt=0, decimal_places=4)
     current_price: Decimal = Field(default=Decimal("0"), ge=0, decimal_places=4)
 
-class PositionUpdateRequest(BaseModel):
-    """Request to update an existing position."""
 
+class PositionUpdateRequest(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     current_price: Decimal | None = Field(default=None, ge=0, decimal_places=4)
     shares: Decimal | None = Field(default=None, gt=0, decimal_places=8)
 
-class PositionResponse(BaseModel):
-    """Position data returned by API."""
 
+class PositionResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
@@ -61,9 +42,8 @@ class PositionResponse(BaseModel):
     opened_at: datetime
     updated_at: datetime
 
-class PositionSummary(BaseModel):
-    """Simplified position for list views."""
 
+class PositionSummary(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     ticker: str
@@ -74,13 +54,8 @@ class PositionSummary(BaseModel):
     gain_loss_percent: Decimal
     weight_percent: Decimal
 
-# ============================================================================
-# Portfolio DTOs
-# ============================================================================
 
 class PortfolioCreateRequest(BaseModel):
-    """Request to create a new portfolio."""
-
     model_config = ConfigDict(frozen=True)
 
     name: str = Field(..., min_length=1, max_length=100)
@@ -88,18 +63,16 @@ class PortfolioCreateRequest(BaseModel):
     currency: str = Field(default="USD", max_length=3)
     initial_cash: Decimal = Field(default=Decimal("0"), ge=0, decimal_places=2)
 
-class PortfolioUpdateRequest(BaseModel):
-    """Request to update portfolio metadata."""
 
+class PortfolioUpdateRequest(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     name: str | None = Field(default=None, min_length=1, max_length=100)
     description: str | None = Field(default=None, max_length=500)
     available_cash: Decimal | None = Field(default=None, ge=0, decimal_places=2)
 
-class PortfolioResponse(BaseModel):
-    """Portfolio data returned by API."""
 
+class PortfolioResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
@@ -114,9 +87,8 @@ class PortfolioResponse(BaseModel):
     available_cash: Decimal
     position_count: int
 
-class PortfolioSummary(BaseModel):
-    """Summary for portfolio list views."""
 
+class PortfolioSummary(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
@@ -126,13 +98,8 @@ class PortfolioSummary(BaseModel):
     total_gain_loss: Decimal
     position_count: int
 
-# ============================================================================
-# Transaction DTOs
-# ============================================================================
 
 class TransactionCreateRequest(BaseModel):
-    """Request to record a new transaction."""
-
     model_config = ConfigDict(frozen=True)
 
     ticker: str = Field(..., min_length=1, max_length=20)
@@ -143,9 +110,8 @@ class TransactionCreateRequest(BaseModel):
     broker_order_id: str | None = Field(default=None, max_length=50)
     notes: str | None = Field(default=None, max_length=500)
 
-class TransactionResponse(BaseModel):
-    """Transaction data returned by API."""
 
+class TransactionResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
@@ -161,13 +127,8 @@ class TransactionResponse(BaseModel):
     broker_order_id: str | None
     notes: str | None
 
-# ============================================================================
-# Quote DTOs
-# ============================================================================
 
 class QuoteResponse(BaseModel):
-    """Current market quote for a security."""
-
     model_config = ConfigDict(frozen=True)
 
     ticker: str
@@ -179,9 +140,8 @@ class QuoteResponse(BaseModel):
     low_52_week: Decimal | None
     timestamp: datetime
 
-class QuoteHistoryResponse(BaseModel):
-    """Historical quote data point."""
 
+class QuoteHistoryResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     ticker: str
@@ -190,13 +150,8 @@ class QuoteHistoryResponse(BaseModel):
     change_percent: Decimal | None
     recorded_at: datetime
 
-# ============================================================================
-# Analysis DTOs
-# ============================================================================
 
 class PortfolioMetrics(BaseModel):
-    """Calculated portfolio metrics."""
-
     model_config = ConfigDict(frozen=True)
 
     total_value: Decimal
@@ -205,24 +160,22 @@ class PortfolioMetrics(BaseModel):
     unrealized_gain_percent: Decimal
     day_change: Decimal
     day_change_percent: Decimal
-    diversification_score: Decimal  # 0-100
-    concentration_risk: str  # LOW, MEDIUM, HIGH
+    diversification_score: Decimal
+    concentration_risk: str
+
 
 class RebalanceSuggestion(BaseModel):
-    """Suggestion for portfolio rebalancing."""
-
     model_config = ConfigDict(frozen=True)
 
     ticker: str
     current_weight: Decimal
     suggested_weight: Decimal
-    action: str  # BUY, SELL, HOLD
+    action: str
     suggested_amount: Decimal
     reason: str
 
-class PortfolioAnalysisResponse(BaseModel):
-    """Complete portfolio analysis."""
 
+class PortfolioAnalysisResponse(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     portfolio: PortfolioResponse

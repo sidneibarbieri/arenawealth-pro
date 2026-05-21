@@ -1,104 +1,85 @@
+import {
+  Activity,
+  AlertTriangle,
+  BarChart3,
+  CheckCircle2,
+  CircleDollarSign,
+  RefreshCw,
+  ShieldCheck,
+  WalletCards,
+} from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
-interface PortfolioSummary {
-  total_market_value: number;
-  total_cost_basis: number;
-  total_gain_loss: number;
-  total_gain_loss_pct: number;
-  position_count: number;
-  currency: string;
+import {
+  fetchPortfolio,
+  fetchRecommendation,
+  type PortfolioResponse,
+  type Position,
+  type RecommendationOrder,
+  type RecommendationResponse,
+} from './api';
+import { formatDateTime, formatMoney, formatNumber, formatPercent } from './format';
+
+const DEFAULT_CASH = 1511.18;
+
+function readInitialCash(): number {
+  const cashParameter = new URLSearchParams(window.location.search).get('cash');
+  if (!cashParameter) {
+    return DEFAULT_CASH;
+  }
+  return parseCashInput(cashParameter);
 }
 
-interface Position {
-  ticker: string;
-  name: string;
-  shares: number;
-  current_price: number;
-  market_value: number;
-  gain_loss: number;
-  gain_loss_pct: number;
-  weight_pct?: number;
+function readInitialOfflineDemo(): boolean {
+  return new URLSearchParams(window.location.search).get('offline_demo') === 'true';
 }
 
-interface PortfolioResponse {
-  summary: PortfolioSummary;
-  positions: Position[];
-  last_updated: string;
+function parseCashInput(value: string): number {
+  const normalizedValue = value.replace(',', '.').trim();
+  const parsedValue = Number(normalizedValue);
+  if (!Number.isFinite(parsedValue) || parsedValue <= 0) {
+    throw new Error('Cash must be a positive number.');
+  }
+  return parsedValue;
 }
 
-interface RecommendationOrder {
-  ticker: string;
-  amount: number;
-  shares: number;
-  fee: number;
+function isAbortError(error: unknown): boolean {
+  return error instanceof DOMException && error.name === 'AbortError';
 }
-
-interface RankedPosition {
-  ticker: string;
-  theme: string;
-  weight_pct: number;
-  moat_class: string;
-  compounding_class: string;
-  composite_score: number;
-  valuation_points: number;
-  forward_pe: number | null;
-}
-
-interface RecommendationResponse {
-  cash: number;
-  provider_mode: string;
-  generated_at: string;
-  orders: RecommendationOrder[];
-  excluded_overweight: string[];
-  excluded_theme: string[];
-  ranked_positions: RankedPosition[];
-}
-
-const money = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-  maximumFractionDigits: 2,
-});
-
-const number = new Intl.NumberFormat('en-US', {
-  maximumFractionDigits: 2,
-});
 
 function App() {
-  const [data, setData] = useState<PortfolioResponse | null>(null);
+  const [portfolio, setPortfolio] = useState<PortfolioResponse | null>(null);
   const [recommendation, setRecommendation] = useState<RecommendationResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [portfolioError, setPortfolioError] = useState<string | null>(null);
   const [recommendationError, setRecommendationError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isPortfolioLoading, setIsPortfolioLoading] = useState(true);
   const [isRecommendationLoading, setIsRecommendationLoading] = useState(true);
+  const [cashInput, setCashInput] = useState(() => readInitialCash().toFixed(2));
+  const [cashToAnalyze, setCashToAnalyze] = useState(() => readInitialCash());
+  const [offlineDemo, setOfflineDemo] = useState(() => readInitialOfflineDemo());
+  const [refreshIndex, setRefreshIndex] = useState(0);
 
   useEffect(() => {
     const controller = new AbortController();
 
     async function loadPortfolio() {
-      setIsLoading(true);
-      setError(null);
-      const response = await fetch('/api/v1/portfolio/user', {
-        signal: controller.signal,
-      });
-      if (!response.ok) {
-        throw new Error(`Portfolio request failed: ${response.status}`);
-      }
-      const payload = (await response.json()) as PortfolioResponse;
-      setData(payload);
-      setIsLoading(false);
+      setIsPortfolioLoading(true);
+      setPortfolioError(null);
+      const payload = await fetchPortfolio(controller.signal);
+      setPortfolio(payload);
+      setIsPortfolioLoading(false);
     }
 
-    loadPortfolio().catch((loadError: unknown) => {
-      if (loadError instanceof DOMException && loadError.name === 'AbortError') {
+    loadPortfolio().catch((error: unknown) => {
+      if (isAbortError(error)) {
         return;
       }
-      setError(loadError instanceof Error ? loadError.message : 'Unknown error');
-      setIsLoading(false);
+      setPortfolioError(error instanceof Error ? error.message : 'Unknown portfolio error');
+      setIsPortfolioLoading(false);
     });
 
     return () => controller.abort();
-  }, []);
+  }, [refreshIndex]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -106,209 +87,269 @@ function App() {
     async function loadRecommendation() {
       setIsRecommendationLoading(true);
       setRecommendationError(null);
-      const response = await fetch('/api/v1/portfolio/user/recommendation?cash=1511.18', {
-        signal: controller.signal,
-      });
-      if (!response.ok) {
-        throw new Error(`Recommendation request failed: ${response.status}`);
-      }
-      const payload = (await response.json()) as RecommendationResponse;
+      const payload = await fetchRecommendation(cashToAnalyze, offlineDemo, controller.signal);
       setRecommendation(payload);
       setIsRecommendationLoading(false);
     }
 
-    loadRecommendation().catch((loadError: unknown) => {
-      if (loadError instanceof DOMException && loadError.name === 'AbortError') {
+    loadRecommendation().catch((error: unknown) => {
+      if (isAbortError(error)) {
         return;
       }
-      setRecommendationError(loadError instanceof Error ? loadError.message : 'Unknown error');
+      setRecommendationError(
+        error instanceof Error ? error.message : 'Unknown recommendation error',
+      );
       setIsRecommendationLoading(false);
     });
 
     return () => controller.abort();
-  }, []);
+  }, [cashToAnalyze, offlineDemo, refreshIndex]);
 
   const positions = useMemo(() => {
-    if (!data) {
+    if (!portfolio) {
       return [];
     }
-    const denominator = data.summary.total_market_value || 1;
-    return data.positions
+    const denominator = portfolio.summary.total_market_value || 1;
+    return portfolio.positions
       .map((position) => ({
         ...position,
         weight_pct: position.weight_pct ?? (position.market_value / denominator) * 100,
       }))
-      .sort((first, second) => second.market_value - first.market_value);
-  }, [data]);
+      .sort((firstPosition, secondPosition) => {
+        return secondPosition.market_value - firstPosition.market_value;
+      });
+  }, [portfolio]);
+
+  const largestPosition = positions[0];
+  const recommendedCapital =
+    recommendation?.orders.reduce((total, order) => total + order.amount, 0) ?? 0;
+  const topRanked = recommendation?.ranked_positions[0];
+
+  function refreshRecommendation() {
+    const parsedCash = parseCashInput(cashInput);
+    setCashToAnalyze(parsedCash);
+    setRefreshIndex((currentIndex) => currentIndex + 1);
+  }
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-950">
-      <section className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-6 md:flex-row md:items-end md:justify-between">
+    <main className="app-shell">
+      <aside className="side-rail" aria-label="Workspace navigation">
+        <div className="brand-lockup">
+          <div className="brand-mark">A</div>
           <div>
-            <p className="text-sm font-medium text-slate-500">ArenaWealth Pro</p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-normal text-slate-950">
-              Portfolio Dashboard
-            </h1>
+            <p className="eyebrow">ArenaWealth</p>
+            <p className="brand-subtitle">Research desk</p>
           </div>
-          {data && (
-            <p className="text-sm text-slate-500">
-              Last updated: {new Date(data.last_updated).toLocaleString('en-US')}
-            </p>
-          )}
         </div>
-      </section>
+        <nav className="rail-nav">
+          <a href="#deployment">
+            <CircleDollarSign size={17} />
+            Deploy cash
+          </a>
+          <a href="#rankings">
+            <BarChart3 size={17} />
+            Quality rank
+          </a>
+          <a href="#positions">
+            <WalletCards size={17} />
+            Positions
+          </a>
+        </nav>
+        <div className="rail-note">
+          <ShieldCheck size={17} />
+          <span>Read-only portfolio. Orders are proposed, not placed.</span>
+        </div>
+      </aside>
 
-      <section className="mx-auto max-w-7xl px-6 py-8">
-        {isLoading && <p className="text-slate-600">Loading portfolio...</p>}
-
-        {error && (
-          <div className="border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-            {error}
+      <section className="workspace">
+        <header className="topbar">
+          <div>
+            <p className="eyebrow">Moat and compounding workbench</p>
+            <h1>ArenaWealth Pro</h1>
           </div>
-        )}
+          <button className="icon-button" type="button" onClick={refreshRecommendation}>
+            <RefreshCw size={17} />
+            Refresh
+          </button>
+        </header>
 
-        {data && (
-          <div className="space-y-8">
-            <div className="grid gap-4 md:grid-cols-4">
-              <Metric label="Total value" value={money.format(data.summary.total_market_value)} />
-              <Metric label="Cost basis" value={money.format(data.summary.total_cost_basis)} />
+        {portfolioError && <StatusBlock tone="danger" message={portfolioError} />}
+        {recommendationError && <StatusBlock tone="warning" message={recommendationError} />}
+
+        {portfolio && (
+          <>
+            <section className="metric-strip" aria-label="Portfolio summary">
               <Metric
-                label="Gain/loss"
-                value={money.format(data.summary.total_gain_loss)}
-                tone={data.summary.total_gain_loss >= 0 ? 'positive' : 'negative'}
+                label="Portfolio value"
+                value={formatMoney(portfolio.summary.total_market_value)}
               />
-              <Metric label="Positions" value={String(data.summary.position_count)} />
-            </div>
+              <Metric
+                label="Unrealized P/L"
+                value={`${formatMoney(portfolio.summary.total_gain_loss)} (${formatPercent(
+                  portfolio.summary.total_gain_loss_pct,
+                )})`}
+                tone={portfolio.summary.total_gain_loss >= 0 ? 'positive' : 'negative'}
+              />
+              <Metric
+                label="Largest position"
+                value={largestPosition ? largestPosition.ticker : 'n/a'}
+                detail={largestPosition ? formatPercent(largestPosition.weight_pct ?? 0) : undefined}
+              />
+              <Metric label="Positions" value={String(portfolio.summary.position_count)} />
+            </section>
 
-            <section className="border border-slate-200 bg-white p-5">
-              <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <section className="deployment-band" id="deployment">
+              <div className="section-heading">
                 <div>
-                  <h2 className="text-xl font-semibold">Cash Deployment</h2>
-                  <p className="text-sm text-slate-500">
-                    Moat, compounding, valuation, concentration, and theme-aware sizing.
-                  </p>
+                  <p className="eyebrow">Cash deployment</p>
+                  <h2>Allocation queue</h2>
                 </div>
-                {recommendation && (
-                  <p className="text-sm text-slate-500">
-                    Provider: {recommendation.provider_mode} · Cash:{' '}
-                    {money.format(recommendation.cash)}
-                  </p>
-                )}
+                <span className="freshness">
+                  Data snapshot {formatDateTime(portfolio.last_updated)}
+                </span>
+              </div>
+
+              <div className="control-row">
+                <label className="field">
+                  <span>Available cash</span>
+                  <input
+                    inputMode="decimal"
+                    type="text"
+                    value={cashInput}
+                    onChange={(event) => setCashInput(event.target.value)}
+                  />
+                </label>
+                <label className="toggle-field">
+                  <input
+                    type="checkbox"
+                    checked={offlineDemo}
+                    onChange={(event) => setOfflineDemo(event.target.checked)}
+                  />
+                  <span>Deterministic reviewer mode</span>
+                </label>
+                <button className="primary-button" type="button" onClick={refreshRecommendation}>
+                  <Activity size={17} />
+                  Analyze
+                </button>
               </div>
 
               {isRecommendationLoading && (
-                <p className="mt-4 text-sm text-slate-600">Loading recommendation...</p>
+                <div className="loading-row">Loading recommendation...</div>
               )}
 
-              {recommendationError && (
-                <div className="mt-4 border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-                  {recommendationError}
-                </div>
-              )}
-
-              {recommendation && (
-                <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_1.4fr]">
-                  <div className="space-y-3">
+              {recommendation && !isRecommendationLoading && (
+                <div className="deployment-layout">
+                  <div className="order-stack">
+                    <div className="provider-line">
+                      <CheckCircle2 size={17} />
+                      <span>
+                        {recommendation.provider_mode} · {formatMoney(recommendedCapital)} queued
+                      </span>
+                    </div>
                     {recommendation.orders.map((order) => (
-                      <div key={order.ticker} className="border border-slate-200 p-4">
-                        <p className="text-sm text-slate-500">Buy</p>
-                        <p className="mt-1 text-2xl font-semibold">{order.ticker}</p>
-                        <p className="mt-2 text-sm text-slate-700">
-                          {money.format(order.amount)} · {number.format(order.shares)} shares ·{' '}
-                          {money.format(order.fee)} fee
-                        </p>
-                      </div>
+                      <OrderRow key={order.ticker} order={order} />
                     ))}
-                    <p className="text-xs text-slate-500">
-                      Overweight skipped: {recommendation.excluded_overweight.join(', ') || 'none'}
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      Theme skipped: {recommendation.excluded_theme.join(', ') || 'none'}
-                    </p>
                   </div>
 
-                  <div className="overflow-hidden border border-slate-200">
-                    <table className="min-w-full divide-y divide-slate-200">
-                      <thead className="bg-slate-100 text-left text-xs font-semibold uppercase text-slate-600">
-                        <tr>
-                          <th className="px-3 py-2">Ticker</th>
-                          <th className="px-3 py-2">Theme</th>
-                          <th className="px-3 py-2 text-right">Weight</th>
-                          <th className="px-3 py-2 text-right">Score</th>
-                          <th className="px-3 py-2 text-right">Valuation</th>
-                          <th className="px-3 py-2 text-right">fPE</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100 text-sm">
-                        {recommendation.ranked_positions.slice(0, 8).map((position) => (
-                          <tr key={position.ticker}>
-                            <td className="px-3 py-2 font-semibold">{position.ticker}</td>
-                            <td className="px-3 py-2 text-slate-600">{position.theme}</td>
-                            <td className="px-3 py-2 text-right">
-                              {number.format(position.weight_pct)}%
-                            </td>
-                            <td className="px-3 py-2 text-right">
-                              {number.format(position.composite_score)}
-                            </td>
-                            <td className="px-3 py-2 text-right">
-                              {number.format(position.valuation_points)}
-                            </td>
-                            <td className="px-3 py-2 text-right">
-                              {position.forward_pe ? number.format(position.forward_pe) : 'n/a'}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                  <div className="decision-notes">
+                    <h3>Guardrails</h3>
+                    <p>
+                      Overweight:{' '}
+                      <strong>{recommendation.excluded_overweight.join(', ') || 'none'}</strong>
+                    </p>
+                    <p>
+                      Theme cap: <strong>{recommendation.excluded_theme.join(', ') || 'none'}</strong>
+                    </p>
+                    <p>
+                      Top rank: <strong>{topRanked?.ticker ?? 'n/a'}</strong>
+                      {topRanked ? ` at ${formatNumber(topRanked.composite_score)} points` : ''}
+                    </p>
                   </div>
                 </div>
               )}
             </section>
 
-            <div className="overflow-hidden border border-slate-200 bg-white">
-              <table className="min-w-full divide-y divide-slate-200">
-                <thead className="bg-slate-100 text-left text-xs font-semibold uppercase text-slate-600">
-                  <tr>
-                    <th className="px-4 py-3">Ticker</th>
-                    <th className="px-4 py-3">Name</th>
-                    <th className="px-4 py-3 text-right">Shares</th>
-                    <th className="px-4 py-3 text-right">Price</th>
-                    <th className="px-4 py-3 text-right">Value</th>
-                    <th className="px-4 py-3 text-right">Weight</th>
-                    <th className="px-4 py-3 text-right">P/L</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 text-sm">
-                  {positions.map((position) => (
-                    <tr key={position.ticker} className="hover:bg-slate-50">
-                      <td className="px-4 py-3 font-semibold">{position.ticker}</td>
-                      <td className="px-4 py-3 text-slate-600">{position.name}</td>
-                      <td className="px-4 py-3 text-right">{number.format(position.shares)}</td>
-                      <td className="px-4 py-3 text-right">
-                        {money.format(position.current_price)}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        {money.format(position.market_value)}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        {number.format(position.weight_pct)}%
-                      </td>
-                      <td
-                        className={`px-4 py-3 text-right font-medium ${
-                          position.gain_loss >= 0 ? 'text-emerald-700' : 'text-red-700'
-                        }`}
-                      >
-                        {money.format(position.gain_loss)} ({number.format(position.gain_loss_pct)}
-                        %)
-                      </td>
+            {recommendation && (
+              <section className="data-section" id="rankings">
+                <div className="section-heading">
+                  <div>
+                    <p className="eyebrow">Research ranking</p>
+                    <h2>Moat, compounding, valuation</h2>
+                  </div>
+                </div>
+                <div className="table-frame">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Ticker</th>
+                        <th>Theme</th>
+                        <th className="numeric">Weight</th>
+                        <th>Moat</th>
+                        <th>Compounding</th>
+                        <th className="numeric">Score</th>
+                        <th className="numeric">Valuation</th>
+                        <th className="numeric">fPE</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {recommendation.ranked_positions.map((rankedPosition) => (
+                        <tr key={rankedPosition.ticker}>
+                          <td className="ticker-cell">{rankedPosition.ticker}</td>
+                          <td>{rankedPosition.theme}</td>
+                          <td className="numeric">{formatPercent(rankedPosition.weight_pct)}</td>
+                          <td>{rankedPosition.moat_class}</td>
+                          <td>{rankedPosition.compounding_class}</td>
+                          <td className="numeric">
+                            {formatNumber(rankedPosition.composite_score)}
+                          </td>
+                          <td className="numeric">
+                            {formatNumber(rankedPosition.valuation_points)}
+                          </td>
+                          <td className="numeric">
+                            {rankedPosition.forward_pe
+                              ? formatNumber(rankedPosition.forward_pe)
+                              : 'n/a'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            )}
+
+            <section className="data-section" id="positions">
+              <div className="section-heading">
+                <div>
+                  <p className="eyebrow">Current holdings</p>
+                  <h2>Portfolio positions</h2>
+                </div>
+              </div>
+              <div className="table-frame">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Ticker</th>
+                      <th>Name</th>
+                      <th className="numeric">Shares</th>
+                      <th className="numeric">Price</th>
+                      <th className="numeric">Value</th>
+                      <th className="numeric">Weight</th>
+                      <th className="numeric">P/L</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                  </thead>
+                  <tbody>
+                    {positions.map((position) => (
+                      <PositionRow key={position.ticker} position={position} />
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </>
         )}
+
+        {isPortfolioLoading && <div className="loading-row">Loading portfolio...</div>}
       </section>
     </main>
   );
@@ -317,18 +358,74 @@ function App() {
 interface MetricProps {
   label: string;
   value: string;
+  detail?: string;
   tone?: 'positive' | 'negative';
 }
 
-function Metric({ label, value, tone }: MetricProps) {
-  const toneClass =
-    tone === 'positive' ? 'text-emerald-700' : tone === 'negative' ? 'text-red-700' : 'text-slate-950';
-
+function Metric({ label, value, detail, tone }: MetricProps) {
+  const toneClass = tone ? `metric-value ${tone}` : 'metric-value';
   return (
-    <div className="border border-slate-200 bg-white p-4">
-      <p className="text-sm text-slate-500">{label}</p>
-      <p className={`mt-2 text-2xl font-semibold ${toneClass}`}>{value}</p>
+    <div className="metric">
+      <span>{label}</span>
+      <strong className={toneClass}>{value}</strong>
+      {detail && <small>{detail}</small>}
     </div>
+  );
+}
+
+interface StatusBlockProps {
+  tone: 'warning' | 'danger';
+  message: string;
+}
+
+function StatusBlock({ tone, message }: StatusBlockProps) {
+  return (
+    <div className={`status-block ${tone}`}>
+      <AlertTriangle size={18} />
+      <span>{message}</span>
+    </div>
+  );
+}
+
+interface OrderRowProps {
+  order: RecommendationOrder;
+}
+
+function OrderRow({ order }: OrderRowProps) {
+  return (
+    <article className="order-row">
+      <div>
+        <span>Buy</span>
+        <strong>{order.ticker}</strong>
+      </div>
+      <div className="order-meta">
+        <span>{formatMoney(order.amount)}</span>
+        <span>{formatNumber(order.shares)} shares</span>
+        <span>{formatMoney(order.fee)} fee</span>
+      </div>
+    </article>
+  );
+}
+
+interface PositionRowProps {
+  position: Position;
+}
+
+function PositionRow({ position }: PositionRowProps) {
+  const weight = position.weight_pct ?? 0;
+  const gainClass = position.gain_loss >= 0 ? 'positive' : 'negative';
+  return (
+    <tr>
+      <td className="ticker-cell">{position.ticker}</td>
+      <td>{position.name}</td>
+      <td className="numeric">{formatNumber(position.shares)}</td>
+      <td className="numeric">{formatMoney(position.current_price)}</td>
+      <td className="numeric">{formatMoney(position.market_value)}</td>
+      <td className="numeric">{formatPercent(weight)}</td>
+      <td className={`numeric ${gainClass}`}>
+        {formatMoney(position.gain_loss)} ({formatPercent(position.gain_loss_pct)})
+      </td>
+    </tr>
   );
 }
 

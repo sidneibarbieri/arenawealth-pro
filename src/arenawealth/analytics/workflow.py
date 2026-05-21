@@ -14,12 +14,12 @@ def fetch_fundamentals(
     provider: FundamentalsProvider,
     max_workers: int = 8,
 ) -> dict[str, Fundamentals]:
+    def fetch_one(holding: Holding) -> tuple[str, Fundamentals]:
+        return holding.ticker, provider.get_fundamentals(holding.ticker)
+
     workers = min(max_workers, max(1, len(holdings)))
     with ThreadPoolExecutor(max_workers=workers) as executor:
-        pairs = executor.map(
-            lambda holding: (holding.ticker, provider.get_fundamentals(holding.ticker)),
-            holdings,
-        )
+        pairs = executor.map(fetch_one, holdings)
     return dict(pairs)
 
 

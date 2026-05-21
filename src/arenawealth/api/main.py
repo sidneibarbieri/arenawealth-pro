@@ -1,11 +1,4 @@
-"""FastAPI application - REST endpoints for ArenaWealth dashboard.
-
-Modern architecture with:
-- SQLModel/SQLite persistence
-- Repository pattern
-- Dependency injection
-- DTOs for API contracts
-"""
+"""FastAPI application for the ArenaWealth dashboard."""
 
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
@@ -22,21 +15,14 @@ from arenawealth.api.routers import (
 from arenawealth.models.database import init_database
 from arenawealth.providers.yahoo import YahooProvider
 
-# Global provider instance
 _yahoo_provider: YahooProvider | None = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    """Initialize application resources.
-
-    Creates database tables and initializes providers.
-    """
+    """Initialize application resources."""
     global _yahoo_provider
 
-    # Initialize database
     init_database()
-
-    # Initialize quote provider
     _yahoo_provider = YahooProvider()
 
     yield
@@ -45,12 +31,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 app = FastAPI(
     title="ArenaWealth API",
-    description="Professional wealth management with persistent storage",
+    description="Portfolio analysis API with persistent storage",
     version="0.2.0",
     lifespan=lifespan,
 )
 
-# CORS for frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://localhost:3000"],
@@ -59,7 +44,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
 app.include_router(portfolios_router)
 app.include_router(positions_router)
 app.include_router(transactions_router)

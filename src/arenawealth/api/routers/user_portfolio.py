@@ -7,7 +7,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Query
 from pydantic import BaseModel
 
 from arenawealth.analytics import (
@@ -250,13 +250,7 @@ async def get_user_recommendation(
     cash: float = Query(default=1511.18, gt=0),
     offline_demo: bool = Query(default=False),
 ) -> RecommendationResponse:
-    try:
-        return build_recommendation_response(cash, offline_demo)
-    except Exception as error:
-        raise HTTPException(
-            status_code=502,
-            detail=f"Recommendation provider failed: {error}",
-        ) from error
+    return build_recommendation_response(cash, offline_demo)
 
 
 @router.get("/user/health")

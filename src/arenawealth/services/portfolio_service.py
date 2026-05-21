@@ -214,7 +214,7 @@ class PortfolioService:
         return updated_count
 
     def get_portfolio_value(self, portfolio_id: int) -> dict:
-        """Calculate comprehensive portfolio valuation.
+        """Calculate portfolio valuation.
 
         Args:
             portfolio_id: Portfolio identifier.
@@ -232,21 +232,25 @@ class PortfolioService:
         total_cost_basis = Decimal("0")
 
         position_values = []
-        for pos in positions:
-            mv = pos.shares * pos.current_price
-            cb = pos.shares * pos.average_cost_basis
-            total_market_value += mv
-            total_cost_basis += cb
+        for position in positions:
+            market_value = position.shares * position.current_price
+            cost_basis = position.shares * position.average_cost_basis
+            total_market_value += market_value
+            total_cost_basis += cost_basis
 
             position_values.append(
                 {
-                    "ticker": pos.ticker,
-                    "shares": pos.shares,
-                    "price": pos.current_price,
-                    "market_value": mv,
-                    "cost_basis": cb,
-                    "unrealized_pnl": mv - cb,
-                    "unrealized_pnl_pct": (((mv - cb) / cb * 100) if cb > 0 else Decimal("0")),
+                    "ticker": position.ticker,
+                    "shares": position.shares,
+                    "price": position.current_price,
+                    "market_value": market_value,
+                    "cost_basis": cost_basis,
+                    "unrealized_pnl": market_value - cost_basis,
+                    "unrealized_pnl_pct": (
+                        ((market_value - cost_basis) / cost_basis * 100)
+                        if cost_basis > 0
+                        else Decimal("0")
+                    ),
                 }
             )
 
@@ -293,9 +297,9 @@ class PortfolioService:
         position_count = len(positions)
         equal_weight = Decimal("100") / position_count if position_count > 0 else Decimal("0")
 
-        for pos in positions:
-            ticker = pos["ticker"]
-            current_weight = (pos["market_value"] / total_value) * 100
+        for position_value in positions:
+            ticker = position_value["ticker"]
+            current_weight = (position_value["market_value"] / total_value) * 100
 
             if target_weights and ticker in target_weights:
                 target = target_weights[ticker]
@@ -306,7 +310,7 @@ class PortfolioService:
 
             if abs(weight_diff) > 5:
                 suggested_value = (target / 100) * total_value
-                current_value = pos["market_value"]
+                current_value = position_value["market_value"]
                 action = "BUY" if weight_diff < 0 else "SELL"
                 amount = abs(suggested_value - current_value)
 
@@ -323,6 +327,8 @@ class PortfolioService:
 
         return sorted(
             suggestions,
-            key=lambda x: abs(x["current_weight"] - x["target_weight"]),
+            key=lambda suggestion: abs(
+                suggestion["current_weight"] - suggestion["target_weight"]
+            ),
             reverse=True,
         )

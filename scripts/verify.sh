@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Local verification: lint, Python tests, frontend build, and ESLint.
+# Local verification for the Python package and browser app.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"

@@ -1,15 +1,11 @@
-"""Fallback chain — tries providers in order until one succeeds.
-
-Ported from old_arenawealth's multi-provider fallback (R), now with structured
-coverage reporting. A missing API key skips the provider silently (graceful
-degradation, not an error).
-"""
+"""Fallback chain for quote providers."""
 
 from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
 
+from arenawealth.providers.base import QuoteError
 from arenawealth.providers.protocol import Capability, QuoteProvider
 from arenawealth.providers.types import QuoteResult
 
@@ -55,16 +51,16 @@ class FallbackChain:
                     len(tickers),
                 )
                 return FallbackResult(quotes=quotes, attempts=attempts)
-            except Exception as exc:
+            except QuoteError as error:
                 attempts.append(
                     ProviderAttempt(
                         provider.info.provider_id,
                         success=False,
-                        error=str(exc),
+                        error=str(error),
                     )
                 )
                 logger.warning(
-                    "provider %s failed for quotes: %s", provider.info.provider_id, exc
+                    "provider %s failed for quotes: %s", provider.info.provider_id, error
                 )
 
         logger.error("all providers failed for quotes on tickers: %s", tickers)

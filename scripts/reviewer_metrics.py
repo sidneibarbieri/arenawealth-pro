@@ -12,6 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT_DIR = ROOT / "exports"
 SOURCE_DIRS = (ROOT / "src" / "arenawealth", ROOT / "tests", ROOT / "scripts")
+FRONTEND_SOURCE_DIR = ROOT / "frontend" / "src"
 EXCLUDED_PARTS = {"__pycache__", ".pytest_cache", ".ruff_cache", "archive", "exports"}
 
 
@@ -68,12 +69,18 @@ def source_metrics() -> dict[str, int]:
     files = iter_python_files()
     test_files = [path for path in files if "/tests/" in str(path)]
     source_files = [path for path in files if "/tests/" not in str(path)]
+    frontend_files = sorted(FRONTEND_SOURCE_DIR.rglob("*")) if FRONTEND_SOURCE_DIR.exists() else []
+    frontend_source_files = [
+        path for path in frontend_files if path.suffix in {".css", ".ts", ".tsx"}
+    ]
     return {
         "python_files": len(files),
         "source_files": len(source_files),
         "test_files": len(test_files),
         "source_lines": sum(count_code_lines(path) for path in source_files),
         "test_lines": sum(count_code_lines(path) for path in test_files),
+        "frontend_source_files": len(frontend_source_files),
+        "frontend_lines": sum(count_code_lines(path) for path in frontend_source_files),
     }
 
 
@@ -81,6 +88,8 @@ def build_payload(timeout_seconds: int) -> dict[str, object]:
     commands = [
         run_command([".venv/bin/python", "-m", "ruff", "check", "."], timeout_seconds),
         run_command([".venv/bin/python", "-m", "pytest", "-q"], timeout_seconds),
+        run_command(["npm", "--prefix", "frontend", "run", "build"], timeout_seconds),
+        run_command(["npm", "--prefix", "frontend", "run", "lint"], timeout_seconds),
         run_command(
             [
                 ".venv/bin/python",
@@ -100,7 +109,7 @@ def build_payload(timeout_seconds: int) -> dict[str, object]:
         "repository": ROOT.name,
         "metrics": source_metrics(),
         "commands": [asdict(result) for result in commands],
-        "overall_passed": all(result.passed for result in commands[:3]),
+        "overall_passed": all(result.passed for result in commands[:-1]),
     }
 
 

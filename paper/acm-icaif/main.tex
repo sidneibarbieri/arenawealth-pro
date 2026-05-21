@@ -1,0 +1,110 @@
+\documentclass[sigconf,review,anonymous]{acmart}
+
+\microtypesetup{expansion=false}
+\settopmatter{printacmref=false}
+\renewcommand\footnotetextcopyrightpermission[1]{}
+\pagestyle{plain}
+\emergencystretch=2em
+
+\title{ArenaWealth Pro: Reproducible Moat and Compounding Analytics for Long-Horizon Equity Portfolios}
+
+\author{Anonymous Author(s)}
+\affiliation{%
+  \institution{Anonymous Institution}
+  \city{Anonymous}
+  \country{Anonymous}
+}
+\email{anonymous@example.com}
+
+\begin{abstract}
+Long-horizon equity investors often combine qualitative moat judgments with
+quantitative evidence about capital efficiency, free-cash-flow durability, and
+valuation. We present ArenaWealth Pro, a reproducible portfolio-analysis
+artifact that turns those criteria into an auditable cash-deployment workflow.
+The current artifact provides deterministic offline analysis, live provider
+adapters, theme-aware concentration controls, and reviewer scripts that validate
+the executable surface. This draft is intentionally conservative: it reports
+artifact readiness and defines the empirical work still required before making
+outperformance claims.
+\end{abstract}
+
+\keywords{computational finance, portfolio analytics, reproducibility, moat, compounding}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+ArenaWealth Pro is scoped for ACM-style AI finance venues such as ICAIF
+\cite{acmIcaif}. It targets a practical investment workflow: deciding where to
+deploy incremental cash inside a concentrated portfolio of high-quality
+businesses. The system ranks existing holdings using moat, compounding,
+valuation, concentration, and theme constraints, then emits a fee-aware purchase
+plan. The artifact is designed to be reviewed as software first: a reviewer can
+install dependencies, run tests, reproduce deterministic recommendations, and
+inspect claim-evidence mappings.
+
+\section{Scope and Claims}
+
+The current artifact does not claim to beat market benchmarks or registered
+advisers. Those claims require out-of-sample backtests, baselines, ablations,
+transaction-cost modeling, and licensed data access. The present contribution is
+an auditable implementation substrate for those experiments.
+
+\section{System Design}
+
+The backend separates API DTOs, portfolio importers, provider adapters,
+analytics scoring, and deployment planning. Network access is isolated behind
+provider abstractions. The scoring and deployment logic are deterministic and
+covered by unit tests. The browser application is read-only and does not place
+orders.
+
+\section{Reviewer Workflow}
+
+The reviewer executes:
+
+\begin{verbatim}
+make verify
+make metrics
+python scripts/moat_compounding_analysis.py \
+  --cash 1511.18 \
+  --holdings tests/fixtures/seed_portfolio_avenue.csv \
+  --offline-demo
+\end{verbatim}
+
+The first command validates lint, Python tests, frontend build, and frontend
+lint. The second emits a JSON evidence report under \texttt{exports/}. The third
+runs a deterministic recommendation path that does not require API keys. The
+scaffold follows ACM conference authoring conventions \cite{acmAuthorSubmissions}.
+
+\section{Experimental Plan}
+
+The next paper milestone is a full empirical section:
+
+\begin{itemize}
+  \item Baselines: market-cap index, equal weight, quality factor, value factor,
+  and simple robo-advisor rebalancing rules.
+  \item Ablations: moat, compounding, valuation, concentration, and theme caps.
+  \item Costs: fees, slippage, turnover, taxes, and cash drag.
+  \item Robustness: provider missingness, stale data, and threshold sensitivity.
+\end{itemize}
+
+\section{Limitations}
+
+ArenaWealth Pro is not a registered investment adviser, broker-dealer, or order
+execution system. Commercial use requires legal, compliance, data-licensing,
+security, suitability, and disclosure review. The repository also does not
+include MITRE/STICKS cybersecurity campaign execution; those measurements belong
+to a separate artifact.
+
+\section{Conclusion}
+
+ArenaWealth Pro is a cleaned, executable foundation for a computational-finance
+artifact. It is ready for reviewer-oriented software validation, while its
+research claims remain intentionally bounded until the empirical benchmark suite
+is implemented.
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}
+
+\end{document}

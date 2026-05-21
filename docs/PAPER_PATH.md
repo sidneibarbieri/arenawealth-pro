@@ -22,8 +22,15 @@ that the method beats the state of the art.
 ## Current Reviewer Command
 
 ```bash
-python scripts/reviewer_metrics.py
+make verify
+make metrics
 ```
 
 This validates lint, tests, and deterministic offline analysis. It does not
 claim investment outperformance.
+
+## Venue Scaffold
+
+The current LaTeX scaffold is `paper/acm-icaif/main.tex`. It uses ACM `sigconf`
+review format because the most coherent computing-and-finance target is ACM
+ICAIF. See `docs/PAPER_TARGET.md` for the venue/prize distinction.

@@ -172,7 +172,7 @@ def analyze_portfolio(
     portfolio_id: int,
     service: PortfolioServiceDep,
 ) -> PortfolioAnalysisResponse:
-    """Get comprehensive portfolio analysis.
+    """Get portfolio analysis.
 
     Args:
         portfolio_id: Portfolio identifier.
