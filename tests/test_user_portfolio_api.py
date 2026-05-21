@@ -42,3 +42,14 @@ def test_portfolio_recommendation_offline_demo(api_client: TestClient) -> None:
     assert body["provider_mode"] == "offline-demo"
     assert body["orders"]
     assert body["ranked_positions"]
+
+
+def test_portfolio_candidates_offline_demo(api_client: TestClient) -> None:
+    response = api_client.get("/api/v1/portfolio/user/candidates?offline_demo=true&limit=5")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["provider_mode"] == "offline-demo"
+    assert 1 <= len(body["candidates"]) <= 5
+    scores = [candidate["composite_score"] for candidate in body["candidates"]]
+    assert scores == sorted(scores, reverse=True)

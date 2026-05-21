@@ -19,8 +19,13 @@ from arenawealth.analytics import (
     analyze_holdings,
     build_fundamentals_provider,
     plan_deployment,
+    screen_candidates,
 )
-from arenawealth.analytics.universe import FINANCIAL_TICKERS, THEME_BY_TICKER
+from arenawealth.analytics.universe import (
+    CANDIDATE_UNIVERSE,
+    FINANCIAL_TICKERS,
+    THEME_BY_TICKER,
+)
 from arenawealth.domain.position import Position
 from arenawealth.importers.csv_importer import import_csv
 from arenawealth.providers.yahoo import YahooProvider
@@ -93,6 +98,25 @@ class RecommendationResponse(BaseModel):
     excluded_overweight: list[str]
     excluded_theme: list[str]
     ranked_positions: list[RecommendationPositionResponse]
+
+
+class CandidateResponse(BaseModel):
+    ticker: str
+    name: str
+    theme: str
+    live_price: float
+    moat_class: str
+    compounding_class: str
+    composite_score: float
+    valuation_points: float
+    forward_pe: float | None
+    roic: float | None
+
+
+class CandidatesResponse(BaseModel):
+    provider_mode: str
+    generated_at: str
+    candidates: list[CandidateResponse]
 
 
 def holdings_path() -> Path:
@@ -299,6 +323,51 @@ async def get_user_recommendation(
     offline_demo: bool = Query(default=False),
 ) -> RecommendationResponse:
     return build_recommendation_response(cash, offline_demo)
+
+
+def candidate_holdings() -> tuple[Holding, ...]:
+    return tuple(
+        Holding(ticker, name, 1.0, 100.0, 100.0, theme, False)
+        for ticker, (name, theme) in CANDIDATE_UNIVERSE.items()
+    )
+
+
+def build_candidates_response(offline_demo: bool, limit: int) -> CandidatesResponse:
+    owned = [position.ticker for position in load_positions()]
+    if offline_demo:
+        provider: FundamentalsProvider = DemoFundamentalsProvider(candidate_holdings())
+        provider_mode = "offline-demo"
+    else:
+        provider = build_fundamentals_provider()
+        provider_mode = "live-auto"
+    candidates = screen_candidates(provider, owned=owned)[:limit]
+    return CandidatesResponse(
+        provider_mode=provider_mode,
+        generated_at=datetime.now(UTC).isoformat(),
+        candidates=[
+            CandidateResponse(
+                ticker=candidate.ticker,
+                name=candidate.name,
+                theme=candidate.theme,
+                live_price=candidate.live_price,
+                moat_class=candidate.score.moat_class,
+                compounding_class=candidate.score.compounding_class,
+                composite_score=candidate.score.composite_score,
+                valuation_points=candidate.score.valuation_points,
+                forward_pe=candidate.score.forward_pe,
+                roic=candidate.score.roic,
+            )
+            for candidate in candidates
+        ],
+    )
+
+
+@router.get("/user/candidates", response_model=CandidatesResponse)
+async def get_user_candidates(
+    offline_demo: bool = Query(default=False),
+    limit: int = Query(default=10, gt=0, le=50),
+) -> CandidatesResponse:
+    return build_candidates_response(offline_demo, limit)
 
 
 @router.get("/user/health")
