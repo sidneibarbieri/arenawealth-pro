@@ -4,6 +4,7 @@ import {
   BarChart3,
   CheckCircle2,
   CircleDollarSign,
+  KeyRound,
   RefreshCw,
   Search,
   ShieldCheck,
@@ -14,12 +15,14 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   fetchCandidates,
   fetchPortfolio,
+  fetchProviderStatus,
   fetchRecommendation,
   type Candidate,
   type CandidatesResponse,
   type PortfolioReview,
   type PortfolioResponse,
   type Position,
+  type ProviderStatus,
   type RecommendationOrder,
   type RecommendationResponse,
 } from './api';
@@ -57,6 +60,7 @@ function App() {
   const [portfolio, setPortfolio] = useState<PortfolioResponse | null>(null);
   const [recommendation, setRecommendation] = useState<RecommendationResponse | null>(null);
   const [candidates, setCandidates] = useState<CandidatesResponse | null>(null);
+  const [providers, setProviders] = useState<ProviderStatus[]>([]);
   const [portfolioError, setPortfolioError] = useState<string | null>(null);
   const [recommendationError, setRecommendationError] = useState<string | null>(null);
   const [candidateError, setCandidateError] = useState<string | null>(null);
@@ -89,6 +93,24 @@ function App() {
 
     return () => controller.abort();
   }, [offlineDemo, refreshIndex]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadProviders() {
+      const payload = await fetchProviderStatus(controller.signal);
+      setProviders(payload);
+    }
+
+    loadProviders().catch((error: unknown) => {
+      if (isAbortError(error)) {
+        return;
+      }
+      setPortfolioError(error instanceof Error ? error.message : 'Unknown provider error');
+    });
+
+    return () => controller.abort();
+  }, [refreshIndex]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -331,6 +353,8 @@ function App() {
               )}
             </section>
 
+            <ProviderStatusPanel providers={providers} />
+
             {recommendation && (
               <section className="data-section" id="rankings">
                 <div className="section-heading">
@@ -565,6 +589,42 @@ function StatusBlock({ tone, message }: StatusBlockProps) {
       <AlertTriangle size={18} />
       <span>{message}</span>
     </div>
+  );
+}
+
+interface ProviderStatusPanelProps {
+  providers: ProviderStatus[];
+}
+
+function ProviderStatusPanel({ providers }: ProviderStatusPanelProps) {
+  if (providers.length === 0) {
+    return null;
+  }
+  const configuredCount = providers.filter((provider) => provider.configured).length;
+  return (
+    <section className="provider-panel" aria-label="Provider status">
+      <div className="section-heading">
+        <div>
+          <p className="eyebrow">Data providers</p>
+          <h2>Free source readiness</h2>
+        </div>
+        <span className="freshness">
+          {configuredCount}/{providers.length} enabled
+        </span>
+      </div>
+      <div className="provider-list">
+        {providers.map((provider) => (
+          <div className="provider-row" key={provider.provider_id}>
+            <div className="provider-name">
+              {provider.configured ? <CheckCircle2 size={17} /> : <KeyRound size={17} />}
+              <strong>{provider.display_name}</strong>
+            </div>
+            <span>{provider.required_for}</span>
+            <code>{provider.env_var ?? 'no key required'}</code>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 

@@ -92,10 +92,11 @@ file counts, and line counts. Generated reports are not committed.
 make price-backtest
 ```
 
-This compares the current basket against `SPY` using free adjusted closes from
-Yahoo Finance and writes JSON under `exports/`. It is a current-basket price
-backtest, not a point-in-time stock-selection study. The data limitations are
-listed in `docs/DATA_SOURCES.md`.
+This compares the current basket against `SPY` and an equal-weight baseline
+using free adjusted closes from Yahoo Finance. It also reports a rebalancing
+ablation with transaction costs. The output is a JSON report under `exports/`.
+It is a current-basket price study, not a point-in-time stock-selection study.
+The data limitations are listed in `docs/DATA_SOURCES.md`.
 
 ## API
 

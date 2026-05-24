@@ -34,6 +34,17 @@ def test_health_aggregate_exists(api_client: TestClient) -> None:
     assert response.json().get("status") == "healthy"
 
 
+def test_provider_status_never_returns_secret_values(api_client: TestClient) -> None:
+    response = api_client.get("/api/v1/providers/status")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body
+    assert {provider["provider_id"] for provider in body} >= {"yahoo", "sec_edgar"}
+    assert all("api_key" not in provider for provider in body)
+    assert all("configured" in provider for provider in body)
+
+
 def test_portfolio_recommendation_offline_demo(api_client: TestClient) -> None:
     response = api_client.get("/api/v1/portfolio/user/recommendation?offline_demo=true")
 

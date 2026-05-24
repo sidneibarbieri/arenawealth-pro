@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from arenawealth.api.routers import (
     portfolios_router,
     positions_router,
+    providers_router,
     transactions_router,
     user_portfolio_router,
 )
@@ -46,6 +47,7 @@ app.add_middleware(
 
 app.include_router(portfolios_router)
 app.include_router(positions_router)
+app.include_router(providers_router)
 app.include_router(transactions_router)
 app.include_router(user_portfolio_router)
 

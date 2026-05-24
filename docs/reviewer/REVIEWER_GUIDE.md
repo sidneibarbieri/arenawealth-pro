@@ -33,8 +33,10 @@ make price-backtest
 ```
 
 This path uses free adjusted closes and writes a JSON report under `exports/`.
-It is useful for checking risk and benchmark behavior of the current basket. It
-does not claim point-in-time stock-selection performance.
+It compares the current basket against `SPY`, equal-weight holdings, and a
+rebalancing ablation with transaction costs. It is useful for checking risk and
+benchmark behavior of the current basket. It does not claim point-in-time
+stock-selection performance.
 
 ## Local App
 

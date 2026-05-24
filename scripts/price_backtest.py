@@ -11,7 +11,12 @@ from typing import Any
 
 import yfinance
 
-from arenawealth.analytics import PriceBacktestReport, run_price_backtest
+from arenawealth.analytics import (
+    BacktestComparison,
+    BacktestResult,
+    PriceBacktestStudy,
+    run_price_backtest_study,
+)
 
 DEFAULT_HOLDINGS = Path("data/carteira_atual.csv")
 DEFAULT_FIXTURE = Path("tests/fixtures/seed_portfolio_avenue.csv")
@@ -69,35 +74,43 @@ def fetch_close_history(
     return histories
 
 
-def report_to_payload(report: PriceBacktestReport, generated_utc: str) -> dict[str, Any]:
+def result_to_payload(result: BacktestResult) -> dict[str, Any]:
     return {
+        "periods": result.periods,
+        "rebalances": result.rebalances,
+        "total_return": result.total_return,
+        "cagr": result.cagr,
+        "annualized_volatility": result.annualized_volatility,
+        "sharpe_ratio": result.sharpe_ratio,
+        "max_drawdown": result.max_drawdown,
+        "total_cost": result.total_cost,
+    }
+
+
+def comparison_to_payload(comparison: BacktestComparison) -> dict[str, Any]:
+    return {
+        "excess_total_return": comparison.excess_total_return,
+        "excess_cagr": comparison.excess_cagr,
+        "sharpe_delta": comparison.sharpe_delta,
+        "max_drawdown_delta": comparison.max_drawdown_delta,
+    }
+
+
+def study_to_payload(study: PriceBacktestStudy, generated_utc: str) -> dict[str, Any]:
+    payload: dict[str, Any] = {
         "generated_utc": generated_utc,
-        "start_date": report.start_date,
-        "end_date": report.end_date,
-        "tickers": list(report.tickers),
-        "benchmark_ticker": report.benchmark_ticker,
-        "strategy": {
-            "periods": report.strategy.periods,
-            "rebalances": report.strategy.rebalances,
-            "total_return": report.strategy.total_return,
-            "cagr": report.strategy.cagr,
-            "annualized_volatility": report.strategy.annualized_volatility,
-            "sharpe_ratio": report.strategy.sharpe_ratio,
-            "max_drawdown": report.strategy.max_drawdown,
-            "total_cost": report.strategy.total_cost,
+        "start_date": study.start_date,
+        "end_date": study.end_date,
+        "tickers": list(study.tickers),
+        "benchmark_ticker": study.benchmark_ticker,
+        "baselines": {
+            "current_weight": result_to_payload(study.current_weight),
+            "equal_weight": result_to_payload(study.equal_weight),
+            "benchmark": result_to_payload(study.benchmark),
         },
-        "benchmark": {
-            "total_return": report.benchmark.total_return,
-            "cagr": report.benchmark.cagr,
-            "annualized_volatility": report.benchmark.annualized_volatility,
-            "sharpe_ratio": report.benchmark.sharpe_ratio,
-            "max_drawdown": report.benchmark.max_drawdown,
-        },
-        "comparison": {
-            "excess_total_return": report.comparison.excess_total_return,
-            "excess_cagr": report.comparison.excess_cagr,
-            "sharpe_delta": report.comparison.sharpe_delta,
-            "max_drawdown_delta": report.comparison.max_drawdown_delta,
+        "comparisons": {
+            "current_vs_equal_weight": comparison_to_payload(study.current_vs_equal_weight),
+            "current_vs_benchmark": comparison_to_payload(study.current_vs_benchmark),
         },
         "limitations": [
             "Current-basket backtest; not a point-in-time stock-selection backtest.",
@@ -105,6 +118,16 @@ def report_to_payload(report: PriceBacktestReport, generated_utc: str) -> dict[s
             "Survivorship and selection bias are not eliminated.",
         ],
     }
+    if study.rebalanced_current is not None and study.current_vs_rebalanced is not None:
+        payload["ablations"] = {
+            "rebalanced_current": result_to_payload(study.rebalanced_current),
+            "current_vs_rebalanced": comparison_to_payload(study.current_vs_rebalanced),
+        }
+    return payload
+
+
+def report_to_payload(study: PriceBacktestStudy, generated_utc: str) -> dict[str, Any]:
+    return study_to_payload(study, generated_utc)
 
 
 def write_payload(payload: dict[str, Any], output_dir: Path) -> Path:
@@ -120,8 +143,8 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--benchmark", default="SPY")
     parser.add_argument("--start", default="2021-01-01")
     parser.add_argument("--end", default=None)
-    parser.add_argument("--rebalance-every", type=int, default=0)
-    parser.add_argument("--cost-rate", type=float, default=0.0)
+    parser.add_argument("--rebalance-every", type=int, default=63)
+    parser.add_argument("--cost-rate", type=float, default=0.001)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     return parser.parse_args()
 
@@ -131,7 +154,7 @@ def main() -> None:
     weights = load_target_weights(arguments.holdings)
     tickers = sorted({*weights, arguments.benchmark.upper()})
     histories = fetch_close_history(tickers, arguments.start, arguments.end)
-    report = run_price_backtest(
+    study = run_price_backtest_study(
         histories,
         weights,
         benchmark_ticker=arguments.benchmark.upper(),
@@ -139,14 +162,15 @@ def main() -> None:
         cost_rate=arguments.cost_rate,
     )
     generated_utc = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
-    payload = report_to_payload(report, generated_utc)
+    payload = study_to_payload(study, generated_utc)
     output_path = write_payload(payload, arguments.output_dir)
     print(
-        "Price backtest "
-        f"{report.start_date}..{report.end_date} "
-        f"strategy={report.strategy.total_return:.2%} "
-        f"benchmark={report.benchmark.total_return:.2%} "
-        f"excess={report.comparison.excess_total_return:.2%}"
+        "Price backtest study "
+        f"{study.start_date}..{study.end_date} "
+        f"current={study.current_weight.total_return:.2%} "
+        f"equal_weight={study.equal_weight.total_return:.2%} "
+        f"benchmark={study.benchmark.total_return:.2%} "
+        f"excess_vs_benchmark={study.current_vs_benchmark.excess_total_return:.2%}"
     )
     print(f"Output {output_path}")
 

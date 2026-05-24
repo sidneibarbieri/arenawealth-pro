@@ -53,13 +53,33 @@ The offline demo path reads holdings from a tracked fixture, uses deterministic
 demo fundamentals, and prints a deployment plan. Local holdings and generated
 exports are ignored by Git because they may contain private portfolio data.
 
+## Free Price Study
+
+```bash
+make price-backtest
+```
+
+This uses free Yahoo Finance adjusted closes. The report compares the current
+basket against `SPY`, an equal-weight basket, and a rebalancing ablation with
+transaction costs. It is reproducible as a price-history study, but it is not a
+point-in-time stock-selection backtest.
+
 ## Optional Data Providers
 
 Provider priority is FMP, then Finnhub, then Yahoo Finance. The offline demo
 mode avoids external providers entirely.
 
+The local app exposes provider readiness without returning secret values:
+
+```bash
+curl http://127.0.0.1:8000/api/v1/providers/status
+```
+
+Optional keys can be stored in `.env` or `~/.arenawealth/credentials.env`.
+Reviewer runs do not require them.
+
 ## Known Limits
 
-The current artifact does not yet include investment backtests, benchmark
-baselines, ablations, or paper table generation. Performance claims require that
-empirical work first.
+The current artifact includes a current-basket price study. It does not yet
+include a point-in-time fundamental selection backtest, factor-adjusted alpha, or
+paper table generation. Performance claims require that empirical work first.

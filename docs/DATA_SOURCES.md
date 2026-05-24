@@ -27,3 +27,18 @@ paid subscriptions.
 
 Performance is reported only with these biases stated and, where possible,
 bounded.
+
+## Current Free Evidence
+
+`make price-backtest` runs a free current-basket price study. It uses adjusted
+closes only, compares against `SPY` and equal-weight holdings, and includes a
+rebalancing ablation with transaction costs. It does not prove that the selection
+rule would have chosen the same assets in the past.
+
+## Point-in-Time Foundation
+
+SEC company facts include filing dates. The helper functions in
+`arenawealth.analytics.sec_facts` filter facts by `filed <= as_of`, so future
+filings are not visible to historical studies. This is the required foundation
+for a free point-in-time fundamentals backtest. The remaining work is mapping
+free SEC facts into the full moat and compounding score for each rebalance date.

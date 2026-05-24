@@ -11,8 +11,8 @@ that the method beats the state of the art.
 ## Evidence Still Needed
 
 - Out-of-sample backtests across multiple market regimes.
-- Baselines against factor portfolios, quality screens, equal-weight portfolios,
-  market-cap indexes, and common robo-advisor logic.
+- Baselines against factor portfolios, quality screens, market-cap indexes, and
+  common robo-advisor logic.
 - Transaction cost, fee, tax, turnover, and slippage modeling.
 - Ablations for moat, compounding, valuation, concentration, and theme rules.
 - Sensitivity analysis for thresholds and provider data quality.
@@ -29,8 +29,18 @@ make metrics
 This validates lint, tests, and deterministic offline analysis. It does not
 claim investment outperformance.
 
+## Current Evidence Command
+
+```bash
+make price-backtest
+```
+
+This runs a free current-basket price study with `SPY`, equal-weight holdings,
+and a rebalancing-cost ablation. It is useful evidence, but it is not yet a
+point-in-time stock-selection result.
+
 ## Venue Scaffold
 
-The current LaTeX scaffold is `paper/acm-icaif/main.tex`. It uses ACM `sigconf`
-review format because the most coherent computing-and-finance target is ACM
-ICAIF. See `docs/PAPER_TARGET.md` for the venue/prize distinction.
+The current LaTeX scaffold is `paper/main.tex`. It uses ACM `sigconf` review
+format because the most coherent computing-and-finance paper target uses that
+format. See `notes/PAPER_TARGET.md` for the event and prize distinction.

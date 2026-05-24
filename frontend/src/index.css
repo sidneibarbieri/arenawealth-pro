@@ -313,6 +313,58 @@ h3 {
   font-weight: 700;
 }
 
+.provider-panel {
+  min-width: 0;
+  margin-top: 34px;
+  padding-top: 22px;
+  border-top: 1px solid #d8d6cd;
+}
+
+.provider-list {
+  display: grid;
+  border: 1px solid #d8d6cd;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.provider-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) minmax(220px, 1fr) minmax(160px, auto);
+  gap: 16px;
+  align-items: center;
+  min-width: 0;
+  padding: 13px 16px;
+  border-bottom: 1px solid #d8d6cd;
+  color: #55554d;
+  font-size: 0.86rem;
+}
+
+.provider-row:last-child {
+  border-bottom: 0;
+}
+
+.provider-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  color: #111113;
+}
+
+.provider-name svg {
+  color: #2f5f4f;
+  flex: 0 0 auto;
+}
+
+.provider-row code {
+  justify-self: end;
+  max-width: 100%;
+  padding: 3px 7px;
+  overflow-wrap: anywhere;
+  background: #f2f1ec;
+  color: #33332f;
+  font-size: 0.78rem;
+}
+
 .review-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -622,6 +674,7 @@ tbody tr:last-child td {
   .metric-strip,
   .deployment-layout,
   .control-row,
+  .provider-row,
   .review-grid {
     grid-template-columns: 1fr;
   }
@@ -657,6 +710,10 @@ tbody tr:last-child td {
 
   .review-column:last-child {
     border-bottom: 0;
+  }
+
+  .provider-row code {
+    justify-self: start;
   }
 }
 

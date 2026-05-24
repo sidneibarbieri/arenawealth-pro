@@ -2,10 +2,10 @@
 
 import json
 
-from scripts.price_backtest import load_target_weights, report_to_payload
+from scripts.price_backtest import load_target_weights, study_to_payload
 
 from arenawealth.analytics.backtest import compare_backtests, run_backtest
-from arenawealth.analytics.price_backtest import PriceBacktestReport
+from arenawealth.analytics.price_backtest import PriceBacktestStudy
 
 
 def test_load_target_weights_from_csv(tmp_path):
@@ -25,18 +25,23 @@ def test_load_target_weights_from_csv(tmp_path):
 
 
 def test_report_payload_is_json_serializable():
-    strategy = run_backtest({"AAA": (0.1, 0.1)}, {"AAA": 1.0}, periods_per_year=1)
+    current = run_backtest({"AAA": (0.1, 0.1)}, {"AAA": 1.0}, periods_per_year=1)
+    equal_weight = run_backtest({"AAA": (0.1, 0.1)}, {"AAA": 1.0}, periods_per_year=1)
     benchmark = run_backtest({"SPY": (0.05, 0.05)}, {"SPY": 1.0}, periods_per_year=1)
-    report = PriceBacktestReport(
+    study = PriceBacktestStudy(
         start_date="2024-01-02",
         end_date="2024-01-03",
         tickers=("AAA",),
         benchmark_ticker="SPY",
-        strategy=strategy,
+        current_weight=current,
+        equal_weight=equal_weight,
         benchmark=benchmark,
-        comparison=compare_backtests(strategy, benchmark),
+        current_vs_equal_weight=compare_backtests(current, equal_weight),
+        current_vs_benchmark=compare_backtests(current, benchmark),
     )
-    payload = report_to_payload(report, "20260521_180000")
+    payload = study_to_payload(study, "20260521_180000")
 
     assert payload["limitations"]
+    assert "baselines" in payload
+    assert "comparisons" in payload
     json.dumps(payload)

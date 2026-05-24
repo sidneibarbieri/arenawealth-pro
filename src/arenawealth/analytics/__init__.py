@@ -34,11 +34,21 @@ from arenawealth.analytics.portfolio_review import (
 from arenawealth.analytics.price_backtest import (
     AlignedReturnSeries,
     PriceBacktestReport,
+    PriceBacktestStudy,
     align_price_history,
+    equal_weights,
     run_price_backtest,
+    run_price_backtest_study,
 )
 from arenawealth.analytics.scoring import analyze, score_fundamentals
 from arenawealth.analytics.screening import CandidateAnalysis, screen_candidates
+from arenawealth.analytics.sec_facts import (
+    PointInTimeFact,
+    annual_series_as_of,
+    fact_entries,
+    facts_available_as_of,
+    latest_fact_as_of,
+)
 from arenawealth.analytics.snapshots import SnapshotProvider, load_snapshot, record_snapshot
 from arenawealth.analytics.workflow import analyze_holdings, fetch_fundamentals
 
@@ -57,9 +67,11 @@ __all__ = [
     "FundamentalsProvider",
     "Holding",
     "Order",
+    "PointInTimeFact",
     "PortfolioReview",
     "PositionAnalysis",
     "PriceBacktestReport",
+    "PriceBacktestStudy",
     "ReplacementReview",
     "SnapshotProvider",
     "TrimReview",
@@ -67,9 +79,14 @@ __all__ = [
     "align_price_history",
     "analyze",
     "analyze_holdings",
+    "annual_series_as_of",
     "build_fundamentals_provider",
     "compare_backtests",
+    "equal_weights",
+    "fact_entries",
+    "facts_available_as_of",
     "fetch_fundamentals",
+    "latest_fact_as_of",
     "load_snapshot",
     "normalize_weights",
     "order_fee",
@@ -78,6 +95,7 @@ __all__ = [
     "review_portfolio",
     "run_backtest",
     "run_price_backtest",
+    "run_price_backtest_study",
     "score_fundamentals",
     "screen_candidates",
 ]

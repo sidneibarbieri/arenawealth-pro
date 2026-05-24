@@ -107,6 +107,15 @@ export interface CandidatesResponse {
   candidates: Candidate[];
 }
 
+export interface ProviderStatus {
+  provider_id: string;
+  display_name: string;
+  env_var: string | null;
+  configured: boolean;
+  required_for: string;
+  free_tier: boolean;
+}
+
 async function parseJsonResponse<ResponsePayload>(
   response: Response,
   resourceName: string,
@@ -152,4 +161,9 @@ export async function fetchCandidates(
   });
   const response = await fetch(`/api/v1/portfolio/user/candidates?${parameters}`, { signal });
   return parseJsonResponse<CandidatesResponse>(response, 'Candidates');
+}
+
+export async function fetchProviderStatus(signal: AbortSignal): Promise<ProviderStatus[]> {
+  const response = await fetch('/api/v1/providers/status', { signal });
+  return parseJsonResponse<ProviderStatus[]>(response, 'Provider status');
 }
