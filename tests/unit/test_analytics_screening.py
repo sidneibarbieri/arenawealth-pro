@@ -68,3 +68,9 @@ def test_candidate_universe_includes_requested_adr_reit_and_energy_names():
     assert {"AAPL", "NVDA", "V", "LVMUY", "VICI", "EQNR", "ENB"}.issubset(
         CANDIDATE_UNIVERSE
     )
+
+
+def test_candidate_universe_includes_legacy_quality_salvage_names():
+    assert {"CME", "WM", "WCN", "TXN", "SHW", "ITW", "APD", "EW"}.issubset(
+        CANDIDATE_UNIVERSE
+    )

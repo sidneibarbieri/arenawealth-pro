@@ -49,6 +49,8 @@ academic_*_report_*.md
 *.fls
 *.synctex.gz
 paper/**/*.pdf
+paper/.Rhistory
+paper/_fig_preview.tex
 
 # Local / sensitive data
 data/carteira_atual.csv
@@ -75,4 +77,6 @@ htmlcov/
 *_test_results_*.json
 *_excellence_report_*.md
 archive/
+old_arenawealth-pro/
+brandArena/
 notes/brand-assets/

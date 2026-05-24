@@ -11,6 +11,9 @@ of presenting opaque advice.
 - Keep provider access replaceable through small interfaces.
 - Keep reviewer validation simple: install, lint, test, run metrics.
 - Separate implemented behavior from future research ideas.
+- Treat model portfolios as policy templates, not universal prescriptions.
+- Preserve determinism in advisor workflows by pinning portfolio input, data
+  snapshot, and policy version.
 
 ## Current Focus
 
@@ -22,10 +25,14 @@ The current artifact focuses on:
 - provider abstractions
 - moat, compounding, and deployment analytics
 - reproducibility metrics for reviewers
+- deterministic candidate screening and portfolio review
+- current-basket price-history baselines
 
 ## Future Work
 
 - correlation-aware allocation
+- web editing for imported and manually entered portfolios
+- advisor-grade data isolation and audit logs
 - liquidity and market-impact constraints
 - tax-aware deployment
 - broader provider coverage
