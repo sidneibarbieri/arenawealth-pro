@@ -1,0 +1,3 @@
+display_name: API Health Semaphores
+short_description: Add visual API health indicators with working/configured/not_configured/error states.
+default_prompt: Add a health semaphore for each external data provider in this project, distinguishing between configured, working, and error states with a UI chip and a /health/providers endpoint.
