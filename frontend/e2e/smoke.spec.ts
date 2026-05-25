@@ -12,8 +12,10 @@ test.describe('ArenaWealth workbench', () => {
     await expect(page.getByRole('heading', { name: 'ArenaWealth Pro' })).toBeVisible();
     await expect(page.locator('aside[aria-label="Workspace navigation"]')).toBeVisible();
     await expect(page.getByText('Allocation queue')).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Free source readiness' })).toBeVisible();
-    await expect(page.getByText('Yahoo Finance')).toBeVisible();
+    const providerPanel = page.getByLabel('Provider status');
+    await expect(providerPanel.getByRole('heading', { name: 'Free source readiness' })).toBeVisible();
+    await expect(providerPanel.getByText('Yahoo Finance')).toBeVisible();
+    await expect(page.getByLabel('Data sources health')).toBeVisible();
     await expect(page.getByText('Portfolio positions')).toBeVisible();
   });
 

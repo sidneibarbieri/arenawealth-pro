@@ -13,6 +13,14 @@ cd frontend && npm install && cd ..
 
 No API keys are required for the unit and integration tests.
 
+Optional free provider credentials can be configured with:
+
+```bash
+make configure-env
+```
+
+The generated `.env` is ignored by Git.
+
 ## Validation
 
 ```bash
@@ -73,6 +81,8 @@ The local app exposes provider readiness without returning secret values:
 
 ```bash
 curl http://127.0.0.1:8000/api/v1/providers/status
+curl http://127.0.0.1:8000/api/v1/data-sources/health
+curl "http://127.0.0.1:8000/api/v1/data-sources/health?live=true"
 ```
 
 Optional keys can be stored in `.env` or `~/.arenawealth/credentials.env`.

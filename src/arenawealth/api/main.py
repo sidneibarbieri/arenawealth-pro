@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from arenawealth.api.routers import (
+    data_sources_router,
     portfolios_router,
     positions_router,
     providers_router,
@@ -17,6 +18,7 @@ from arenawealth.models.database import init_database
 from arenawealth.providers.yahoo import YahooProvider
 
 _yahoo_provider: YahooProvider | None = None
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
@@ -29,6 +31,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     yield
 
     _yahoo_provider = None
+
 
 app = FastAPI(
     title="ArenaWealth API",
@@ -45,11 +48,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(data_sources_router)
 app.include_router(portfolios_router)
 app.include_router(positions_router)
 app.include_router(providers_router)
 app.include_router(transactions_router)
 app.include_router(user_portfolio_router)
+
 
 @app.get("/api/v1/health")
 async def health_check() -> dict:
@@ -59,6 +64,7 @@ async def health_check() -> dict:
         "version": "0.2.0",
         "features": ["persistence", "rest-api", "analysis"],
     }
+
 
 if __name__ == "__main__":
     import uvicorn

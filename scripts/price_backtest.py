@@ -47,25 +47,20 @@ def load_target_weights(path: Path) -> dict[str, float]:
 def fetch_close_history(
     tickers: list[str], start: str, end: str | None
 ) -> dict[str, dict[str, float]]:
-    data = yfinance.download(
-        tickers,
-        start=start,
-        end=end,
-        auto_adjust=True,
-        progress=False,
-        group_by="column",
-        threads=True,
-    )
-    if data.empty:
-        raise ValueError("Yahoo Finance returned no historical prices")
-
-    close_data = data.get("Close", data)
-    if len(tickers) == 1:
-        close_data = close_data.to_frame(name=tickers[0])
-
     histories: dict[str, dict[str, float]] = {}
     for ticker in tickers:
-        series = close_data[ticker].dropna()
+        data = yfinance.download(
+            ticker,
+            start=start,
+            end=end,
+            auto_adjust=True,
+            progress=False,
+        )
+        if data.empty:
+            raise ValueError(f"Yahoo Finance returned no historical prices for {ticker}")
+        close_data = data["Close"]
+        series = close_data[ticker] if hasattr(close_data, "columns") else close_data
+        series = series.dropna()
         histories[ticker] = {
             index.strftime("%Y-%m-%d"): float(value)
             for index, value in series.items()

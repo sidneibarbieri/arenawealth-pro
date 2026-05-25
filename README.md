@@ -27,6 +27,14 @@ Equivalent shortcut:
 make setup
 ```
 
+To create a local `.env` template for free data-provider configuration:
+
+```bash
+make configure-env
+```
+
+The generated `.env` is ignored by Git. It contains no required paid services.
+
 ## Backend Validation
 
 ```bash
@@ -107,6 +115,7 @@ make api
 Main routes:
 
 - `GET /api/v1/health`
+- `GET /api/v1/data-sources/health`
 - `GET /api/v1/portfolio/user`
 - `GET /api/v1/portfolios`
 
@@ -121,8 +130,12 @@ Open `http://127.0.0.1:5173`.
 To run both API and frontend in one terminal:
 
 ```bash
-make app
+./run.sh
 ```
+
+`./run.sh` frees stale local ports, starts the API, waits for the health check,
+then starts the frontend. It prints log file paths under `/tmp/` and stops both
+processes on Ctrl+C. `make app` and `make run` call the same script.
 
 End-to-end browser smoke test:
 

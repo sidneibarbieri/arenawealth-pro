@@ -15,6 +15,15 @@ make metrics
 `make verify` runs Python lint, Python tests, frontend build, and frontend lint.
 `make metrics` writes a timestamped JSON report under `exports/`.
 
+To open the local workbench:
+
+```bash
+./run.sh
+```
+
+The runner starts the API first, waits for readiness, then starts the frontend.
+It also clears stale local processes on the configured API and UI ports.
+
 ## Offline Analysis
 
 ```bash
@@ -40,19 +49,14 @@ stock-selection performance.
 
 ## Local App
 
-Terminal 1:
-
 ```bash
-make api
-```
-
-Terminal 2:
-
-```bash
-make ui
+./run.sh
 ```
 
 Open `http://127.0.0.1:5173`.
+
+The Data Sources Health panel defaults to configuration checks. Use "Run live
+check" to test free providers that have local credentials configured.
 
 ## End-to-End Smoke Test
 

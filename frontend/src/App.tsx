@@ -26,6 +26,7 @@ import {
   type RecommendationOrder,
   type RecommendationResponse,
 } from './api';
+import { DataSourcesHealth } from './components/DataSourcesHealth';
 import { formatDateTime, formatMoney, formatNumber, formatPercent } from './format';
 import { type TableSort, useTableSort } from './useTableSort';
 
@@ -354,6 +355,8 @@ function App() {
             </section>
 
             <ProviderStatusPanel providers={providers} />
+
+            <DataSourcesHealth />
 
             {recommendation && (
               <section className="data-section" id="rankings">

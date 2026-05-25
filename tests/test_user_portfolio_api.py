@@ -45,6 +45,19 @@ def test_provider_status_never_returns_secret_values(api_client: TestClient) -> 
     assert all("configured" in provider for provider in body)
 
 
+def test_data_sources_health_config_mode_hides_secret_values(
+    api_client: TestClient,
+) -> None:
+    response = api_client.get("/api/v1/data-sources/health")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["live"] is False
+    assert body["sources"]
+    assert all("api_key" not in source for source in body["sources"])
+    assert all(source["status"] in {"configured", "not_configured"} for source in body["sources"])
+
+
 def test_portfolio_recommendation_offline_demo(api_client: TestClient) -> None:
     response = api_client.get("/api/v1/portfolio/user/recommendation?offline_demo=true")
 

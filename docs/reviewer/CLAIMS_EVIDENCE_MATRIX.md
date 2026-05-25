@@ -7,6 +7,7 @@
 | The reviewer can run a deterministic offline recommendation. | `scripts/moat_compounding_analysis.py --offline-demo` | Supported |
 | The app exposes a live cash-deployment endpoint. | `GET /api/v1/portfolio/user/recommendation` | Supported |
 | The live recommendation uses external data when provider keys are available. | Provider mode in CLI/API output | Supported with provider availability |
+| Data-source readiness is visible without exposing secrets. | `GET /api/v1/data-sources/health` and app Data Sources Health panel | Supported |
 | The artifact can run free price-history baselines and a rebalancing ablation. | `make price-backtest` | Supported for current-basket price history |
 | SEC fundamentals can be filtered point-in-time by filing date. | `tests/unit/test_sec_facts.py` | Supported as a foundation |
 | The method beats market or advisor baselines. | Current-basket price history is available, but point-in-time selection backtests and factor-adjusted baselines are not complete. | Not supported |

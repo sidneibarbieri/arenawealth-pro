@@ -2,7 +2,7 @@ PYTHON ?= .venv/bin/python
 PIP ?= .venv/bin/pip
 UVICORN ?= .venv/bin/uvicorn
 
-.PHONY: setup verify verify-e2e metrics recommendation price-backtest api ui app paper clean
+.PHONY: setup verify verify-e2e metrics recommendation price-backtest configure-env api ui app run paper clean
 
 setup:
 	python3.11 -m venv .venv
@@ -24,6 +24,9 @@ recommendation:
 price-backtest:
 	$(PYTHON) scripts/price_backtest.py --start 2021-01-01 --benchmark SPY
 
+configure-env:
+	bash scripts/configure_env.sh
+
 api:
 	$(UVICORN) arenawealth.api.main:app --host 127.0.0.1 --port 8000 --reload
 
@@ -31,6 +34,9 @@ ui:
 	cd frontend && npm run dev -- --host 127.0.0.1
 
 app:
+	bash scripts/start.sh
+
+run:
 	bash scripts/start.sh
 
 paper:
