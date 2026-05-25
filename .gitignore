@@ -64,6 +64,12 @@ data/snapshots/
 .env.*
 !.env.example
 
+# FinTech WC demo screenshots contain real portfolio data — keep local only
+FinTech_WC/demo_shots/*.png
+# QA render artifacts
+FinTech_WC/*.pdf
+_qa_*.pdf
+
 # Local environments and generated output
 venv311/
 exports/
