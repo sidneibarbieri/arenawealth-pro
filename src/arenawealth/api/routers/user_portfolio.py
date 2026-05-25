@@ -31,12 +31,10 @@ from arenawealth.analytics.universe import (
 )
 from arenawealth.domain.position import Position
 from arenawealth.importers.csv_importer import import_csv
+from arenawealth.importers.holdings_source import ROOT, resolve_holdings_path
 from arenawealth.models.database import QuoteHistory, get_session
 from arenawealth.providers.yahoo import YahooProvider
 
-ROOT = Path(__file__).resolve().parents[4]
-PRIVATE_HOLDINGS = ROOT / "data" / "carteira_atual.csv"
-FIXTURE_HOLDINGS = ROOT / "tests" / "fixtures" / "seed_portfolio_avenue.csv"
 QUOTE_CACHE_TTL = timedelta(minutes=15)
 
 router = APIRouter(
@@ -159,9 +157,7 @@ class CandidatesResponse(BaseModel):
 
 
 def holdings_path() -> Path:
-    if PRIVATE_HOLDINGS.exists():
-        return PRIVATE_HOLDINGS
-    return FIXTURE_HOLDINGS
+    return resolve_holdings_path()
 
 
 def load_positions() -> list[Position]:

@@ -274,6 +274,7 @@ function App() {
                 </div>
                 <span className="freshness">
                   Data snapshot {formatDateTime(portfolio.last_updated)}
+                  {portfolio.analysis?.source ? ` · ${portfolio.analysis.source}` : ''}
                 </span>
               </div>
 

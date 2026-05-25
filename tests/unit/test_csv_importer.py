@@ -51,3 +51,19 @@ class TestCsvImporter:
         csv.write_text("ticker,shares,cost_basis_per_share\nAAPL,10,150\n")
         positions = import_csv(csv)
         assert positions[0].current_price == Decimal("150")
+
+    def test_reads_avenue_download_columns(self, tmp_path: Path) -> None:
+        csv = tmp_path / "portfolio.csv"
+        csv.write_text(
+            "Symbol,Name,Asset Class,Category,Total Quantity,Available Quantity,"
+            "Average Price,Current Price,Total Invested,Current Value\n"
+            "AVGO,Broadcom Inc,Stocks Global,Stock,24.221260,24.221260,"
+            "241.16,414.14,5841.20,10030.99\n"
+        )
+
+        positions = import_csv(csv)
+
+        assert positions[0].ticker == "AVGO"
+        assert positions[0].shares == Decimal("24.221260")
+        assert positions[0].cost_basis_per_share == Decimal("241.16")
+        assert positions[0].current_price == Decimal("414.14")

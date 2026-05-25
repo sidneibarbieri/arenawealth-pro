@@ -17,7 +17,16 @@ from arenawealth.domain.position import Position
 
 TICKER_ALIASES = {"ticker", "symbol", "código", "codigo", "ativo", "stock"}
 NAME_ALIASES = {"name", "nome", "description", "descrição", "descricao", "company"}
-SHARES_ALIASES = {"shares", "quantity", "quantidade", "qtd", "qty", "cotas"}
+SHARES_ALIASES = {
+    "shares",
+    "quantity",
+    "total_quantity",
+    "available_quantity",
+    "quantidade",
+    "qtd",
+    "qty",
+    "cotas",
+}
 COST_BASIS_ALIASES = {
     "cost_basis",
     "cost_basis_per_share",

@@ -73,6 +73,11 @@ offline demo mode does not.
 Private portfolio CSVs are intentionally ignored by Git. The default local path
 is `data/carteira_atual.csv`; reviewers should use the fixture command above.
 
+For broker exports, place the latest CSV under `data/inbox/`. The app reads the
+newest CSV in that directory first, then falls back to `data/carteira_atual.csv`,
+then to the tracked reviewer fixture. This lets a local user download a fresh
+portfolio export without editing code or committing private data.
+
 ## Cash Recommendation API
 
 ```bash

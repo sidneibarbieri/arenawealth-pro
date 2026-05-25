@@ -44,12 +44,17 @@ without mixing their claims.
    - Next support: a first-class Transactions panel wired to the canonical
      portfolio store.
 
-4. As an investor, I can add a new candidate to the watched universe so I can
+4. As an investor, I can drop a broker CSV into a local inbox so the app uses
+   the freshest exported portfolio automatically.
+   - Current support: `data/inbox/*.csv`, newest file wins.
+   - Next support: in-app import status, validation errors, and import history.
+
+5. As an investor, I can add a new candidate to the watched universe so I can
    compare it against current holdings.
    - Current support: curated candidate screen.
    - Next support: editable watchlist with provider-backed validation.
 
-5. As an advisor, I can evaluate multiple client portfolios independently so
+6. As an advisor, I can evaluate multiple client portfolios independently so
    deterministic rules are applied per client.
    - Current support: repository layer supports multiple portfolios.
    - Next support: UI portfolio switcher, data isolation, audit log, and

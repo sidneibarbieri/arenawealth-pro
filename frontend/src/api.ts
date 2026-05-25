@@ -23,6 +23,10 @@ export interface PortfolioResponse {
   summary: PortfolioSummary;
   positions: Position[];
   price_source?: string;
+  analysis?: {
+    source?: string;
+    largest_position?: string | null;
+  };
   last_updated: string;
 }
 

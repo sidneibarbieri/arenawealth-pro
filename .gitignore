@@ -54,6 +54,7 @@ paper/_fig_preview.tex
 
 # Local / sensitive data
 data/carteira_atual.csv
+data/inbox/*.csv
 data/arenawealth_universe.db
 data/*.db
 data/snapshots/
