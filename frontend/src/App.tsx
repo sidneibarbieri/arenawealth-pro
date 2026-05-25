@@ -17,8 +17,10 @@ import {
   fetchPortfolio,
   fetchProviderStatus,
   fetchRecommendation,
+  recordManualTrade,
   type Candidate,
   type CandidatesResponse,
+  type ManualTradeRequest,
   type PortfolioReview,
   type PortfolioResponse,
   type Position,
@@ -65,12 +67,21 @@ function App() {
   const [portfolioError, setPortfolioError] = useState<string | null>(null);
   const [recommendationError, setRecommendationError] = useState<string | null>(null);
   const [candidateError, setCandidateError] = useState<string | null>(null);
+  const [tradeMessage, setTradeMessage] = useState<string | null>(null);
   const [isPortfolioLoading, setIsPortfolioLoading] = useState(true);
   const [isRecommendationLoading, setIsRecommendationLoading] = useState(false);
   const [isCandidateLoading, setIsCandidateLoading] = useState(false);
   const [cashInput, setCashInput] = useState(() => readInitialCash().toFixed(2));
   const [offlineDemo, setOfflineDemo] = useState(() => readInitialOfflineDemo());
   const [refreshIndex, setRefreshIndex] = useState(0);
+  const [tradeForm, setTradeForm] = useState<ManualTradeRequest>({
+    action: 'buy',
+    ticker: '',
+    name: '',
+    shares: 0,
+    price: 0,
+    fees: 0,
+  });
 
   useEffect(() => {
     const controller = new AbortController();
@@ -191,6 +202,33 @@ function App() {
       setCandidateError(error instanceof Error ? error.message : 'Unknown candidate error');
     } finally {
       setIsCandidateLoading(false);
+    }
+  }
+
+  async function submitManualTrade(): Promise<void> {
+    setTradeMessage(null);
+    setPortfolioError(null);
+    try {
+      const payload = await recordManualTrade({
+        ...tradeForm,
+        ticker: tradeForm.ticker.trim().toUpperCase(),
+        name: tradeForm.name?.trim() || undefined,
+      });
+      setPortfolio(payload);
+      setTradeMessage(
+        `${tradeForm.action === 'buy' ? 'Buy' : 'Sell'} recorded in data/inbox/manual-portfolio.csv`,
+      );
+      setRecommendation(null);
+      setTradeForm({
+        action: tradeForm.action,
+        ticker: '',
+        name: '',
+        shares: 0,
+        price: 0,
+        fees: 0,
+      });
+    } catch (error: unknown) {
+      setPortfolioError(error instanceof Error ? error.message : 'Unknown trade error');
     }
   }
 
@@ -321,8 +359,18 @@ function App() {
                   Enter cash and run analysis when you need a deployment plan.
                 </div>
               )}
+              {recommendation && recommendation.orders.length === 0 && !isRecommendationLoading && (
+                <div className="status-block warning">
+                  <AlertTriangle size={18} />
+                  <span>
+                    Cash is below the economic order minimum of{' '}
+                    {formatMoney(recommendation.minimum_order_amount)}. Keep it as cash or add more
+                    before placing an order.
+                  </span>
+                </div>
+              )}
 
-              {recommendation && !isRecommendationLoading && (
+              {recommendation && recommendation.orders.length > 0 && !isRecommendationLoading && (
                 <div className="deployment-layout">
                   <div className="order-stack">
                     <div className="provider-line">
@@ -360,6 +408,15 @@ function App() {
             <ProviderStatusPanel providers={providers} />
 
             <DataSourcesHealth />
+
+            <PortfolioEditor
+              form={tradeForm}
+              message={tradeMessage}
+              onChange={setTradeForm}
+              onSubmit={() => {
+                void submitManualTrade();
+              }}
+            />
 
             {recommendation && (
               <section className="data-section" id="rankings">
@@ -630,6 +687,106 @@ function ProviderStatusPanel({ providers }: ProviderStatusPanelProps) {
           </div>
         ))}
       </div>
+    </section>
+  );
+}
+
+interface PortfolioEditorProps {
+  form: ManualTradeRequest;
+  message: string | null;
+  onChange: (form: ManualTradeRequest) => void;
+  onSubmit: () => void;
+}
+
+function PortfolioEditor({ form, message, onChange, onSubmit }: PortfolioEditorProps) {
+  function updateField<Key extends keyof ManualTradeRequest>(
+    key: Key,
+    value: ManualTradeRequest[Key],
+  ) {
+    onChange({ ...form, [key]: value });
+  }
+
+  return (
+    <section className="data-section" aria-label="Portfolio editor">
+      <div className="section-heading">
+        <div>
+          <p className="eyebrow">Manual portfolio</p>
+          <h2>Record buy or sell</h2>
+        </div>
+      </div>
+      <div className="trade-form">
+        <label className="field">
+          <span>Action</span>
+          <select
+            value={form.action}
+            onChange={(event) => updateField('action', event.target.value as 'buy' | 'sell')}
+          >
+            <option value="buy">Buy</option>
+            <option value="sell">Sell</option>
+          </select>
+        </label>
+        <label className="field">
+          <span>Ticker</span>
+          <input
+            type="text"
+            value={form.ticker}
+            onChange={(event) => updateField('ticker', event.target.value)}
+          />
+        </label>
+        <label className="field">
+          <span>Name</span>
+          <input
+            type="text"
+            value={form.name ?? ''}
+            onChange={(event) => updateField('name', event.target.value)}
+          />
+        </label>
+        <label className="field">
+          <span>Shares</span>
+          <input
+            inputMode="decimal"
+            type="number"
+            min="0"
+            step="0.000001"
+            value={form.shares || ''}
+            onChange={(event) => updateField('shares', Number(event.target.value))}
+          />
+        </label>
+        <label className="field">
+          <span>Price</span>
+          <input
+            inputMode="decimal"
+            type="number"
+            min="0"
+            step="0.01"
+            value={form.price || ''}
+            onChange={(event) => updateField('price', Number(event.target.value))}
+          />
+        </label>
+        <label className="field">
+          <span>Fees</span>
+          <input
+            inputMode="decimal"
+            type="number"
+            min="0"
+            step="0.01"
+            value={form.fees || ''}
+            onChange={(event) => updateField('fees', Number(event.target.value))}
+          />
+        </label>
+        <button className="primary-button" type="button" onClick={onSubmit}>
+          Record
+        </button>
+      </div>
+      <p className="mode-hint">
+        Manual edits write a local CSV under data/inbox and become the active portfolio source.
+      </p>
+      {message && (
+        <div className="status-block">
+          <CheckCircle2 size={18} />
+          <span>{message}</span>
+        </div>
+      )}
     </section>
   );
 }

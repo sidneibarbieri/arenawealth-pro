@@ -20,6 +20,8 @@ OVERWEIGHT_MULTIPLE = 1.3
 THEME_CONCENTRATION_CAP = 20.0
 TRANCHE_SIZE = 1000.0
 FEE_PER_TRANCHE = 2.50
+MAX_FEE_PCT = 1.0
+MIN_ORDER_AMOUNT = FEE_PER_TRANCHE / (MAX_FEE_PCT / 100)
 
 
 def order_fee(amount: float) -> float:
@@ -65,14 +67,16 @@ def build_order(analysis: PositionAnalysis, amount: float) -> Order:
 
 
 def size_orders(picks: Sequence[PositionAnalysis], cash: float) -> tuple[Order, ...]:
-    if not picks:
+    if not picks or cash < MIN_ORDER_AMOUNT:
         return ()
-    if len(picks) == 1:
+    if len(picks) == 1 or cash < MIN_ORDER_AMOUNT * 2:
         return (build_order(picks[0], cash),)
     first, second = picks[0], picks[1]
     first_share = first.composite_score / (first.composite_score + second.composite_score)
     first_amount = cash * first_share
     second_amount = cash - first_amount
+    if first_amount < MIN_ORDER_AMOUNT or second_amount < MIN_ORDER_AMOUNT:
+        return (build_order(first, cash),)
     # Keep each order within one tranche so it never triggers an extra fee.
     if first_amount > TRANCHE_SIZE:
         first_amount, second_amount = TRANCHE_SIZE, cash - TRANCHE_SIZE

@@ -2,6 +2,7 @@
 
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
@@ -98,8 +99,52 @@ def test_portfolio_recommendation_offline_demo(api_client: TestClient) -> None:
     assert response.status_code == 200
     body = response.json()
     assert body["provider_mode"] == "offline-demo"
-    assert body["orders"]
+    assert body["minimum_order_amount"] == 250.0
     assert body["ranked_positions"]
+
+
+def test_portfolio_recommendation_rejects_uneconomic_cash(
+    api_client: TestClient,
+) -> None:
+    response = api_client.get("/api/v1/portfolio/user/recommendation?cash=0.10&offline_demo=true")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["minimum_order_amount"] == 250.0
+    assert body["provider_mode"] == "not-run"
+    assert body["orders"] == []
+
+
+def test_manual_trade_writes_local_inbox_portfolio(
+    api_client: TestClient,
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    import arenawealth.api.routers.user_portfolio as user_portfolio
+
+    inbox = tmp_path / "inbox"
+    inbox.mkdir()
+    seed = inbox / "portfolio.csv"
+    seed.write_text("ticker,name,shares,cost_basis_per_share,current_price\nAAPL,Apple,1,100,110\n")
+    manual = inbox / "manual-portfolio.csv"
+    monkeypatch.setenv("ARENAWEALTH_PORTFOLIO_INBOX", str(inbox))
+    monkeypatch.setattr(user_portfolio, "MANUAL_PORTFOLIO", manual)
+
+    response = api_client.post(
+        "/api/v1/portfolio/user/trades",
+        json={
+            "action": "buy",
+            "ticker": "AAPL",
+            "name": "Apple",
+            "shares": 1,
+            "price": 120,
+            "fees": 0,
+        },
+    )
+
+    assert response.status_code == 200
+    assert manual.exists()
+    assert "AAPL,Apple,2.0,110.0,120.0" in manual.read_text()
 
 
 def test_portfolio_candidates_offline_demo(api_client: TestClient) -> None:

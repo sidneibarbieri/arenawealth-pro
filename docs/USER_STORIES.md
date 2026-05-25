@@ -40,9 +40,9 @@ without mixing their claims.
 
 3. As an investor, I can record a buy or sell so the tracked portfolio matches
    reality.
-   - Current support: lower-level portfolio APIs exist.
-   - Next support: a first-class Transactions panel wired to the canonical
-     portfolio store.
+   - Current support: Portfolio Editor records buy/sell events into a local
+     normalized CSV under `data/inbox`.
+   - Next support: full transaction ledger, cash ledger, and portfolio switcher.
 
 4. As an investor, I can drop a broker CSV into a local inbox so the app uses
    the freshest exported portfolio automatically.

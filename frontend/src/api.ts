@@ -52,6 +52,7 @@ export interface RecommendationResponse {
   cash: number;
   provider_mode: string;
   generated_at: string;
+  minimum_order_amount: number;
   orders: RecommendationOrder[];
   excluded_overweight: string[];
   excluded_theme: string[];
@@ -120,6 +121,15 @@ export interface ProviderStatus {
   free_tier: boolean;
 }
 
+export interface ManualTradeRequest {
+  action: 'buy' | 'sell';
+  ticker: string;
+  name?: string;
+  shares: number;
+  price: number;
+  fees: number;
+}
+
 async function parseJsonResponse<ResponsePayload>(
   response: Response,
   resourceName: string,
@@ -170,4 +180,13 @@ export async function fetchCandidates(
 export async function fetchProviderStatus(signal: AbortSignal): Promise<ProviderStatus[]> {
   const response = await fetch('/api/v1/providers/status', { signal });
   return parseJsonResponse<ProviderStatus[]>(response, 'Provider status');
+}
+
+export async function recordManualTrade(request: ManualTradeRequest): Promise<PortfolioResponse> {
+  const response = await fetch('/api/v1/portfolio/user/trades', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(request),
+  });
+  return parseJsonResponse<PortfolioResponse>(response, 'Manual trade');
 }

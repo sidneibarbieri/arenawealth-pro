@@ -1,4 +1,4 @@
-import { AlertCircle, CheckCircle2, RefreshCw } from 'lucide-react';
+import { AlertCircle, CheckCircle2, CircleDashed, RefreshCw } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface DataSourceHealth {
@@ -91,7 +91,11 @@ function HealthSummary({ health }: { health: DataSourcesHealthResponse }) {
     <>
       <div className="review-grid">
         <HealthMetric label="Total" value={health.summary.total} />
-        <HealthMetric label="Working" value={health.summary.working} tone="positive" />
+        <HealthMetric
+          label={health.live ? 'Working' : 'Ready'}
+          value={health.live ? health.summary.working : health.summary.configured}
+          tone="positive"
+        />
         <HealthMetric label="Configured" value={health.summary.configured} />
         <HealthMetric
           label="Errors"
@@ -104,15 +108,13 @@ function HealthSummary({ health }: { health: DataSourcesHealthResponse }) {
         {health.sources.map((source) => (
           <div className="provider-row" key={source.provider_id}>
             <div className="provider-name">
-              {source.status === 'working' || source.status === 'configured' ? (
-                <CheckCircle2 size={17} />
-              ) : (
-                <AlertCircle size={17} />
-              )}
+              <SourceIcon status={source.status} />
               <strong>{source.name}</strong>
             </div>
             <span>{source.metadata.purpose}</span>
-            <code>{source.error ?? source.status.replace('_', ' ')}</code>
+            <code className={`source-status ${source.status}`}>
+              {source.error ?? source.status.replace('_', ' ')}
+            </code>
           </div>
         ))}
       </div>
@@ -123,6 +125,16 @@ function HealthSummary({ health }: { health: DataSourcesHealthResponse }) {
       </p>
     </>
   );
+}
+
+function SourceIcon({ status }: { status: DataSourceHealth['status'] }) {
+  if (status === 'working') {
+    return <CheckCircle2 className="source-icon working" size={17} />;
+  }
+  if (status === 'error') {
+    return <AlertCircle className="source-icon error" size={17} />;
+  }
+  return <CircleDashed className={`source-icon ${status}`} size={17} />;
 }
 
 function HealthMetric({

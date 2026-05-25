@@ -1,6 +1,6 @@
 """Unit tests for the deterministic deployment planner (no network)."""
 
-from arenawealth.analytics.deployment import order_fee, plan_deployment
+from arenawealth.analytics.deployment import MIN_ORDER_AMOUNT, order_fee, plan_deployment
 from arenawealth.analytics.models import Holding, PositionAnalysis
 
 
@@ -100,3 +100,27 @@ def test_two_orders_cost_same_as_one():
     plan = plan_deployment(positions, 1511.18)
 
     assert plan.total_fee == order_fee(1511.18)
+
+
+def test_does_not_deploy_cash_below_economic_minimum():
+    positions = [
+        make_position("A", 80.0, 10.0, "TA"),
+        make_position("B", 70.0, 10.0, "TB"),
+    ]
+
+    plan = plan_deployment(positions, MIN_ORDER_AMOUNT - 0.01)
+
+    assert plan.orders == ()
+    assert plan.total_fee == 0.0
+
+
+def test_uses_one_order_when_cash_cannot_fund_two_economic_orders():
+    positions = [
+        make_position("A", 80.0, 10.0, "TA"),
+        make_position("B", 70.0, 10.0, "TB"),
+    ]
+
+    plan = plan_deployment(positions, MIN_ORDER_AMOUNT * 1.5)
+
+    assert tuple(order.ticker for order in plan.orders) == ("A",)
+    assert plan.orders[0].amount == MIN_ORDER_AMOUNT * 1.5

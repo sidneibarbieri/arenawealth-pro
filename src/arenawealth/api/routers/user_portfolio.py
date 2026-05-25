@@ -9,8 +9,8 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, Query
-from pydantic import BaseModel
+from fastapi import APIRouter, HTTPException, Query, status
+from pydantic import BaseModel, Field
 from sqlmodel import select
 
 from arenawealth.analytics import (
@@ -24,6 +24,7 @@ from arenawealth.analytics import (
     review_portfolio,
     screen_candidates,
 )
+from arenawealth.analytics.deployment import MIN_ORDER_AMOUNT
 from arenawealth.analytics.universe import (
     CANDIDATE_UNIVERSE,
     FINANCIAL_TICKERS,
@@ -31,11 +32,12 @@ from arenawealth.analytics.universe import (
 )
 from arenawealth.domain.position import Position
 from arenawealth.importers.csv_importer import import_csv
-from arenawealth.importers.holdings_source import ROOT, resolve_holdings_path
+from arenawealth.importers.holdings_source import DEFAULT_INBOX, ROOT, resolve_holdings_path
 from arenawealth.models.database import QuoteHistory, get_session
 from arenawealth.providers.yahoo import YahooProvider
 
 QUOTE_CACHE_TTL = timedelta(minutes=15)
+MANUAL_PORTFOLIO = DEFAULT_INBOX / "manual-portfolio.csv"
 
 router = APIRouter(
     prefix="/api/v1/portfolio",
@@ -97,6 +99,7 @@ class RecommendationResponse(BaseModel):
     cash: float
     provider_mode: str
     generated_at: str
+    minimum_order_amount: float
     orders: list[RecommendationOrderResponse]
     excluded_overweight: list[str]
     excluded_theme: list[str]
@@ -156,6 +159,15 @@ class CandidatesResponse(BaseModel):
     candidates: list[CandidateResponse]
 
 
+class ManualTradeRequest(BaseModel):
+    action: str = Field(pattern="^(buy|sell)$")
+    ticker: str = Field(min_length=1, max_length=20)
+    name: str | None = None
+    shares: float = Field(gt=0)
+    price: float = Field(gt=0)
+    fees: float = Field(default=0, ge=0)
+
+
 def holdings_path() -> Path:
     return resolve_holdings_path()
 
@@ -181,6 +193,79 @@ def positions_to_holdings(positions: list[Position]) -> tuple[Holding, ...]:
 
 def decimal_to_float(value: Decimal) -> float:
     return float(value)
+
+
+def display_path(path: Path) -> str:
+    try:
+        return str(path.relative_to(ROOT))
+    except ValueError:
+        return str(path)
+
+
+def write_positions_csv(positions: list[Position], path: Path = MANUAL_PORTFOLIO) -> Path:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    rows = ["ticker,name,shares,cost_basis_per_share,current_price"]
+    for position in sorted(positions, key=lambda item: item.ticker):
+        rows.append(
+            ",".join(
+                [
+                    position.ticker,
+                    position.name.replace(",", " "),
+                    str(position.shares),
+                    str(position.cost_basis_per_share),
+                    str(position.current_price),
+                ]
+            )
+        )
+    path.write_text("\n".join(rows) + "\n", encoding="utf-8")
+    return path
+
+
+def apply_manual_trade(request: ManualTradeRequest) -> Path:
+    positions = {position.ticker: position for position in load_positions()}
+    ticker = request.ticker.upper().strip()
+    shares = Decimal(str(request.shares))
+    price = Decimal(str(request.price))
+    fees = Decimal(str(request.fees))
+
+    current = positions.get(ticker)
+    if request.action == "buy":
+        existing_shares = current.shares if current else Decimal("0")
+        existing_cost = current.cost_basis_total.amount if current else Decimal("0")
+        new_shares = existing_shares + shares
+        new_cost_basis = (existing_cost + shares * price + fees) / new_shares
+        positions[ticker] = Position(
+            ticker=ticker,
+            name=request.name or (current.name if current else ticker),
+            shares=new_shares,
+            cost_basis_per_share=new_cost_basis,
+            current_price=price,
+        )
+        return write_positions_csv(list(positions.values()), MANUAL_PORTFOLIO)
+
+    if current is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Position {ticker} not found",
+        )
+    if shares > current.shares:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Cannot sell {shares} shares; current position has {current.shares}",
+        )
+
+    remaining = current.shares - shares
+    if remaining == 0:
+        del positions[ticker]
+    else:
+        positions[ticker] = Position(
+            ticker=current.ticker,
+            name=current.name,
+            shares=remaining,
+            cost_basis_per_share=current.cost_basis_per_share,
+            current_price=price,
+        )
+    return write_positions_csv(list(positions.values()), MANUAL_PORTFOLIO)
 
 
 @dataclass(frozen=True)
@@ -334,7 +419,7 @@ def build_snapshot(
         positions=position_rows,
         price_source=price_source,
         analysis={
-            "source": str(holdings_path().relative_to(ROOT)),
+            "source": display_path(holdings_path()),
             "largest_position": max(position_rows, key=lambda row: row.market_value).ticker
             if position_rows
             else None,
@@ -354,6 +439,18 @@ def select_recommendation_provider(
 def build_recommendation_response(
     cash: float, offline_demo: bool
 ) -> RecommendationResponse:
+    if cash < MIN_ORDER_AMOUNT:
+        return RecommendationResponse(
+            cash=cash,
+            provider_mode="not-run",
+            generated_at=datetime.now(UTC).isoformat(),
+            minimum_order_amount=MIN_ORDER_AMOUNT,
+            orders=[],
+            excluded_overweight=[],
+            excluded_theme=[],
+            ranked_positions=[],
+        )
+
     holdings = positions_to_holdings(load_positions())
     provider, provider_mode = select_recommendation_provider(holdings, offline_demo)
     analyses = analyze_holdings(holdings, provider)
@@ -363,6 +460,7 @@ def build_recommendation_response(
         cash=cash,
         provider_mode=provider_mode,
         generated_at=datetime.now(UTC).isoformat(),
+        minimum_order_amount=MIN_ORDER_AMOUNT,
         orders=[
             RecommendationOrderResponse(
                 ticker=order.ticker,
@@ -513,6 +611,12 @@ async def get_user_candidates(
     limit: int = Query(default=10, gt=0, le=50),
 ) -> CandidatesResponse:
     return build_candidates_response(offline_demo, limit)
+
+
+@router.post("/user/trades", response_model=PortfolioResponse)
+async def record_manual_trade(request: ManualTradeRequest) -> PortfolioResponse:
+    apply_manual_trade(request)
+    return build_snapshot(live=False)
 
 
 @router.get("/user/health")
