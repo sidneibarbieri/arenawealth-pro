@@ -30,6 +30,16 @@ export interface PortfolioResponse {
   last_updated: string;
 }
 
+export interface PortfolioSource {
+  active_path: string;
+  active_type: 'manual' | 'inbox' | 'private' | 'fixture';
+  modified_at: string | null;
+  position_count: number;
+  manual_override: boolean;
+  inbox_path: string;
+  latest_broker_export: string | null;
+}
+
 export interface RecommendationOrder {
   ticker: string;
   amount: number;
@@ -189,4 +199,14 @@ export async function recordManualTrade(request: ManualTradeRequest): Promise<Po
     body: JSON.stringify(request),
   });
   return parseJsonResponse<PortfolioResponse>(response, 'Manual trade');
+}
+
+export async function fetchPortfolioSource(signal: AbortSignal): Promise<PortfolioSource> {
+  const response = await fetch('/api/v1/portfolio/user/source', { signal });
+  return parseJsonResponse<PortfolioSource>(response, 'Portfolio source');
+}
+
+export async function clearManualPortfolio(): Promise<PortfolioResponse> {
+  const response = await fetch('/api/v1/portfolio/user/source/manual', { method: 'DELETE' });
+  return parseJsonResponse<PortfolioResponse>(response, 'Manual portfolio reset');
 }

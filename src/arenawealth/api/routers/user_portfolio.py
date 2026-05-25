@@ -32,12 +32,19 @@ from arenawealth.analytics.universe import (
 )
 from arenawealth.domain.position import Position
 from arenawealth.importers.csv_importer import import_csv
-from arenawealth.importers.holdings_source import DEFAULT_INBOX, ROOT, resolve_holdings_path
+from arenawealth.importers.holdings_source import (
+    MANUAL_PORTFOLIO_NAME,
+    ROOT,
+    holdings_inbox,
+    latest_inbox_csv,
+    manual_portfolio_path,
+    resolve_holdings_path,
+)
 from arenawealth.models.database import QuoteHistory, get_session
 from arenawealth.providers.yahoo import YahooProvider
 
 QUOTE_CACHE_TTL = timedelta(minutes=15)
-MANUAL_PORTFOLIO = DEFAULT_INBOX / "manual-portfolio.csv"
+MANUAL_PORTFOLIO = manual_portfolio_path()
 
 router = APIRouter(
     prefix="/api/v1/portfolio",
@@ -75,6 +82,16 @@ class PortfolioResponse(BaseModel):
     price_source: str
     analysis: dict[str, Any]
     last_updated: str
+
+
+class PortfolioSourceResponse(BaseModel):
+    active_path: str
+    active_type: str
+    modified_at: str | None
+    position_count: int
+    manual_override: bool
+    inbox_path: str
+    latest_broker_export: str | None
 
 
 class RecommendationPositionResponse(BaseModel):
@@ -200,6 +217,33 @@ def display_path(path: Path) -> str:
         return str(path.relative_to(ROOT))
     except ValueError:
         return str(path)
+
+
+def source_type(path: Path) -> str:
+    if path.name == MANUAL_PORTFOLIO_NAME:
+        return "manual"
+    if path.parent == holdings_inbox():
+        return "inbox"
+    if path.name == "carteira_atual.csv":
+        return "private"
+    return "fixture"
+
+
+def portfolio_source_response() -> PortfolioSourceResponse:
+    path = holdings_path()
+    modified_at = None
+    if path.exists():
+        modified_at = datetime.fromtimestamp(path.stat().st_mtime, UTC).isoformat()
+    latest_broker = latest_inbox_csv(include_manual=False)
+    return PortfolioSourceResponse(
+        active_path=display_path(path),
+        active_type=source_type(path),
+        modified_at=modified_at,
+        position_count=len(import_csv(path)),
+        manual_override=path.name == MANUAL_PORTFOLIO_NAME,
+        inbox_path=display_path(holdings_inbox()),
+        latest_broker_export=display_path(latest_broker) if latest_broker else None,
+    )
 
 
 def write_positions_csv(positions: list[Position], path: Path = MANUAL_PORTFOLIO) -> Path:
@@ -616,6 +660,18 @@ async def get_user_candidates(
 @router.post("/user/trades", response_model=PortfolioResponse)
 async def record_manual_trade(request: ManualTradeRequest) -> PortfolioResponse:
     apply_manual_trade(request)
+    return build_snapshot(live=False)
+
+
+@router.get("/user/source", response_model=PortfolioSourceResponse)
+async def get_portfolio_source() -> PortfolioSourceResponse:
+    return portfolio_source_response()
+
+
+@router.delete("/user/source/manual", response_model=PortfolioResponse)
+async def clear_manual_portfolio() -> PortfolioResponse:
+    if MANUAL_PORTFOLIO.exists():
+        MANUAL_PORTFOLIO.unlink()
     return build_snapshot(live=False)
 
 

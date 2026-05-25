@@ -19,11 +19,14 @@
 - [ ] App can run without paid APIs.
 - [ ] API keys are optional and never shown in UI.
 - [ ] Portfolio workflow is understandable in under three minutes.
+- [ ] Portfolio source/import status is visible.
+- [ ] Manual buy/sell edit is demonstrable without external brokerage access.
+- [ ] Micro-order guardrails are visible.
 - [ ] Candidate screen and deterministic review are visible.
 
 ## Product Gaps Before Pitch
 
-- [ ] Editable/importable portfolio workflow in the UI.
+- [x] Editable/importable portfolio workflow in the UI.
 - [ ] Multi-portfolio workspace for advisor mode.
 - [ ] Audit log for recommendation runs.
 - [ ] User authentication and data isolation.

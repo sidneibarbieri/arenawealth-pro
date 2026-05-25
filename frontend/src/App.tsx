@@ -4,6 +4,7 @@ import {
   BarChart3,
   CheckCircle2,
   CircleDollarSign,
+  FileText,
   KeyRound,
   RefreshCw,
   Search,
@@ -15,14 +16,17 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   fetchCandidates,
   fetchPortfolio,
+  fetchPortfolioSource,
   fetchProviderStatus,
   fetchRecommendation,
   recordManualTrade,
+  clearManualPortfolio,
   type Candidate,
   type CandidatesResponse,
   type ManualTradeRequest,
   type PortfolioReview,
   type PortfolioResponse,
+  type PortfolioSource,
   type Position,
   type ProviderStatus,
   type RecommendationOrder,
@@ -64,6 +68,7 @@ function App() {
   const [recommendation, setRecommendation] = useState<RecommendationResponse | null>(null);
   const [candidates, setCandidates] = useState<CandidatesResponse | null>(null);
   const [providers, setProviders] = useState<ProviderStatus[]>([]);
+  const [portfolioSource, setPortfolioSource] = useState<PortfolioSource | null>(null);
   const [portfolioError, setPortfolioError] = useState<string | null>(null);
   const [recommendationError, setRecommendationError] = useState<string | null>(null);
   const [candidateError, setCandidateError] = useState<string | null>(null);
@@ -104,6 +109,24 @@ function App() {
 
     return () => controller.abort();
   }, [offlineDemo, refreshIndex]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadPortfolioSource() {
+      const payload = await fetchPortfolioSource(controller.signal);
+      setPortfolioSource(payload);
+    }
+
+    loadPortfolioSource().catch((error: unknown) => {
+      if (isAbortError(error)) {
+        return;
+      }
+      setPortfolioError(error instanceof Error ? error.message : 'Unknown portfolio source error');
+    });
+
+    return () => controller.abort();
+  }, [refreshIndex, portfolio?.analysis?.source]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -218,6 +241,7 @@ function App() {
       setTradeMessage(
         `${tradeForm.action === 'buy' ? 'Buy' : 'Sell'} recorded in data/inbox/manual-portfolio.csv`,
       );
+      setRefreshIndex((currentIndex) => currentIndex + 1);
       setRecommendation(null);
       setTradeForm({
         action: tradeForm.action,
@@ -229,6 +253,20 @@ function App() {
       });
     } catch (error: unknown) {
       setPortfolioError(error instanceof Error ? error.message : 'Unknown trade error');
+    }
+  }
+
+  async function resetManualPortfolio(): Promise<void> {
+    setTradeMessage(null);
+    setPortfolioError(null);
+    try {
+      const payload = await clearManualPortfolio();
+      setPortfolio(payload);
+      setTradeMessage('Manual portfolio cleared. Using latest broker export.');
+      setRefreshIndex((currentIndex) => currentIndex + 1);
+      setRecommendation(null);
+    } catch (error: unknown) {
+      setPortfolioError(error instanceof Error ? error.message : 'Unknown source reset error');
     }
   }
 
@@ -408,6 +446,15 @@ function App() {
             <ProviderStatusPanel providers={providers} />
 
             <DataSourcesHealth />
+
+            {portfolioSource && (
+              <PortfolioSourcePanel
+                source={portfolioSource}
+                onResetManual={() => {
+                  void resetManualPortfolio();
+                }}
+              />
+            )}
 
             <PortfolioEditor
               form={tradeForm}
@@ -687,6 +734,59 @@ function ProviderStatusPanel({ providers }: ProviderStatusPanelProps) {
           </div>
         ))}
       </div>
+    </section>
+  );
+}
+
+interface PortfolioSourcePanelProps {
+  source: PortfolioSource;
+  onResetManual: () => void;
+}
+
+function PortfolioSourcePanel({ source, onResetManual }: PortfolioSourcePanelProps) {
+  return (
+    <section className="provider-panel" aria-label="Portfolio source">
+      <div className="section-heading">
+        <div>
+          <p className="eyebrow">Portfolio source</p>
+          <h2>Import status</h2>
+        </div>
+        {source.manual_override && (
+          <button className="secondary-button" type="button" onClick={onResetManual}>
+            Use broker export
+          </button>
+        )}
+      </div>
+      <div className="provider-list">
+        <div className="provider-row">
+          <div className="provider-name">
+            <FileText size={17} />
+            <strong>{source.active_type}</strong>
+          </div>
+          <span>{source.active_path}</span>
+          <code>{source.position_count} positions</code>
+        </div>
+        <div className="provider-row">
+          <div className="provider-name">
+            <RefreshCw size={17} />
+            <strong>Modified</strong>
+          </div>
+          <span>{source.modified_at ? formatDateTime(source.modified_at) : 'unknown'}</span>
+          <code>{source.manual_override ? 'manual override' : 'broker source'}</code>
+        </div>
+        <div className="provider-row">
+          <div className="provider-name">
+            <WalletCards size={17} />
+            <strong>Inbox</strong>
+          </div>
+          <span>{source.inbox_path}</span>
+          <code>{source.latest_broker_export ?? 'no broker export'}</code>
+        </div>
+      </div>
+      <p className="mode-hint">
+        Drop a new broker CSV into the inbox to update the portfolio. Manual edits become the active
+        source until cleared.
+      </p>
     </section>
   );
 }

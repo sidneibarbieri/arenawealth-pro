@@ -29,12 +29,44 @@ deployment, and replay evidence instead of trusting an opaque recommendation.
 ## Demo Flow
 
 1. Start with `./run.sh`.
-2. Show data source health and provider readiness.
-3. Show portfolio summary and live/stored price status.
-4. Run cash-deployment recommendation.
-5. Run candidate screen.
-6. Show `make price-backtest` output as evidence discipline, not a performance
+2. Show portfolio source/import status: latest broker CSV versus manual edits.
+3. Show data source health and provider readiness.
+4. Show portfolio summary and live/stored price status.
+5. Run cash-deployment recommendation with economic guardrails.
+6. Record a small manual buy/sell edit and show the source changing to manual.
+7. Clear manual override and return to the broker export.
+8. Run candidate screen.
+9. Show `make price-backtest` output as evidence discipline, not a performance
    guarantee.
+
+## Three-Minute Judge Narrative
+
+1. Most portfolio tools hide data provenance and make recommendations that are
+   hard to audit.
+2. ArenaWealth shows the active portfolio source, provider health, and policy
+   guardrails before making any recommendation.
+3. The same workbench supports real investor operation and reviewer-grade
+   reproducibility: import, edit, inspect, recommend, screen, and replay.
+
+## Use Cases to Demonstrate
+
+- Retail holder: import an Avenue CSV, enter available cash, and see whether an
+  order is economically large enough after fees.
+- Self-directed analyst: compare current holdings against external moat and
+  compounding candidates.
+- Independent advisor: run the same deterministic policy per client portfolio,
+  with source tracking and replayable evidence.
+- Research reviewer: run the offline deterministic path and free price baseline
+  without paid APIs.
+
+## Product Proof Points
+
+- One-command local demo: `./run.sh`.
+- Free-data-first operation.
+- Visible data-source status: configured, working, or error.
+- Portfolio source provenance: broker export, manual override, fixture.
+- Economic guardrails: no microscopic orders that lose to fees.
+- Reproducibility boundary: claims are separated from limitations.
 
 ## Current Public Sources
 

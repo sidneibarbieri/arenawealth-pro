@@ -28,13 +28,21 @@ which claims are supported.
 
 ## 5. Demo
 
+- Import/source status.
 - Source health.
 - Portfolio dashboard.
 - Cash-deployment recommendation.
+- Manual buy/sell edit.
 - Candidate universe screen.
 - Price baseline study.
 
-## 6. Ask
+## 6. Business Wedge
+
+Start as a decision-support workbench for international equity holders. Expand
+to advisor workspaces only after compliance, client isolation, audit logging,
+and suitability controls are complete.
+
+## 7. Ask
 
 Use the competition to validate advisor workflows, meet data and distribution
 partners, and refine compliance-safe commercialization.

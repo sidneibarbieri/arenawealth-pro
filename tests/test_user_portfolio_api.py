@@ -147,6 +147,53 @@ def test_manual_trade_writes_local_inbox_portfolio(
     assert "AAPL,Apple,2.0,110.0,120.0" in manual.read_text()
 
 
+def test_portfolio_source_reports_manual_override(
+    api_client: TestClient,
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    import arenawealth.api.routers.user_portfolio as user_portfolio
+
+    inbox = tmp_path / "inbox"
+    inbox.mkdir()
+    manual = inbox / "manual-portfolio.csv"
+    manual.write_text("ticker,name,shares,cost_basis_per_share,current_price\nAAPL,Apple,1,100,110\n")
+    monkeypatch.setenv("ARENAWEALTH_PORTFOLIO_INBOX", str(inbox))
+    monkeypatch.setattr(user_portfolio, "MANUAL_PORTFOLIO", manual)
+
+    response = api_client.get("/api/v1/portfolio/user/source")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["active_type"] == "manual"
+    assert body["manual_override"] is True
+    assert body["position_count"] == 1
+
+
+def test_clear_manual_portfolio_restores_broker_export(
+    api_client: TestClient,
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    import arenawealth.api.routers.user_portfolio as user_portfolio
+
+    inbox = tmp_path / "inbox"
+    inbox.mkdir()
+    broker = inbox / "portfolio.csv"
+    broker.write_text("ticker,name,shares,cost_basis_per_share,current_price\nMSFT,Microsoft,1,200,210\n")
+    manual = inbox / "manual-portfolio.csv"
+    manual.write_text("ticker,name,shares,cost_basis_per_share,current_price\nAAPL,Apple,1,100,110\n")
+    monkeypatch.setenv("ARENAWEALTH_PORTFOLIO_INBOX", str(inbox))
+    monkeypatch.setattr(user_portfolio, "MANUAL_PORTFOLIO", manual)
+
+    response = api_client.delete("/api/v1/portfolio/user/source/manual")
+
+    assert response.status_code == 200
+    assert not manual.exists()
+    body = response.json()
+    assert body["positions"][0]["ticker"] == "MSFT"
+
+
 def test_portfolio_candidates_offline_demo(api_client: TestClient) -> None:
     response = api_client.get("/api/v1/portfolio/user/candidates?offline_demo=true&limit=5")
 

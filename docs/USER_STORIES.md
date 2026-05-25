@@ -46,8 +46,9 @@ without mixing their claims.
 
 4. As an investor, I can drop a broker CSV into a local inbox so the app uses
    the freshest exported portfolio automatically.
-   - Current support: `data/inbox/*.csv`, newest file wins.
-   - Next support: in-app import status, validation errors, and import history.
+   - Current support: `data/inbox/*.csv`, newest file wins; the app shows the
+     active source, modified time, and position count.
+   - Next support: validation errors and import history.
 
 5. As an investor, I can add a new candidate to the watched universe so I can
    compare it against current holdings.
