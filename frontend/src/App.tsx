@@ -66,10 +66,9 @@ function App() {
   const [recommendationError, setRecommendationError] = useState<string | null>(null);
   const [candidateError, setCandidateError] = useState<string | null>(null);
   const [isPortfolioLoading, setIsPortfolioLoading] = useState(true);
-  const [isRecommendationLoading, setIsRecommendationLoading] = useState(true);
+  const [isRecommendationLoading, setIsRecommendationLoading] = useState(false);
   const [isCandidateLoading, setIsCandidateLoading] = useState(false);
   const [cashInput, setCashInput] = useState(() => readInitialCash().toFixed(2));
-  const [cashToAnalyze, setCashToAnalyze] = useState(() => readInitialCash());
   const [offlineDemo, setOfflineDemo] = useState(() => readInitialOfflineDemo());
   const [refreshIndex, setRefreshIndex] = useState(0);
 
@@ -114,32 +113,10 @@ function App() {
   }, [refreshIndex]);
 
   useEffect(() => {
-    const controller = new AbortController();
-
-    async function loadRecommendation() {
-      setIsRecommendationLoading(true);
-      setRecommendationError(null);
-      const payload = await fetchRecommendation(cashToAnalyze, offlineDemo, controller.signal);
-      setRecommendation(payload);
-      setIsRecommendationLoading(false);
-    }
-
-    loadRecommendation().catch((error: unknown) => {
-      if (isAbortError(error)) {
-        return;
-      }
-      setRecommendationError(
-        error instanceof Error ? error.message : 'Unknown recommendation error',
-      );
-      setIsRecommendationLoading(false);
-    });
-
-    return () => controller.abort();
-  }, [cashToAnalyze, offlineDemo, refreshIndex]);
-
-  useEffect(() => {
     setCandidates(null);
     setCandidateError(null);
+    setRecommendation(null);
+    setRecommendationError(null);
   }, [offlineDemo]);
 
   const positions = useMemo(() => {
@@ -182,10 +159,25 @@ function App() {
   );
   const candidateSort = useTableSort(candidateRows, 'composite_score', 'desc');
 
-  function refreshRecommendation() {
-    const parsedCash = parseCashInput(cashInput);
-    setCashToAnalyze(parsedCash);
+  function refreshWorkspace() {
     setRefreshIndex((currentIndex) => currentIndex + 1);
+  }
+
+  async function analyzeCashDeployment(): Promise<void> {
+    const parsedCash = parseCashInput(cashInput);
+    const controller = new AbortController();
+    setIsRecommendationLoading(true);
+    setRecommendationError(null);
+    try {
+      const payload = await fetchRecommendation(parsedCash, offlineDemo, controller.signal);
+      setRecommendation(payload);
+    } catch (error: unknown) {
+      setRecommendationError(
+        error instanceof Error ? error.message : 'Unknown recommendation error',
+      );
+    } finally {
+      setIsRecommendationLoading(false);
+    }
   }
 
   async function screenUniverse(): Promise<void> {
@@ -242,7 +234,7 @@ function App() {
             <p className="eyebrow">Moat and compounding workbench</p>
             <h1>ArenaWealth Pro</h1>
           </div>
-          <button className="icon-button" type="button" onClick={refreshRecommendation}>
+          <button className="icon-button" type="button" onClick={refreshWorkspace}>
             <RefreshCw size={17} />
             Refresh
           </button>
@@ -303,9 +295,16 @@ function App() {
                   />
                   <span>Deterministic reviewer mode</span>
                 </label>
-                <button className="primary-button" type="button" onClick={refreshRecommendation}>
+                <button
+                  className="primary-button"
+                  type="button"
+                  onClick={() => {
+                    void analyzeCashDeployment();
+                  }}
+                  disabled={isRecommendationLoading}
+                >
                   <Activity size={17} />
-                  Analyze
+                  {isRecommendationLoading ? 'Analyzing...' : 'Analyze'}
                 </button>
               </div>
 
@@ -315,8 +314,11 @@ function App() {
                 actionable.
               </p>
 
-              {isRecommendationLoading && (
-                <div className="loading-row">Loading recommendation...</div>
+              {isRecommendationLoading && <div className="loading-row">Running analysis...</div>}
+              {!recommendation && !isRecommendationLoading && (
+                <div className="loading-row">
+                  Enter cash and run analysis when you need a deployment plan.
+                </div>
               )}
 
               {recommendation && !isRecommendationLoading && (

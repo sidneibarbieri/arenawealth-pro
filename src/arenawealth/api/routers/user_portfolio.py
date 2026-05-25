@@ -4,13 +4,14 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, Query
 from pydantic import BaseModel
+from sqlmodel import select
 
 from arenawealth.analytics import (
     DemoFundamentalsProvider,
@@ -30,11 +31,13 @@ from arenawealth.analytics.universe import (
 )
 from arenawealth.domain.position import Position
 from arenawealth.importers.csv_importer import import_csv
+from arenawealth.models.database import QuoteHistory, get_session
 from arenawealth.providers.yahoo import YahooProvider
 
 ROOT = Path(__file__).resolve().parents[4]
 PRIVATE_HOLDINGS = ROOT / "data" / "carteira_atual.csv"
 FIXTURE_HOLDINGS = ROOT / "tests" / "fixtures" / "seed_portfolio_avenue.csv"
+QUOTE_CACHE_TTL = timedelta(minutes=15)
 
 router = APIRouter(
     prefix="/api/v1/portfolio",
@@ -191,6 +194,25 @@ class LiveQuote:
 
 
 def fetch_live_quotes(tickers: list[str]) -> dict[str, LiveQuote]:
+    tickers = sorted({ticker.upper() for ticker in tickers})
+    cached = read_cached_quotes(tickers, max_age=QUOTE_CACHE_TTL)
+    missing = [ticker for ticker in tickers if ticker not in cached]
+    if not missing:
+        return cached
+
+    try:
+        fresh = fetch_remote_quotes(missing)
+    except Exception:
+        stale = read_cached_quotes(missing, max_age=None)
+        if stale:
+            return {**cached, **stale}
+        raise
+
+    write_cached_quotes(fresh)
+    return {**cached, **fresh}
+
+
+def fetch_remote_quotes(tickers: list[str]) -> dict[str, LiveQuote]:
     quotes = YahooProvider().get_quotes(tickers)
     return {
         quote.ticker: LiveQuote(
@@ -199,6 +221,53 @@ def fetch_live_quotes(tickers: list[str]) -> dict[str, LiveQuote]:
         )
         for quote in quotes
     }
+
+
+def read_cached_quotes(
+    tickers: list[str],
+    max_age: timedelta | None,
+) -> dict[str, LiveQuote]:
+    if not tickers:
+        return {}
+
+    cutoff = datetime.now(UTC).replace(tzinfo=None) - max_age if max_age else None
+    cached: dict[str, LiveQuote] = {}
+    with get_session() as session:
+        for ticker in tickers:
+            statement = (
+                select(QuoteHistory)
+                .where(QuoteHistory.ticker == ticker)
+                .order_by(QuoteHistory.recorded_at.desc())
+                .limit(1)
+            )
+            row = session.exec(statement).first()
+            if row is None:
+                continue
+            if cutoff and row.recorded_at < cutoff:
+                continue
+            cached[ticker] = LiveQuote(
+                price=float(row.price),
+                change_pct=float(row.change_percent) if row.change_percent is not None else None,
+            )
+    return cached
+
+
+def write_cached_quotes(quotes: dict[str, LiveQuote]) -> None:
+    if not quotes:
+        return
+
+    with get_session() as session:
+        for ticker, quote in quotes.items():
+            session.add(
+                QuoteHistory(
+                    ticker=ticker.upper(),
+                    price=Decimal(str(quote.price)),
+                    change_percent=(
+                        Decimal(str(quote.change_pct)) if quote.change_pct is not None else None
+                    ),
+                )
+            )
+        session.commit()
 
 
 def build_snapshot(

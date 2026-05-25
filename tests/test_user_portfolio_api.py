@@ -1,8 +1,17 @@
 """Integration: dashboard portfolio route mounted on main app."""
 
+from datetime import UTC, datetime, timedelta
+from decimal import Decimal
+
 from fastapi.testclient import TestClient
 
-from arenawealth.api.routers.user_portfolio import LiveQuote, build_snapshot
+from arenawealth.api.routers.user_portfolio import (
+    LiveQuote,
+    build_snapshot,
+    read_cached_quotes,
+    write_cached_quotes,
+)
+from arenawealth.models.database import QuoteHistory, get_session
 
 
 def test_portfolio_user_returns_payload(api_client: TestClient) -> None:
@@ -26,6 +35,31 @@ def test_build_snapshot_overlays_live_prices() -> None:
     assert snapshot.positions
     assert all(position.current_price == 1234.0 for position in snapshot.positions)
     assert all(position.change_pct == 1.5 for position in snapshot.positions)
+
+
+def test_quote_cache_round_trip(api_client: TestClient) -> None:
+    write_cached_quotes({"AAPL": LiveQuote(price=123.45, change_pct=1.2)})
+
+    quotes = read_cached_quotes(["AAPL"], max_age=timedelta(minutes=15))
+
+    assert quotes["AAPL"] == LiveQuote(price=123.45, change_pct=1.2)
+
+
+def test_quote_cache_respects_ttl(api_client: TestClient) -> None:
+    with get_session() as session:
+        session.add(
+            QuoteHistory(
+                ticker="MSFT",
+                price=Decimal("300.00"),
+                change_percent=Decimal("0.5"),
+                recorded_at=datetime.now(UTC).replace(tzinfo=None) - timedelta(days=1),
+            )
+        )
+        session.commit()
+
+    quotes = read_cached_quotes(["MSFT"], max_age=timedelta(minutes=15))
+
+    assert quotes == {}
 
 
 def test_health_aggregate_exists(api_client: TestClient) -> None:
