@@ -1,6 +1,6 @@
 """Database models and connection management."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
 
@@ -19,6 +19,10 @@ engine = create_engine(
 )
 
 
+def utc_now_naive() -> datetime:
+    return datetime.now(UTC).replace(tzinfo=None)
+
+
 class Portfolio(SQLModel, table=True):
     __tablename__ = "portfolios"
 
@@ -26,8 +30,8 @@ class Portfolio(SQLModel, table=True):
     name: str = Field(index=True)
     description: str | None = None
     currency: str = Field(default="USD")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=utc_now_naive)
+    updated_at: datetime = Field(default_factory=utc_now_naive)
 
     total_market_value: Decimal = Field(default=Decimal("0"))
     total_cost_basis: Decimal = Field(default=Decimal("0"))
@@ -48,8 +52,8 @@ class Position(SQLModel, table=True):
     average_cost_basis: Decimal = Field(decimal_places=4)
     current_price: Decimal = Field(default=Decimal("0"), decimal_places=4)
 
-    opened_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    opened_at: datetime = Field(default_factory=utc_now_naive)
+    updated_at: datetime = Field(default_factory=utc_now_naive)
 
     @property
     def market_value(self) -> Decimal:
@@ -88,7 +92,7 @@ class Transaction(SQLModel, table=True):
     total_amount: Decimal = Field(decimal_places=2)
     fees: Decimal = Field(default=Decimal("0"), decimal_places=2)
 
-    executed_at: datetime = Field(default_factory=datetime.utcnow)
+    executed_at: datetime = Field(default_factory=utc_now_naive)
     broker_order_id: str | None = None
     notes: str | None = None
 
@@ -101,10 +105,24 @@ class QuoteHistory(SQLModel, table=True):
     price: Decimal = Field(decimal_places=4)
     volume: int | None = None
     change_percent: Decimal | None = Field(default=None, decimal_places=4)
-    recorded_at: datetime = Field(default_factory=datetime.utcnow, index=True)
+    recorded_at: datetime = Field(default_factory=utc_now_naive, index=True)
 
     high_52_week: Decimal | None = Field(default=None, decimal_places=4)
     low_52_week: Decimal | None = Field(default=None, decimal_places=4)
+
+
+class DecisionLog(SQLModel, table=True):
+    __tablename__ = "decision_logs"
+
+    id: int | None = Field(default=None, primary_key=True)
+    created_at: datetime = Field(default_factory=utc_now_naive, index=True)
+    policy_version: str
+    portfolio_source: str
+    provider_mode: str
+    cash: Decimal = Field(decimal_places=2)
+    order_count: int
+    total_order_amount: Decimal = Field(decimal_places=2)
+    payload_json: str
 
 
 def init_database() -> None:
@@ -119,9 +137,9 @@ def get_session() -> Session:
 
 @event.listens_for(Portfolio, "before_update")
 def update_portfolio_timestamp(_mapper, _connection, target: Portfolio) -> None:
-    target.updated_at = datetime.utcnow()
+    target.updated_at = utc_now_naive()
 
 
 @event.listens_for(Position, "before_update")
 def update_position_timestamp(_mapper, _connection, target: Position) -> None:
-    target.updated_at = datetime.utcnow()
+    target.updated_at = utc_now_naive()

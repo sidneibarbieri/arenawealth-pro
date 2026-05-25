@@ -69,6 +69,17 @@ export interface RecommendationResponse {
   ranked_positions: RankedPosition[];
 }
 
+export interface DecisionLogEntry {
+  id: number;
+  created_at: string;
+  policy_version: string;
+  portfolio_source: string;
+  provider_mode: string;
+  cash: number;
+  order_count: number;
+  total_order_amount: number;
+}
+
 export interface Candidate {
   ticker: string;
   name: string;
@@ -209,4 +220,9 @@ export async function fetchPortfolioSource(signal: AbortSignal): Promise<Portfol
 export async function clearManualPortfolio(): Promise<PortfolioResponse> {
   const response = await fetch('/api/v1/portfolio/user/source/manual', { method: 'DELETE' });
   return parseJsonResponse<PortfolioResponse>(response, 'Manual portfolio reset');
+}
+
+export async function fetchDecisionLogs(signal: AbortSignal): Promise<DecisionLogEntry[]> {
+  const response = await fetch('/api/v1/portfolio/user/decisions?limit=8', { signal });
+  return parseJsonResponse<DecisionLogEntry[]>(response, 'Decision log');
 }

@@ -33,10 +33,11 @@ deployment, and replay evidence instead of trusting an opaque recommendation.
 3. Show data source health and provider readiness.
 4. Show portfolio summary and live/stored price status.
 5. Run cash-deployment recommendation with economic guardrails.
-6. Record a small manual buy/sell edit and show the source changing to manual.
-7. Clear manual override and return to the broker export.
-8. Run candidate screen.
-9. Show `make price-backtest` output as evidence discipline, not a performance
+6. Show the Decision Log row created by the recommendation run.
+7. Record a small manual buy/sell edit and show the source changing to manual.
+8. Clear manual override and return to the broker export.
+9. Run candidate screen.
+10. Show `make price-backtest` output as evidence discipline, not a performance
    guarantee.
 
 ## Three-Minute Judge Narrative
@@ -46,7 +47,7 @@ deployment, and replay evidence instead of trusting an opaque recommendation.
 2. ArenaWealth shows the active portfolio source, provider health, and policy
    guardrails before making any recommendation.
 3. The same workbench supports real investor operation and reviewer-grade
-   reproducibility: import, edit, inspect, recommend, screen, and replay.
+   reproducibility: import, edit, inspect, recommend, audit, screen, and replay.
 
 ## Use Cases to Demonstrate
 
@@ -65,6 +66,7 @@ deployment, and replay evidence instead of trusting an opaque recommendation.
 - Free-data-first operation.
 - Visible data-source status: configured, working, or error.
 - Portfolio source provenance: broker export, manual override, fixture.
+- Decision log: recommendation runs are timestamped with policy and inputs.
 - Economic guardrails: no microscopic orders that lose to fees.
 - Reproducibility boundary: claims are separated from limitations.
 

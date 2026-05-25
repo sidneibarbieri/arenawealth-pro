@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
@@ -40,11 +41,12 @@ from arenawealth.importers.holdings_source import (
     manual_portfolio_path,
     resolve_holdings_path,
 )
-from arenawealth.models.database import QuoteHistory, get_session
+from arenawealth.models.database import DecisionLog, QuoteHistory, get_session
 from arenawealth.providers.yahoo import YahooProvider
 
 QUOTE_CACHE_TTL = timedelta(minutes=15)
 MANUAL_PORTFOLIO = manual_portfolio_path()
+POLICY_VERSION = "cash-deployment-v1"
 
 router = APIRouter(
     prefix="/api/v1/portfolio",
@@ -121,6 +123,17 @@ class RecommendationResponse(BaseModel):
     excluded_overweight: list[str]
     excluded_theme: list[str]
     ranked_positions: list[RecommendationPositionResponse]
+
+
+class DecisionLogResponse(BaseModel):
+    id: int
+    created_at: str
+    policy_version: str
+    portfolio_source: str
+    provider_mode: str
+    cash: float
+    order_count: int
+    total_order_amount: float
 
 
 class CandidateResponse(BaseModel):
@@ -532,6 +545,45 @@ def build_recommendation_response(
     )
 
 
+def record_decision_log(response: RecommendationResponse) -> DecisionLog:
+    total_order_amount = sum(order.amount for order in response.orders)
+    source = display_path(holdings_path())
+    with get_session() as session:
+        row = DecisionLog(
+            policy_version=POLICY_VERSION,
+            portfolio_source=source,
+            provider_mode=response.provider_mode,
+            cash=Decimal(str(response.cash)),
+            order_count=len(response.orders),
+            total_order_amount=Decimal(str(total_order_amount)),
+            payload_json=json.dumps(response.model_dump(), sort_keys=True),
+        )
+        session.add(row)
+        session.commit()
+        session.refresh(row)
+        return row
+
+
+def decision_log_to_response(row: DecisionLog) -> DecisionLogResponse:
+    return DecisionLogResponse(
+        id=row.id or 0,
+        created_at=row.created_at.replace(tzinfo=UTC).isoformat(),
+        policy_version=row.policy_version,
+        portfolio_source=row.portfolio_source,
+        provider_mode=row.provider_mode,
+        cash=float(row.cash),
+        order_count=row.order_count,
+        total_order_amount=float(row.total_order_amount),
+    )
+
+
+def latest_decision_logs(limit: int) -> list[DecisionLogResponse]:
+    with get_session() as session:
+        statement = select(DecisionLog).order_by(DecisionLog.created_at.desc()).limit(limit)
+        rows = session.exec(statement).all()
+    return [decision_log_to_response(row) for row in rows]
+
+
 def review_to_response(review: PortfolioReview) -> PortfolioReviewResponse:
     return PortfolioReviewResponse(
         current_positions=review.current_positions,
@@ -603,7 +655,9 @@ async def get_user_recommendation(
     cash: float = Query(default=1511.18, gt=0),
     offline_demo: bool = Query(default=False),
 ) -> RecommendationResponse:
-    return build_recommendation_response(cash, offline_demo)
+    response = build_recommendation_response(cash, offline_demo)
+    record_decision_log(response)
+    return response
 
 
 def candidate_holdings() -> tuple[Holding, ...]:
@@ -673,6 +727,13 @@ async def clear_manual_portfolio() -> PortfolioResponse:
     if MANUAL_PORTFOLIO.exists():
         MANUAL_PORTFOLIO.unlink()
     return build_snapshot(live=False)
+
+
+@router.get("/user/decisions", response_model=list[DecisionLogResponse])
+async def get_decision_logs(
+    limit: int = Query(default=10, gt=0, le=50),
+) -> list[DecisionLogResponse]:
+    return latest_decision_logs(limit)
 
 
 @router.get("/user/health")

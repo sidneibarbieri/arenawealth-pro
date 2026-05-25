@@ -15,6 +15,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import {
   fetchCandidates,
+  fetchDecisionLogs,
   fetchPortfolio,
   fetchPortfolioSource,
   fetchProviderStatus,
@@ -23,6 +24,7 @@ import {
   clearManualPortfolio,
   type Candidate,
   type CandidatesResponse,
+  type DecisionLogEntry,
   type ManualTradeRequest,
   type PortfolioReview,
   type PortfolioResponse,
@@ -69,6 +71,7 @@ function App() {
   const [candidates, setCandidates] = useState<CandidatesResponse | null>(null);
   const [providers, setProviders] = useState<ProviderStatus[]>([]);
   const [portfolioSource, setPortfolioSource] = useState<PortfolioSource | null>(null);
+  const [decisionLogs, setDecisionLogs] = useState<DecisionLogEntry[]>([]);
   const [portfolioError, setPortfolioError] = useState<string | null>(null);
   const [recommendationError, setRecommendationError] = useState<string | null>(null);
   const [candidateError, setCandidateError] = useState<string | null>(null);
@@ -147,6 +150,24 @@ function App() {
   }, [refreshIndex]);
 
   useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadDecisionLogs() {
+      const payload = await fetchDecisionLogs(controller.signal);
+      setDecisionLogs(payload);
+    }
+
+    loadDecisionLogs().catch((error: unknown) => {
+      if (isAbortError(error)) {
+        return;
+      }
+      setPortfolioError(error instanceof Error ? error.message : 'Unknown decision log error');
+    });
+
+    return () => controller.abort();
+  }, [refreshIndex]);
+
+  useEffect(() => {
     setCandidates(null);
     setCandidateError(null);
     setRecommendation(null);
@@ -205,6 +226,7 @@ function App() {
     try {
       const payload = await fetchRecommendation(parsedCash, offlineDemo, controller.signal);
       setRecommendation(payload);
+      setRefreshIndex((currentIndex) => currentIndex + 1);
     } catch (error: unknown) {
       setRecommendationError(
         error instanceof Error ? error.message : 'Unknown recommendation error',
@@ -455,6 +477,8 @@ function App() {
                 }}
               />
             )}
+
+            <DecisionLogPanel decisions={decisionLogs} />
 
             <PortfolioEditor
               form={tradeForm}
@@ -786,6 +810,56 @@ function PortfolioSourcePanel({ source, onResetManual }: PortfolioSourcePanelPro
       <p className="mode-hint">
         Drop a new broker CSV into the inbox to update the portfolio. Manual edits become the active
         source until cleared.
+      </p>
+    </section>
+  );
+}
+
+function DecisionLogPanel({ decisions }: { decisions: DecisionLogEntry[] }) {
+  return (
+    <section className="provider-panel" aria-label="Decision log">
+      <div className="section-heading">
+        <div>
+          <p className="eyebrow">Audit trail</p>
+          <h2>Decision log</h2>
+        </div>
+        <span className="freshness">{decisions.length} recent runs</span>
+      </div>
+      {decisions.length === 0 ? (
+        <div className="loading-row">No recommendation runs recorded yet.</div>
+      ) : (
+        <div className="table-frame">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Policy</th>
+                <th>Source</th>
+                <th>Mode</th>
+                <th className="numeric">Cash</th>
+                <th className="numeric">Orders</th>
+                <th className="numeric">Queued</th>
+              </tr>
+            </thead>
+            <tbody>
+              {decisions.map((decision) => (
+                <tr key={decision.id}>
+                  <td>{formatDateTime(decision.created_at)}</td>
+                  <td>{decision.policy_version}</td>
+                  <td>{decision.portfolio_source}</td>
+                  <td>{decision.provider_mode}</td>
+                  <td className="numeric">{formatMoney(decision.cash)}</td>
+                  <td className="numeric">{decision.order_count}</td>
+                  <td className="numeric">{formatMoney(decision.total_order_amount)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      <p className="mode-hint">
+        Each recommendation run is recorded with policy, source, provider mode, cash, and queued
+        order totals.
       </p>
     </section>
   );

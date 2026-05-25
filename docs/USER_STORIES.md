@@ -21,7 +21,13 @@ without mixing their claims.
    - Demo: app Data Sources Health panel or `/api/v1/data-sources/health`
    - Evidence: configured/not configured by provider, live check on demand.
 
-4. As a reviewer, I can run a free price-history baseline so I can see what is
+4. As a reviewer, I can inspect the recommendation audit trail so I can see
+   which policy, data source, provider mode, cash value, and order total were
+   used for each decision.
+   - Demo: app Decision Log panel or `/api/v1/portfolio/user/decisions`
+   - Evidence: timestamped rows written after recommendation runs.
+
+5. As a reviewer, I can run a free price-history baseline so I can see what is
    measured and what is not claimed.
    - Demo: `make price-backtest`
    - Evidence: SPY, equal-weight, current-weight, rebalance ablation.
@@ -50,12 +56,17 @@ without mixing their claims.
      active source, modified time, and position count.
    - Next support: validation errors and import history.
 
-5. As an investor, I can add a new candidate to the watched universe so I can
+5. As an investor, I can see the recent recommendation trail so I can compare
+   decisions across cash values, provider modes, and portfolio sources.
+   - Current support: Decision Log panel records recommendation runs.
+   - Next support: exportable replay bundle per decision.
+
+6. As an investor, I can add a new candidate to the watched universe so I can
    compare it against current holdings.
    - Current support: curated candidate screen.
    - Next support: editable watchlist with provider-backed validation.
 
-6. As an advisor, I can evaluate multiple client portfolios independently so
+7. As an advisor, I can evaluate multiple client portfolios independently so
    deterministic rules are applied per client.
    - Current support: repository layer supports multiple portfolios.
    - Next support: UI portfolio switcher, data isolation, audit log, and
@@ -73,7 +84,8 @@ without mixing their claims.
    - Demo: cash deployment, guardrails, ranked holdings, exclusions.
 
 4. As a judge, I can see why the product is not a black box.
-   - Demo: moat, compounding, valuation, concentration rules, and data limits.
+   - Demo: moat, compounding, valuation, concentration rules, audit trail, and
+     data limits.
 
 ## Interface Principles
 

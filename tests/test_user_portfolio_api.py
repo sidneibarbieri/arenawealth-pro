@@ -115,6 +115,27 @@ def test_portfolio_recommendation_rejects_uneconomic_cash(
     assert body["orders"] == []
 
 
+def test_recommendation_run_is_recorded_in_decision_log(
+    api_client: TestClient,
+) -> None:
+    initial_response = api_client.get("/api/v1/portfolio/user/decisions")
+    assert initial_response.status_code == 200
+    assert initial_response.json() == []
+
+    response = api_client.get("/api/v1/portfolio/user/recommendation?cash=0.10&offline_demo=true")
+    assert response.status_code == 200
+
+    log_response = api_client.get("/api/v1/portfolio/user/decisions")
+    assert log_response.status_code == 200
+    logs = log_response.json()
+    assert len(logs) == 1
+    assert logs[0]["policy_version"] == "cash-deployment-v1"
+    assert logs[0]["provider_mode"] == "not-run"
+    assert logs[0]["cash"] == 0.1
+    assert logs[0]["order_count"] == 0
+    assert logs[0]["total_order_amount"] == 0.0
+
+
 def test_manual_trade_writes_local_inbox_portfolio(
     api_client: TestClient,
     tmp_path: Path,

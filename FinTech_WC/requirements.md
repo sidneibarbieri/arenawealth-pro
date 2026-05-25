@@ -27,8 +27,8 @@
 ## Product Gaps Before Pitch
 
 - [x] Editable/importable portfolio workflow in the UI.
+- [x] Audit log for recommendation runs.
 - [ ] Multi-portfolio workspace for advisor mode.
-- [ ] Audit log for recommendation runs.
 - [ ] User authentication and data isolation.
 - [ ] Compliance review for personalized recommendations.
 - [ ] Landing/pitch page using the selected brand direction.
