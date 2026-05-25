@@ -7,7 +7,6 @@ import re
 import sys
 from pathlib import Path
 
-
 FRONTMATTER_PATTERN = re.compile(
     r"^---\nname: (?P<name>[a-z0-9-]+)\ndescription: (?P<description>.+?)\n",
     re.DOTALL,
@@ -56,4 +55,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

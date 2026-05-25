@@ -40,7 +40,7 @@ Status: **supported**
 |---------------|----------|
 | UI panel | Provider status chips in the workbench header |
 | States | `working`, `configured`, `not_configured`, `error` per provider |
-| Endpoint | `GET /api/v1/health/providers` returns machine-readable status |
+| Endpoint | `GET /api/v1/data-sources/health` returns machine-readable status |
 
 Status: **supported**
 
@@ -51,7 +51,7 @@ Status: **supported**
 
 | Evidence type | Location |
 |---------------|----------|
-| Rule | `src/arenawealth/analytics/deployment.py` — `MINIMUM_ORDER_USD = 250` |
+| Rule | `src/arenawealth/analytics/deployment.py` — `MIN_ORDER_AMOUNT = 250` |
 | Test | `tests/unit/test_analytics_deployment.py` — `cash=0.10` returns no orders |
 | UI message | "Minimum order is US$250 (1% fee cap at US$2.50 per trade)" |
 
@@ -64,10 +64,10 @@ Status: **supported**
 
 | Evidence type | Location |
 |---------------|----------|
-| Database table | `decisions` in SQLite, schema in `src/arenawealth/models/database.py` |
+| Database table | `decision_logs` in SQLite, schema in `src/arenawealth/models/database.py` |
 | Endpoint | `GET /api/v1/portfolio/user/decisions` |
 | UI panel | Decision Log panel shows last N runs with timestamp and metadata |
-| Test | Decision log test in `tests/unit/test_analytics_deployment.py` |
+| Test | `tests/test_user_portfolio_api.py` — recommendation run writes a decision log row |
 
 Status: **supported**
 
@@ -78,7 +78,7 @@ Status: **supported**
 
 | Evidence type | Location |
 |---------------|----------|
-| Source types | `broker_export`, `manual_override`, `private`, `fixture` |
+| Source types | `inbox`, `manual`, `private`, `fixture` |
 | Endpoint | `GET /api/v1/portfolio/user/source` |
 | UI panel | Import Status panel shows active file, modification date, position count |
 | Revert | `DELETE /api/v1/portfolio/user/source/manual` reverts to broker export |
@@ -92,7 +92,7 @@ Status: **supported**
 
 | Evidence type | Location |
 |---------------|----------|
-| Implementation | `src/arenawealth/importers/holdings_source.py` — `find_latest_inbox_csv()` |
+| Implementation | `src/arenawealth/importers/holdings_source.py` — `latest_inbox_csv()` |
 | Test | `tests/unit/test_holdings_source.py` — selects most recent CSV by mtime |
 | Inbox path | `data/inbox/*.csv` — ignored by git, user places exports here |
 

@@ -15,5 +15,10 @@ for skill_dir in "$SOURCE_DIR"/*; do
   echo "installed $skill_name"
 done
 
-echo "Codex skills installed in $TARGET_DIR"
+if [[ -d "$SOURCE_DIR/scripts" ]]; then
+  rm -rf "$TARGET_DIR/scripts"
+  cp -R "$SOURCE_DIR/scripts" "$TARGET_DIR/scripts"
+  echo "installed shared scripts"
+fi
 
+echo "Codex skills installed in $TARGET_DIR"

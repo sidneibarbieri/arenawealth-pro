@@ -5,8 +5,8 @@
 - [ ] One-line product description.
 - [x] Problem statement — `pitch_outline.md` §1.
 - [x] Product demo link or local demo script — `demo_script.md`.
-- [ ] Pitch deck — slides not yet built.
-- [ ] Founder/team profile.
+- [x] Pitch deck — `ArenaWealth_Pitch.pptx`.
+- [x] Founder/team profile — `founder_profile.md`.
 - [x] Market and customer segment — `market_sizing.md`.
 - [ ] Business model and pricing hypothesis — defined in `pitch_outline.md` §6; needs one-page write-up.
 - [ ] Traction or validation evidence — no live users yet; use `make verify` output as reproducibility evidence.
@@ -39,11 +39,13 @@
 - [x] Artifact text hygiene — scanner passes clean.
 
 ### Still Needed for Pitch
-- [ ] Pitch deck (slides) — highest remaining gap.
-- [ ] Landing page or one-pager with the Arena brand direction.
-- [ ] Pre-generated demo screenshots for offline fallback.
-- [ ] Founder/team profile write-up.
+- [x] Pitch deck (slides).
+- [x] Landing page or one-pager with the Arena brand direction.
+- [x] Pre-generated demo screenshots for offline fallback.
+- [x] Founder/team profile write-up.
 - [ ] One-page business model and pricing hypothesis.
+- [ ] Public hosted demo or short walkthrough video.
+- [ ] A dated validation memo that records demo commands, screenshots, and health status.
 
 ### Post-Pitch / Phase 2
 - [ ] Multi-portfolio workspace for advisor mode.

@@ -7,7 +7,6 @@ import argparse
 import re
 from pathlib import Path
 
-
 # Patterns applied to all scanned files
 DEFAULT_PATTERNS = {
     "hype": r"\b(world[- ]class|perfect|ultimate|best[- ]in[- ]class|revolutionary)\b",
@@ -53,7 +52,9 @@ def main() -> int:
     args = parser.parse_args()
     root = Path(args.root)
     findings: list[str] = []
-    patterns = {name: re.compile(pattern, re.IGNORECASE) for name, pattern in DEFAULT_PATTERNS.items()}
+    patterns = {
+        name: re.compile(pattern, re.IGNORECASE) for name, pattern in DEFAULT_PATTERNS.items()
+    }
 
     for path in iter_files(root):
         text = path.read_text(encoding="utf-8", errors="ignore")
