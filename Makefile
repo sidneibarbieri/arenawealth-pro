@@ -2,7 +2,7 @@ PYTHON ?= .venv/bin/python
 PIP ?= .venv/bin/pip
 UVICORN ?= .venv/bin/uvicorn
 
-.PHONY: setup verify verify-e2e metrics recommendation price-backtest configure-env api ui app run paper clean
+.PHONY: setup verify verify-e2e metrics recommendation price-backtest experiments configure-env api ui app run paper clean
 
 setup:
 	python3.11 -m venv .venv
@@ -23,6 +23,9 @@ recommendation:
 
 price-backtest:
 	$(PYTHON) scripts/price_backtest.py --start 2021-01-01 --benchmark SPY
+
+experiments:
+	$(PYTHON) scripts/run_experiments.py
 
 configure-env:
 	bash scripts/configure_env.sh

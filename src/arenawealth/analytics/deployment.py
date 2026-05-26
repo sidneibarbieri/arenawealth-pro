@@ -69,20 +69,30 @@ def build_order(analysis: PositionAnalysis, amount: float) -> Order:
 def size_orders(picks: Sequence[PositionAnalysis], cash: float) -> tuple[Order, ...]:
     if not picks or cash < MIN_ORDER_AMOUNT:
         return ()
+    single = build_order(picks[0], cash)
     if len(picks) == 1 or cash < MIN_ORDER_AMOUNT * 2:
-        return (build_order(picks[0], cash),)
+        return (single,)
     first, second = picks[0], picks[1]
     first_share = first.composite_score / (first.composite_score + second.composite_score)
     first_amount = cash * first_share
     second_amount = cash - first_amount
     if first_amount < MIN_ORDER_AMOUNT or second_amount < MIN_ORDER_AMOUNT:
-        return (build_order(first, cash),)
-    # Keep each order within one tranche so it never triggers an extra fee.
+        return (single,)
+    # Align one leg to a whole tranche. Because the fee is subadditive
+    # (ceil(a/T) + ceil(b/T) >= ceil((a+b)/T)), this is the only split that can
+    # preserve the single-order fee when cash spans more than one tranche.
     if first_amount > TRANCHE_SIZE:
         first_amount, second_amount = TRANCHE_SIZE, cash - TRANCHE_SIZE
     elif second_amount > TRANCHE_SIZE:
         second_amount, first_amount = TRANCHE_SIZE, cash - TRANCHE_SIZE
-    return build_order(first, first_amount), build_order(second, second_amount)
+    split = (build_order(first, first_amount), build_order(second, second_amount))
+    # Diversify only when it is fee-neutral; otherwise consolidate. This keeps
+    # the planner on the fee-optimal frontier even for sub-tranche cash, where a
+    # naive proportional split would pay an extra tranche (see
+    # experiments.fee_landscape and tests/unit/test_analytics_deployment.py).
+    if sum(order.fee for order in split) > single.fee:
+        return (single,)
+    return split
 
 
 def plan_deployment(analyses: Sequence[PositionAnalysis], cash: float) -> DeploymentPlan:

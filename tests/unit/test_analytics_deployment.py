@@ -124,3 +124,32 @@ def test_uses_one_order_when_cash_cannot_fund_two_economic_orders():
 
     assert tuple(order.ticker for order in plan.orders) == ("A",)
     assert plan.orders[0].amount == MIN_ORDER_AMOUNT * 1.5
+
+
+def test_consolidates_in_subtranche_overpay_band():
+    """Cash in (625, 1000] must not split into two sub-tranche orders.
+
+    Two sub-tranche orders cost two tranches ($5.00) while one order covering the
+    same cash costs a single tranche ($2.50). The planner must consolidate.
+    """
+    positions = [
+        make_position("A", 60.0, 10.0, "TA"),
+        make_position("B", 40.0, 10.0, "TB"),
+    ]
+
+    plan = plan_deployment(positions, 800.0)
+
+    assert len(plan.orders) == 1
+    assert plan.total_fee == order_fee(800.0) == 2.50
+
+
+def test_planner_never_overpays_single_order_fee_across_grid():
+    """Property: the split fee never exceeds the single-order fee (subadditivity)."""
+    positions = [
+        make_position("A", 60.0, 10.0, "TA"),
+        make_position("B", 40.0, 10.0, "TB"),
+    ]
+    for cash_cents in range(25_000, 500_000, 1_111):  # $250.00 .. $5000 in odd steps
+        cash = cash_cents / 100
+        plan = plan_deployment(positions, cash)
+        assert plan.total_fee <= order_fee(cash) + 1e-9, f"overpaid at cash={cash}"

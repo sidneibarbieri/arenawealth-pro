@@ -1,0 +1,94 @@
+{
+  "generated_utc": "20260525_111437",
+  "start_date": "2021-01-05",
+  "end_date": "2026-05-22",
+  "tickers": [
+    "ASML",
+    "AVGO",
+    "EQIX",
+    "GOOGL",
+    "ISRG",
+    "JPM",
+    "LIN",
+    "LLY",
+    "MSFT",
+    "NVO",
+    "PLD",
+    "RELX",
+    "ROP",
+    "SPGI",
+    "TDG",
+    "TSM",
+    "UNH"
+  ],
+  "benchmark_ticker": "SPY",
+  "baselines": {
+    "current_weight": {
+      "periods": 1352,
+      "rebalances": 0,
+      "total_return": 1.699429483293092,
+      "cagr": 0.2033307513452034,
+      "annualized_volatility": 0.18616797896661444,
+      "sharpe_ratio": 1.0875032105421911,
+      "max_drawdown": -0.2892485912272619,
+      "total_cost": 0.0
+    },
+    "equal_weight": {
+      "periods": 1352,
+      "rebalances": 0,
+      "total_return": 1.9609434838962394,
+      "cagr": 0.22424999453744943,
+      "annualized_volatility": 0.18795656377488038,
+      "sharpe_ratio": 1.1707171223100319,
+      "max_drawdown": -0.27107281269638495,
+      "total_cost": 0.0
+    },
+    "benchmark": {
+      "periods": 1352,
+      "rebalances": 0,
+      "total_return": 1.1718567359195515,
+      "cagr": 0.15553243922425453,
+      "annualized_volatility": 0.16872795679635655,
+      "sharpe_ratio": 0.9412095618087333,
+      "max_drawdown": -0.2449640302629169,
+      "total_cost": 0.0
+    }
+  },
+  "comparisons": {
+    "current_vs_equal_weight": {
+      "excess_total_return": -0.26151400060314733,
+      "excess_cagr": -0.02091924319224603,
+      "sharpe_delta": -0.08321391176784076,
+      "max_drawdown_delta": -0.01817577853087693
+    },
+    "current_vs_benchmark": {
+      "excess_total_return": 0.5275727473735405,
+      "excess_cagr": 0.04779831212094887,
+      "sharpe_delta": 0.14629364873345785,
+      "max_drawdown_delta": -0.044284560964344966
+    }
+  },
+  "limitations": [
+    "Current-basket backtest; not a point-in-time stock-selection backtest.",
+    "Uses free Yahoo Finance adjusted closes.",
+    "Survivorship and selection bias are not eliminated."
+  ],
+  "ablations": {
+    "rebalanced_current": {
+      "periods": 1352,
+      "rebalances": 21,
+      "total_return": 1.4603256952851456,
+      "cagr": 0.18270741428649728,
+      "annualized_volatility": 0.1784021728696233,
+      "sharpe_ratio": 1.0299636014639988,
+      "max_drawdown": -0.29746186664641183,
+      "total_cost": 0.0015735143265008962
+    },
+    "current_vs_rebalanced": {
+      "excess_total_return": 0.23910378800794652,
+      "excess_cagr": 0.020623337058706115,
+      "sharpe_delta": 0.05753960907819233,
+      "max_drawdown_delta": 0.008213275419149957
+    }
+  }
+}

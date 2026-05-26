@@ -111,6 +111,17 @@ ablation with transaction costs. The output is a JSON report under `exports/`.
 It is a current-basket price study, not a point-in-time stock-selection study.
 The data limitations are listed in `docs/DATA_SOURCES.md`.
 
+## Experiments and Manuscript Figures
+
+```bash
+make experiments
+```
+
+This regenerates the fee, guardrail, ablation, and backtest figures under
+`paper/figures/` and writes an experiment JSON report under `exports/`. These
+experiments use the production engine and are the source for the manuscript's
+findings. The current research ledger is `docs/SCIENTIFIC_LEDGER.md`.
+
 ## API
 
 ```bash
@@ -154,8 +165,9 @@ The Playwright config starts the API and frontend when needed.
 
 ## Paper Scaffold
 
-The LaTeX paper scaffold is under `paper/`. It uses the `acmart` document class
-in anonymous review mode and names no venue, author, or institution.
+The LaTeX paper scaffold is under `paper/`. It is anonymous and names no venue,
+author, or institution. Venue-specific submission packets live under
+`submissions/` and are not required to run the artifact.
 
 ## Scope Notes
 
