@@ -1,6 +1,6 @@
 ---
 name: fintech-competition-prep
-description: Use when preparing a fintech product for a startup competition, accelerator pitch, FinTech World Cup, or investor demo where judges evaluate problem clarity, solution novelty, market size, business model, compliance awareness, and live demo quality within 5-10 minutes.
+description: Use when preparing a fintech product for a startup competition, accelerator pitch, or investor demo where judges evaluate problem clarity, solution novelty, market size, business model, compliance awareness, and live demo quality within 5-10 minutes.
 metadata:
   short-description: FinTech competition and pitch preparation
 ---
@@ -8,9 +8,8 @@ metadata:
 # FinTech Competition Preparation
 
 Use this skill when a project needs to be packaged for a product-pitch
-competition (e.g., FinTech World Cup, Money20/20 Hackathon, accelerator demo
-days) where the audience is judges with finance and product backgrounds, not
-academic reviewers.
+competition, accelerator demo day, or investor showcase where the audience is
+judges with finance and product backgrounds, not academic reviewers.
 
 This is distinct from `prize-submission-strategy`, which targets research
 venues. Competitions favor working demos, market narrative, and business
@@ -73,14 +72,15 @@ Even if the product is pre-revenue, judges expect to see:
 - What the path to a licensed operation looks like.
 
 ### 7. Separate pitch materials from the artifact
-- Competition slides go in `FinTech_WC/` or a venue-specific directory.
+- Competition slides go in `submissions/product-pitch/` or a similar
+  submission-only directory.
 - Never commit venue-specific language into the main source or paper.
 - The live product should not display competition branding.
 
 ## Package Structure
 
 ```
-FinTech_WC/
+submissions/product-pitch/
 ├── README.md           # competition overview and submission checklist
 ├── pitch_outline.md    # slide-by-slide narrative
 ├── demo_script.md      # step-by-step demo instructions

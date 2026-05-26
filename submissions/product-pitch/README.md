@@ -1,13 +1,13 @@
-# FinTech World Cup Preparation Packet
+# Product Pitch Submission Packet
 
 This folder tracks the product and pitch path. It is separate from the research
 paper packet.
 
-## Target
+## Purpose
 
-FinTech World Cup is the best fit for product visibility and prize-oriented
-startup pitching. Dubai FinTech Summit is the platform where the grand finale is
-hosted.
+This packet records product-pitch preparation separately from the executable
+artifact. It may be adapted to a specific competition later, but the product
+and research artifact must remain venue-neutral.
 
 ## Product Thesis
 
@@ -69,9 +69,3 @@ deployment, and replay evidence instead of trusting an opaque recommendation.
 - Decision log: recommendation runs are timestamped with policy and inputs.
 - Economic guardrails: no microscopic orders that lose to fees.
 - Reproducibility boundary: claims are separated from limitations.
-
-## Current Public Sources
-
-- FinTech World Cup: https://fintechworldcup.com/
-- Dubai FinTech Summit ecosystem events:
-  https://dubaifintechsummit.com/ecosystem-events/

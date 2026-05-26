@@ -1,9 +1,9 @@
-# ICAIF Requirements Checklist
+# Research Paper Requirements Checklist
 
 ## Formatting
 
-- [ ] Use ACM `acmart` with `sigconf`.
-- [ ] Keep the paper to 8 pages total, including references.
+- [ ] Use the selected venue template only in the manuscript, not the runtime artifact.
+- [ ] Keep the paper within the target venue page limit.
 - [ ] Remove supplementary-only claims; the paper must stand alone.
 - [ ] Keep claims tied to generated tables or source citations.
 - [ ] Avoid venue names in the executable artifact.

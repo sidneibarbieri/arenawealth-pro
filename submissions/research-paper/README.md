@@ -1,21 +1,20 @@
-# ACM ICAIF Submission Packet
+# Research Paper Submission Packet
 
 This folder tracks the paper-oriented path. It is not part of the runtime
 artifact and should contain only submission preparation material.
 
-## Target
+## Purpose
 
-ACM ICAIF 2026 is the best fit for the research paper because it is a
-peer-reviewed venue focused on AI, machine learning, and finance.
+This packet records submission preparation separately from the executable
+artifact. It may be adapted to a target venue later, but the runtime artifact
+must remain venue-neutral.
 
-## Current Public Requirements
+## Generic Requirements
 
-- Paper deadline: August 2, 2026, Anywhere on Earth.
-- Conference: Milan, November 14-17, 2026.
-- Format: ACM `sigconf`.
-- Length: 8 pages total in two-column format, including figures and references.
-- Submission: PDF through CMT.
-- Supplementary material: not accepted; the paper must be self-contained.
+- Keep the paper short enough to be read in one sitting.
+- Keep claims tied to generated tables, figures, or source citations.
+- Ensure the paper stands alone without relying on hidden supplementary claims.
+- Keep the executable artifact free of venue-specific naming.
 
 ## Winning Thesis
 
@@ -41,8 +40,3 @@ about data limits.
 - SEC filing-date filter: implemented and unit tested.
 - Full point-in-time selection backtest: not implemented yet.
 - Factor-adjusted alpha: not implemented yet.
-
-## Sources
-
-- ICAIF 2026 call for papers: https://icaif2026.org/call-for-papers.html
-- ICAIF 2025 awards: https://icaif25.org/awards/

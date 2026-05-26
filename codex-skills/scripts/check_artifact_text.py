@@ -15,9 +15,9 @@ DEFAULT_PATTERNS = {
     "secret_assignment": r"\b(api[_-]?key|token|secret)\b\s*[:=]\s*[\"']?[A-Za-z0-9._-]{16,}",
 }
 
-# Venue-leak check only applies to executable source, not submission packets
+# Venue-leak check applies only to executable source, not submission packets.
 # Scan: src/, frontend/src/, tests/
-# Skip: paper/, notes/, ACM_ICAIF/, FinTech_WC/, docs/
+# Skip: paper/, notes/, submissions/, docs/
 VENUE_LEAK_PATTERN = re.compile(r"\b(ICAIF|Top 4|best paper)\b", re.IGNORECASE)
 VENUE_LEAK_DIRS = {"src", "frontend"}
 

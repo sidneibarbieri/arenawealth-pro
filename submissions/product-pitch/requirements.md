@@ -1,4 +1,4 @@
-# FinTech World Cup Requirements Checklist
+# Product Pitch Requirements Checklist
 
 ## Submission Assets
 
