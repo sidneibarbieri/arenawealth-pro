@@ -35,6 +35,7 @@ import {
   type RecommendationResponse,
 } from './api';
 import { DataSourcesHealth } from './components/DataSourcesHealth';
+import { PortfolioEditor } from './components/PortfolioEditor';
 import { formatDateTime, formatMoney, formatNumber, formatPercent } from './format';
 import { type TableSort, useTableSort } from './useTableSort';
 
@@ -483,6 +484,7 @@ function App() {
             <PortfolioEditor
               form={tradeForm}
               message={tradeMessage}
+              positions={portfolio?.positions ?? []}
               onChange={setTradeForm}
               onSubmit={() => {
                 void submitManualTrade();
@@ -861,106 +863,6 @@ function DecisionLogPanel({ decisions }: { decisions: DecisionLogEntry[] }) {
         Each recommendation run is recorded with policy, source, provider mode, cash, and queued
         order totals.
       </p>
-    </section>
-  );
-}
-
-interface PortfolioEditorProps {
-  form: ManualTradeRequest;
-  message: string | null;
-  onChange: (form: ManualTradeRequest) => void;
-  onSubmit: () => void;
-}
-
-function PortfolioEditor({ form, message, onChange, onSubmit }: PortfolioEditorProps) {
-  function updateField<Key extends keyof ManualTradeRequest>(
-    key: Key,
-    value: ManualTradeRequest[Key],
-  ) {
-    onChange({ ...form, [key]: value });
-  }
-
-  return (
-    <section className="data-section" aria-label="Portfolio editor">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">Manual portfolio</p>
-          <h2>Record buy or sell</h2>
-        </div>
-      </div>
-      <div className="trade-form">
-        <label className="field">
-          <span>Action</span>
-          <select
-            value={form.action}
-            onChange={(event) => updateField('action', event.target.value as 'buy' | 'sell')}
-          >
-            <option value="buy">Buy</option>
-            <option value="sell">Sell</option>
-          </select>
-        </label>
-        <label className="field">
-          <span>Ticker</span>
-          <input
-            type="text"
-            value={form.ticker}
-            onChange={(event) => updateField('ticker', event.target.value)}
-          />
-        </label>
-        <label className="field">
-          <span>Name</span>
-          <input
-            type="text"
-            value={form.name ?? ''}
-            onChange={(event) => updateField('name', event.target.value)}
-          />
-        </label>
-        <label className="field">
-          <span>Shares</span>
-          <input
-            inputMode="decimal"
-            type="number"
-            min="0"
-            step="0.000001"
-            value={form.shares || ''}
-            onChange={(event) => updateField('shares', Number(event.target.value))}
-          />
-        </label>
-        <label className="field">
-          <span>Price</span>
-          <input
-            inputMode="decimal"
-            type="number"
-            min="0"
-            step="0.01"
-            value={form.price || ''}
-            onChange={(event) => updateField('price', Number(event.target.value))}
-          />
-        </label>
-        <label className="field">
-          <span>Fees</span>
-          <input
-            inputMode="decimal"
-            type="number"
-            min="0"
-            step="0.01"
-            value={form.fees || ''}
-            onChange={(event) => updateField('fees', Number(event.target.value))}
-          />
-        </label>
-        <button className="primary-button" type="button" onClick={onSubmit}>
-          Record
-        </button>
-      </div>
-      <p className="mode-hint">
-        Manual edits write a local CSV under data/inbox and become the active portfolio source.
-      </p>
-      {message && (
-        <div className="status-block">
-          <CheckCircle2 size={18} />
-          <span>{message}</span>
-        </div>
-      )}
     </section>
   );
 }
