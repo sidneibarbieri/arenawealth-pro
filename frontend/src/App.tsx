@@ -261,8 +261,9 @@ function App() {
         name: tradeForm.name?.trim() || undefined,
       });
       setPortfolio(payload);
+      const ticker = tradeForm.ticker.trim().toUpperCase();
       setTradeMessage(
-        `${tradeForm.action === 'buy' ? 'Buy' : 'Sell'} recorded in data/inbox/manual-portfolio.csv`,
+        `${tradeForm.action === 'buy' ? 'Buy' : 'Sell'} of ${ticker} recorded. Portfolio updated.`,
       );
       setRefreshIndex((currentIndex) => currentIndex + 1);
       setRecommendation(null);

@@ -35,6 +35,17 @@ make configure-env
 
 The generated `.env` is ignored by Git. It contains no required paid services.
 
+## One-Shot Reproduction
+
+```bash
+make all
+```
+
+This runs `setup`, `verify`, `experiments`, and `paper` in sequence: it installs
+dependencies, runs the test suite, regenerates the manuscript figures from the
+production engine, and compiles the PDF. Everything is offline; the backtest
+figure reuses the tracked reference in `paper/data/`.
+
 ## Backend Validation
 
 ```bash

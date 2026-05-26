@@ -29,6 +29,7 @@ dev = [
     "pytest-cov>=6.0",
     "ruff>=0.11",
     "mypy>=1.15",
+    "matplotlib>=3.8",
 ]
 quant = [
     "cvxpy>=1.6",

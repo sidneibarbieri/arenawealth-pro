@@ -81,14 +81,14 @@ def list_portfolios(repo: PortfolioRepoDep) -> list[PortfolioSummary]:
     portfolios = repo.get_all()
     return [
         PortfolioSummary(
-            id=p.id,
-            name=p.name,
-            currency=p.currency,
-            total_market_value=p.total_market_value,
-            total_gain_loss=p.total_market_value - p.total_cost_basis,
+            id=portfolio.id,
+            name=portfolio.name,
+            currency=portfolio.currency,
+            total_market_value=portfolio.total_market_value,
+            total_gain_loss=portfolio.total_market_value - portfolio.total_cost_basis,
             position_count=0,
         )
-        for p in portfolios
+        for portfolio in portfolios
     ]
 
 @router.get("/{portfolio_id}", response_model=PortfolioResponse)
@@ -219,14 +219,14 @@ def analyze_portfolio(
     suggestions_raw = service.get_rebalance_suggestions(portfolio_id)
     suggestions = [
         RebalanceSuggestion(
-            ticker=s["ticker"],
-            current_weight=s["current_weight"],
-            suggested_weight=s["target_weight"],
-            action=s["action"],
-            suggested_amount=s["suggested_amount"],
-            reason=s["reason"],
+            ticker=item["ticker"],
+            current_weight=item["current_weight"],
+            suggested_weight=item["target_weight"],
+            action=item["action"],
+            suggested_amount=item["suggested_amount"],
+            reason=item["reason"],
         )
-        for s in suggestions_raw
+        for item in suggestions_raw
     ]
 
     return PortfolioAnalysisResponse(

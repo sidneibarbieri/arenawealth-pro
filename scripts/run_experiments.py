@@ -231,12 +231,12 @@ def main() -> None:
             "guardrail": asdict(guardrail),
             "worst_naive_premium": asdict(worst),
             "engine_overpay_band": [
-                {"cash": p.cash, "engine_premium": p.engine_premium}
-                for p in landscape
-                if p.engine_premium > 0
+                {"cash": point.cash, "engine_premium": point.engine_premium}
+                for point in landscape
+                if point.engine_premium > 0
             ],
-            "max_engine_premium": max(p.engine_premium for p in landscape),
-            "max_naive_premium": max(p.proportional_premium for p in landscape),
+            "max_engine_premium": max(point.engine_premium for point in landscape),
+            "max_naive_premium": max(point.proportional_premium for point in landscape),
         },
         "ablation": {
             "baseline_order": baseline_order,

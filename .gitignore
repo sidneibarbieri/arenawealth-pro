@@ -64,10 +64,10 @@ data/snapshots/
 .env.*
 !.env.example
 
-# FinTech WC demo screenshots contain real portfolio data — keep local only
-FinTech_WC/demo_shots/*.png
-# QA render artifacts
-FinTech_WC/*.pdf
+# Submission packets carry venue-specific narratives — keep local only
+submissions/product-pitch/demo_shots/*.png
+submissions/product-pitch/*.pdf
+notes/PAPER_TARGET.md
 _qa_*.pdf
 
 # Local environments and generated output
@@ -88,3 +88,5 @@ old_arenawealth-pro/
 brandArena/
 project-framework/
 notes/brand-assets/
+/.playwright-mcp/
+portfolio-editor-*.png

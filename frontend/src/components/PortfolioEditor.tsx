@@ -178,23 +178,33 @@ export function PortfolioEditor({
       </div>
 
       <div className={`trade-preview${isBuy ? ' trade-preview--buy' : ' trade-preview--sell'}`}>
-        <div className="preview-row">
-          <span>{isBuy ? 'Total cost' : 'Net proceeds'}</span>
-          <strong>{formatMoney(isBuy ? totalCost : proceeds)}</strong>
-        </div>
-        <div className="preview-detail">
-          {formatNumber(shares)} sh × {formatMoney(price)} {isBuy ? '+' : '−'} {formatMoney(fees)}{' '}
-          fees
-        </div>
-        {!isBuy && owned && shares > 0 && shares <= owned.shares && (
-          <div className="preview-detail">
-            {remaining === 0
-              ? 'Closes the position.'
-              : `Leaves ${formatNumber(remaining)} shares.`}
+        {shares > 0 && price > 0 ? (
+          <>
+            <div className="preview-row">
+              <span>{isBuy ? 'Total cost' : 'Net proceeds'}</span>
+              <strong>{formatMoney(isBuy ? totalCost : proceeds)}</strong>
+            </div>
+            <div className="preview-detail">
+              {formatNumber(shares)} sh × {formatMoney(price)} {isBuy ? '+' : '−'}{' '}
+              {formatMoney(fees)} fees
+            </div>
+            {!isBuy && owned && shares <= owned.shares && (
+              <div className="preview-detail">
+                {remaining === 0
+                  ? 'Closes the position.'
+                  : `Leaves ${formatNumber(remaining)} shares.`}
+              </div>
+            )}
+            {isBuy && owned && (
+              <div className="preview-detail">
+                Adds to {formatNumber(owned.shares)} shares you own.
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="preview-empty">
+            Enter shares and price to preview {isBuy ? 'cost' : 'proceeds'}.
           </div>
-        )}
-        {isBuy && owned && (
-          <div className="preview-detail">Adds to {formatNumber(owned.shares)} shares you own.</div>
         )}
       </div>
 
@@ -216,7 +226,7 @@ export function PortfolioEditor({
       </div>
 
       <p className="mode-hint">
-        Manual edits write a local CSV under data/inbox and become the active portfolio source.
+        Manual edits update your portfolio and become the active source for recommendations.
       </p>
       {message && (
         <div className="status-block">

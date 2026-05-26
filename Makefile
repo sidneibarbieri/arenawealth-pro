@@ -2,7 +2,7 @@ PYTHON ?= .venv/bin/python
 PIP ?= .venv/bin/pip
 UVICORN ?= .venv/bin/uvicorn
 
-.PHONY: setup verify verify-e2e metrics recommendation price-backtest experiments configure-env api ui app run paper clean
+.PHONY: setup verify verify-e2e metrics recommendation price-backtest experiments configure-env api ui app run paper all clean
 
 setup:
 	python3.11 -m venv .venv
@@ -44,6 +44,9 @@ run:
 
 paper:
 	cd paper && latexmk -pdf main.tex
+
+all: setup verify experiments paper
+	@echo "Artifact reproduced end-to-end: tests, figures, and PDF are up to date."
 
 clean:
 	rm -rf .pytest_cache .ruff_cache frontend/dist frontend/test-results frontend/playwright-report exports logs

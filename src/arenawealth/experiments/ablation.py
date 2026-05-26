@@ -48,19 +48,22 @@ def _ranks(order: Sequence[str]) -> dict[str, int]:
 def spearman(order_a: Sequence[str], order_b: Sequence[str]) -> float:
     """Rank correlation in [-1, 1]. No SciPy dependency."""
     ranks_b = _ranks(order_b)
-    n = len(order_a)
-    if n < 2:
+    length = len(order_a)
+    if length < 2:
         return 1.0
-    a_ranks = list(range(n))
-    b_ranks = [ranks_b[ticker] for ticker in order_a]
-    mean_a = sum(a_ranks) / n
-    mean_b = sum(b_ranks) / n
-    cov = sum((a - mean_a) * (b - mean_b) for a, b in zip(a_ranks, b_ranks, strict=True))
-    var_a = sum((a - mean_a) ** 2 for a in a_ranks)
-    var_b = sum((b - mean_b) ** 2 for b in b_ranks)
-    if var_a == 0 or var_b == 0:
+    ranks_a = list(range(length))
+    paired_ranks_b = [ranks_b[ticker] for ticker in order_a]
+    mean_a = sum(ranks_a) / length
+    mean_b = sum(paired_ranks_b) / length
+    covariance = sum(
+        (rank_a - mean_a) * (rank_b - mean_b)
+        for rank_a, rank_b in zip(ranks_a, paired_ranks_b, strict=True)
+    )
+    variance_a = sum((rank_a - mean_a) ** 2 for rank_a in ranks_a)
+    variance_b = sum((rank_b - mean_b) ** 2 for rank_b in paired_ranks_b)
+    if variance_a == 0 or variance_b == 0:
         return 0.0
-    return cov / (var_a * var_b) ** 0.5
+    return covariance / (variance_a * variance_b) ** 0.5
 
 
 @dataclass(frozen=True)

@@ -85,6 +85,28 @@ Current honest position:
 - The next scientific delta is a free point-in-time selection backtest with
   quality/moat baselines and ablations.
 
+## Computation-Theory Strategies Used
+
+| Strategy | Where it appears |
+| --- | --- |
+| Subadditive cost analysis | F1; diversification premium $\pi$ in `fee_landscape.py`. |
+| Closed-form fixed point | F2; guardrail derivation MIN = c/τ in `deployment.py`. |
+| Linear functional ablation | F4; recomposing the composite under alternative weight vectors without re-scoring. |
+| Property-based testing across a grid | `test_planner_never_overpays_single_order_fee_across_grid`. |
+| Rank correlation (Spearman) | Comparing orderings across weight sets without distributional assumptions. |
+| Lipschitz-style stability check | Top-k stability under bounded weight perturbations. |
+
+## Serendipity
+
+- The lower edge of the fee-defect band that produced F1 is not a constant. It
+  is `MIN / (1 - rho)`, the cash level at which the smaller leg first clears
+  the order floor. Measurement preceded theory.
+- F3 and F4 are two independent experiments that point the same way about
+  weighting on this basket. The convergence was not designed.
+- Reproducibility, framed initially as a compliance posture, became a
+  scientific instrument: every figure in the paper exists because a pure
+  function let us sweep its inputs exhaustively.
+
 ## Hypotheses to Test Next
 
 1. A fee-aware planner reduces implementation cost versus naive split policies
@@ -114,3 +136,12 @@ Current honest position:
 - Avoid adjectives that are not measured.
 - Do not claim state-of-the-art performance without factor-adjusted and
   out-of-sample evidence.
+
+## How to Add an Entry
+
+1. Run the experiment or test that produced the observation.
+2. Add a numbered finding under *Current Findings* with the source paths under
+   *Evidence*. Keep the finding to one paragraph.
+3. If a finding falsifies an earlier one, add a new finding that states the
+   falsification and the source; do not silently revise older entries.
+4. Update the paper only when the artifact already supports the claim.
