@@ -36,3 +36,29 @@ DeMiguel, Garlappi, Uppal (2009). "Optimal Versus Naive Diversification: How
 Inefficient Is the 1/N Portfolio Strategy?" Review of Financial Studies
 22(5):1915-1953.
 DOI: 10.1093/rfs/hhm075
+
+[yang2023fingpt.pdf]
+Yang, Liu, Wang (2023). "FinGPT: Open-Source Financial Large Language Models."
+arXiv:2306.06031.
+Download: https://arxiv.org/pdf/2306.06031
+
+[oehler2024chatgpt.pdf]
+Oehler & Horn (2024). "Does ChatGPT Provide Better Advice than Robo-Advisors?"
+Finance Research Letters 60:104898.
+SSRN: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4886298
+DOI: 10.1016/j.frl.2023.104898
+
+[ko2024chatgpt.pdf]
+Ko & Lee (2024). "Can ChatGPT Improve Investment Decisions? From a Portfolio
+Management Perspective." Finance Research Letters 64:105433.
+DOI: 10.1016/j.frl.2024.105433
+
+[otero2025quality.pdf]
+Otero Gonzalez, Duran Santomil, da Torre Vieito, Reboredo (2025).
+"How to Improve Quality Investing." BRQ Business Research Quarterly 28(2):453-473.
+DOI: 10.1177/23409444231202810
+
+[kanuri2016moat.pdf]
+Kanuri & McLeod (2016). "Sustainable Competitive Advantage and Stock
+Performance: The Case for Wide Moat Stocks." Applied Economics 48(52):5117-5127.
+DOI: 10.1080/00036846.2016.1178850

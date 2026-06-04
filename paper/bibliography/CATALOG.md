@@ -1,9 +1,9 @@
 # Bibliography Catalog
 
-Indexed catalog of every work cited in the manuscript, grouped by the related-work
-thread it supports. The BibTeX source of truth is `paper/references.bib`. PDFs of
-open-access works live in `pdfs/` (git-ignored); paywalled works are listed in
-`order.txt` for manual download.
+Indexed catalog of works cited in the manuscript or tracked as active
+state-of-the-art candidates. The BibTeX source of truth is
+`paper/references.bib`. PDFs of open-access works live in `pdfs/` (git-ignored);
+paywalled works are listed in `order.txt` for manual download.
 
 ## Status legend
 
@@ -16,9 +16,16 @@ open-access works live in `pdfs/` (git-ignored); paywalled works are listed in
 | --- | --- | --- | --- | --- |
 | `novyMarx2013` | The Other Side of Value: The Gross Profitability Premium | 2013 | J. Financial Economics | order |
 | `asness2019qmj` | Quality Minus Junk | 2019 | Review of Accounting Studies | order |
+| `kanuri2016moat` | Sustainable Competitive Advantage and Stock Performance | 2016 | Applied Economics | order |
+| `otero2025quality` | How to Improve Quality Investing | 2025 | BRQ Business Research Quarterly | order |
 
 Relevance: establish the selection signals our scoring reuses. We propose no new
 factor; the contribution is the orthogonal cash-deployment layer.
+
+Research gap: economic moat and quality investing are studied as selection
+signals, but the artifact still lacks a point-in-time benchmark that tests
+whether a transparent moat/compounding policy beats simple quality, equal-weight,
+and AI-advisor baselines.
 
 ## Thread 2 — How to trade it: transaction-cost theory and planning
 
@@ -40,13 +47,35 @@ incremental deployment, and closed-form auditable guardrails.
 
 | BibKey | Work | Year | Venue | Status |
 | --- | --- | --- | --- | --- |
-| `elalami2025mlfinance` | Machine Learning and Deep Learning in Computational Finance: A Systematic Review | 2025 | arXiv:2511.21588 | have |
+| `liu2024financialai` | A Survey of Financial AI | 2024 | arXiv:2411.12747 | have |
+| `elalami2025mlfinance` | Machine Learning and Deep Learning in Computational Finance | 2025 | arXiv:2511.21588 | have |
+| `yang2023fingpt` | FinGPT | 2023 | arXiv:2306.06031 | order |
+| `yang2024finrobot` | FinRobot | 2024 | arXiv:2405.14767 | have |
+| `chawla2025riskadvice` | Evaluating AI for Finance | 2025 | arXiv:2505.18953 | have |
 
 Relevance: documents the ML-in-finance mainstream and its open problems
 (interpretability, generalizability, data quality). We position our deterministic
 engine as the transparent reference a learned recommender must beat.
 
-## Thread 4 — Whether to believe it: reproducibility over overfitting
+Research gap: current financial-AI systems emphasize agents, workflows,
+forecasting, and risk profiling. The missing benchmark is an auditable,
+deterministic buy-and-hold recommendation baseline with replayable inputs,
+explicit constraints, and free data.
+
+## Thread 4 — AI and robo-advisory recommendations
+
+| BibKey | Work | Year | Venue | Status |
+| --- | --- | --- | --- | --- |
+| `oehler2024chatgpt` | Does ChatGPT Provide Better Advice than Robo-Advisors? | 2024 | Finance Research Letters | order |
+| `ko2024chatgpt` | Can ChatGPT Improve Investment Decisions? | 2024 | Finance Research Letters | order |
+
+Relevance: closest application-level comparators. They evaluate LLMs as
+investment-advice or portfolio-selection aids. Our opportunity is not to replace
+the deterministic policy with an LLM, but to measure whether LLM-generated
+recommendations can beat, explain, or faithfully augment a deterministic,
+replayable baseline.
+
+## Thread 5 — Whether to believe it: reproducibility over overfitting
 
 | BibKey | Work | Year | Venue | Status |
 | --- | --- | --- | --- | --- |

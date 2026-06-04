@@ -95,6 +95,39 @@ Evidence:
 - `paper/main.tex` (Section "The Fee Structure as an Object of Study")
 - `src/arenawealth/analytics/deployment.py` (`order_fee`, `math.ceil`)
 
+### F7. The fee result is not the winning scientific story
+
+The fee model is correct, useful, and reviewable, but it is too narrow to carry
+the paper alone. The stronger direction is to make the artifact a deterministic,
+replayable benchmark for AI investment recommendations. In that framing, the fee
+work becomes a demonstration of auditability and guardrail testing, while the
+main scientific question becomes whether AI advisors improve, explain, or distort
+buy-and-hold moat/quality/compounding decisions under the same frozen inputs and
+constraints.
+
+Evidence:
+
+- `docs/AI_FINANCE_SOTA.md`
+- `paper/bibliography/CATALOG.md` (Financial AI, robo-advisory, quality/moat
+  threads)
+- downloaded open-access PDFs in `paper/bibliography/pdfs/` (git-ignored)
+
+### F8. AI should augment the decision workflow, not own the final policy
+
+The state-of-the-art literature on financial LLMs and agents emphasizes workflow
+automation, data access, reasoning, and risk profiling. That suggests a more
+defensible architecture: deterministic policy produces and validates the
+recommendation; AI summarizes evidence, proposes hypotheses, and explains trade
+offs; deterministic replay and constraint checks decide whether the AI output is
+admissible. This preserves auditability while creating a real AI-in-finance
+research question.
+
+Evidence:
+
+- `docs/AI_FINANCE_SOTA.md` (Product Implication)
+- `paper/references.bib` (`liu2024financialai`, `yang2024finrobot`,
+  `chawla2025riskadvice`, `oehler2024chatgpt`, `ko2024chatgpt`)
+
 ## State-of-the-Art Reference Points
 
 The project should be compared against these families, not against vague
@@ -107,6 +140,8 @@ The project should be compared against these families, not against vague
 - Broad market baselines: SPY or a comparable broad benchmark.
 - Portfolio operation tools: source provenance, provider health, audit logs,
   and replayability.
+- AI-advisor baselines: LLM and robo-advisor recommendations evaluated against
+  deterministic, replayable policy outputs.
 
 Reference anchors:
 
@@ -115,6 +150,7 @@ Reference anchors:
 - DeMiguel, Garlappi, and Uppal (2009), naive `1/N` diversification.
 - Morningstar Wide Moat Focus methodology, as a public moat-plus-valuation
   reference point.
+- Financial AI and robo-advisory work tracked in `docs/AI_FINANCE_SOTA.md`.
 
 Current honest position:
 
@@ -123,8 +159,8 @@ Current honest position:
   deployment.
 - We have evidence that the current weighting policy is not superior to equal
   weighting on the tested basket.
-- The next scientific delta is a free point-in-time selection backtest with
-  quality/moat baselines and ablations.
+- The next scientific delta is a free point-in-time selection backtest plus an
+  AI-advisor benchmark against the deterministic policy.
 
 ## Computation-Theory Strategies Used
 
@@ -158,16 +194,22 @@ Current honest position:
    inside a fixed portfolio.
 4. Provider-health visibility improves reproducibility by making missing data
    states explicit.
+5. AI-generated recommendations will be less stable and less replayable than the
+   deterministic policy unless constrained by a logged policy-and-snapshot
+   interface.
 
 ## Backlog for Stronger Evidence
 
 1. Free point-in-time SEC fundamentals with conservative filing-date lag.
 2. A broad candidate universe with survivorship limitations stated.
-3. Baselines: broad market, equal weight, quality factor, moat-like selection,
-   and current-weight hold.
-4. Ablations: moat, compounding, valuation, concentration caps, rebalance
-   interval, and transaction costs.
-5. Decision replay bundles: decision id -> frozen inputs -> regenerated output.
+3. Baselines: broad market, equal weight, risk parity, minimum variance, quality
+   factor, moat-like selection, and current-weight hold.
+4. AI-advisor benchmark: frozen scenarios, repeated prompts, stability,
+   constraint violations, explanation faithfulness, and performance under the
+   same backtest harness.
+5. Ablations: moat, compounding, valuation, concentration caps, rebalance
+   interval, transaction costs, and AI augmentation.
+6. Decision replay bundles: decision id -> frozen inputs -> regenerated output.
 
 ## Writing Discipline
 

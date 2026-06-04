@@ -20,6 +20,13 @@ DEFAULT_PATTERNS = {
 # Skip: paper/, notes/, submissions/, docs/
 VENUE_LEAK_PATTERN = re.compile(r"\b(ICAIF|Top 4|best paper)\b", re.IGNORECASE)
 VENUE_LEAK_DIRS = {"src", "frontend"}
+AI_RESEARCH_ALLOWLIST = {
+    Path("docs/AI_FINANCE_SOTA.md"),
+    Path("docs/SCIENTIFIC_LEDGER.md"),
+    Path("paper/bibliography/CATALOG.md"),
+    Path("paper/bibliography/order.txt"),
+    Path("paper/references.bib"),
+}
 
 
 def iter_files(root: Path) -> list[Path]:
@@ -57,10 +64,14 @@ def main() -> int:
     }
 
     for path in iter_files(root):
+        relative_path = path.relative_to(root) if path.is_relative_to(root) else path
         text = path.read_text(encoding="utf-8", errors="ignore")
         in_venue_scope = bool(VENUE_LEAK_DIRS.intersection(path.parts))
+        allow_ai_terms = relative_path in AI_RESEARCH_ALLOWLIST
         for line_number, line in enumerate(text.splitlines(), start=1):
             for name, pattern in patterns.items():
+                if name == "ai_markers" and allow_ai_terms:
+                    continue
                 if pattern.search(line):
                     findings.append(f"{path}:{line_number}: {name}: {line.strip()[:160]}")
             if in_venue_scope and VENUE_LEAK_PATTERN.search(line):
