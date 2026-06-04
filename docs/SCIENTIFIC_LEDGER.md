@@ -157,10 +157,19 @@ unnecessary split fee. Conversely, `valid_but_low_agreement` is fully valid and
 stable while disagreeing with the policy. Takeaway: overlap@k cannot certify
 investment advice; operational constraints must be measured beside ranking.
 This is not yet an LLM result. It is the frozen measurement surface that future
-LLM outputs must use.
+LLM outputs must use. Sharpened: the three axes are \emph{independent}, shown by
+two diagonal controls (`naive_diversifier` = agree 1.0 / stable 1.0 / invalid;
+`valid_but_low_agreement` = valid / stable / agree 0.0).
+
+Status: this is now the paper's lead contribution. The manuscript was reframed
+(commit "Reframe paper around an AI-advisor audit benchmark") so the audit
+protocol leads and the fee/guardrail work is repositioned as the reproducible
+baseline that makes the protocol trustworthy. Next step: run real LLM advisors
+through the same frozen scenarios.
 
 Evidence:
 
+- `paper/main.tex` (Section: The Audit Protocol; Table + figure)
 - `paper/data/ai_advisor_scenarios.json`
 - `paper/data/ai_advisor_audit_reference.json`
 - `paper/figures/ai_advisor_audit.png`
