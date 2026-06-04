@@ -44,10 +44,19 @@ profiles, portfolio advice, or asset-selection support:
   risk.
 - `oehler2024chatgpt`: ChatGPT versus robo-advisors for profile-based advice.
 - `ko2024chatgpt`: ChatGPT as a portfolio-management aid.
+- `spadea2025flarko`: LLM and knowledge-graph asset recommendation aligned with
+  investor behavior.
+- `lee2025bias`: latent LLM biases in investment analysis under evidence
+  conflict.
+- `oh2025alpha`: LLM-driven retail portfolio construction from public financial
+  media.
 
 Gap for us: the field lacks a deterministic replay benchmark that can test
 whether AI advice is stable, faithful to constraints, and better than a
 transparent moat/quality/compounding baseline.
+
+The latest conference reading notes are tracked in
+`paper/bibliography/CONFERENCE_SOTA.md`.
 
 ### 3. Quality, moat, and compounding
 

@@ -18,6 +18,7 @@ paywalled works are listed in `order.txt` for manual download.
 | `asness2019qmj` | Quality Minus Junk | 2019 | Review of Accounting Studies | order |
 | `kanuri2016moat` | Sustainable Competitive Advantage and Stock Performance | 2016 | Applied Economics | order |
 | `otero2025quality` | How to Improve Quality Investing | 2025 | BRQ Business Research Quarterly | order |
+| `lee2024stockrec` | Stock Recommendations for Individual Investors | 2024 | AI-in-Finance proceedings | have |
 
 Relevance: establish the selection signals our scoring reuses. We propose no new
 factor; the contribution is the orthogonal cash-deployment layer.
@@ -52,6 +53,8 @@ incremental deployment, and closed-form auditable guardrails.
 | `yang2023fingpt` | FinGPT | 2023 | arXiv:2306.06031 | order |
 | `yang2024finrobot` | FinRobot | 2024 | arXiv:2405.14767 | have |
 | `chawla2025riskadvice` | Evaluating AI for Finance | 2025 | arXiv:2505.18953 | have |
+| `gu2024spoofability` | The Effect of Liquidity on the Spoofability of Financial Markets | 2024 | AI-in-Finance proceedings | have |
+| `saha2025agents` | Large Language Model Agents for Investment Management | 2025 | SSRN | order |
 
 Relevance: documents the ML-in-finance mainstream and its open problems
 (interpretability, generalizability, data quality). We position our deterministic
@@ -68,12 +71,18 @@ explicit constraints, and free data.
 | --- | --- | --- | --- | --- |
 | `oehler2024chatgpt` | Does ChatGPT Provide Better Advice than Robo-Advisors? | 2024 | Finance Research Letters | order |
 | `ko2024chatgpt` | Can ChatGPT Improve Investment Decisions? | 2024 | Finance Research Letters | order |
+| `spadea2025flarko` | Aligning Language Models with Investor and Market Behavior | 2025 | AI-in-Finance proceedings | have |
+| `lee2025bias` | Your AI, Not Your View | 2025 | AI-in-Finance proceedings | have |
+| `oh2025alpha` | Democratizing Alpha | 2025 | Generative AI in Finance workshop | have |
 
 Relevance: closest application-level comparators. They evaluate LLMs as
 investment-advice or portfolio-selection aids. Our opportunity is not to replace
 the deterministic policy with an LLM, but to measure whether LLM-generated
 recommendations can beat, explain, or faithfully augment a deterministic,
 replayable baseline.
+
+See also `CONFERENCE_SOTA.md` for the detailed reading notes and the current
+candidate experiment.
 
 ## Thread 5 — Whether to believe it: reproducibility over overfitting
 

@@ -128,6 +128,23 @@ Evidence:
 - `paper/references.bib` (`liu2024financialai`, `yang2024finrobot`,
   `chawla2025riskadvice`, `oehler2024chatgpt`, `ko2024chatgpt`)
 
+### F9. Strong AI-in-finance papers make a hidden failure mode measurable
+
+Recent award-level and accepted papers repeatedly turn a vague concern into a
+measurable benchmark: market spoofability under liquidity variation,
+behaviorally aligned stock recommendations, LLM investment bias under evidence
+conflict, risk-profile consistency, and LLM-driven retail portfolios from public
+media. The recurring pattern is not "use a larger model"; it is "define the
+financial failure mode, freeze the information surface, compare against
+baselines, and expose when the system fails." This pattern supports our pivot:
+ArenaWealth should be the deterministic audit harness for AI investment advice.
+
+Evidence:
+
+- `paper/bibliography/CONFERENCE_SOTA.md`
+- downloaded PDFs in `paper/bibliography/pdfs/` (git-ignored)
+- `src/arenawealth/experiments/ai_advisor.py`
+
 ## State-of-the-Art Reference Points
 
 The project should be compared against these families, not against vague
@@ -142,6 +159,8 @@ The project should be compared against these families, not against vague
   and replayability.
 - AI-advisor baselines: LLM and robo-advisor recommendations evaluated against
   deterministic, replayable policy outputs.
+- Recent AI-in-finance conference papers on recommendation, agent benchmarks,
+  bias, market simulation, and LLM-driven portfolio construction.
 
 Reference anchors:
 
@@ -151,6 +170,7 @@ Reference anchors:
 - Morningstar Wide Moat Focus methodology, as a public moat-plus-valuation
   reference point.
 - Financial AI and robo-advisory work tracked in `docs/AI_FINANCE_SOTA.md`.
+- Conference SOTA reading notes tracked in `paper/bibliography/CONFERENCE_SOTA.md`.
 
 Current honest position:
 
@@ -183,6 +203,9 @@ Current honest position:
 - Reproducibility, framed initially as a compliance posture, became a
   scientific instrument: every figure in the paper exists because a pure
   function let us sweep its inputs exhaustively.
+- The best-paper pattern from recent AI-in-finance work is not maximum model
+  complexity. It is a clean evaluation object plus a failure mode that becomes
+  measurable.
 
 ## Hypotheses to Test Next
 

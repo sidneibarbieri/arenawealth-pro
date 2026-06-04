@@ -24,6 +24,7 @@ AI_RESEARCH_ALLOWLIST = {
     Path("docs/AI_FINANCE_SOTA.md"),
     Path("docs/SCIENTIFIC_LEDGER.md"),
     Path("paper/bibliography/CATALOG.md"),
+    Path("paper/bibliography/CONFERENCE_SOTA.md"),
     Path("paper/bibliography/order.txt"),
     Path("paper/references.bib"),
 }
@@ -38,6 +39,7 @@ def iter_files(root: Path) -> list[Path]:
         "dist",
         "archive",
         "data",
+        "notes",
         "project-framework",
         "exports",  # frozen snapshot artifacts — scan separately if needed
     }

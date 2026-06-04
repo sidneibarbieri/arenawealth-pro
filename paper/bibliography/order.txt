@@ -62,3 +62,9 @@ DOI: 10.1177/23409444231202810
 Kanuri & McLeod (2016). "Sustainable Competitive Advantage and Stock
 Performance: The Case for Wide Moat Stocks." Applied Economics 48(52):5117-5127.
 DOI: 10.1080/00036846.2016.1178850
+
+[saha2025agents.pdf]
+Saha, Lyu, Saxena, Zhao, Mehta (2025). "Large Language Model Agents for
+Investment Management: Foundations, Benchmarks, and Research Frontiers."
+SSRN: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5447274
+DOI: 10.2139/ssrn.5447274
