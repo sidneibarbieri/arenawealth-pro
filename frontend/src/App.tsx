@@ -296,6 +296,9 @@ function App() {
 
   return (
     <main className="app-shell">
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       <aside className="side-rail" aria-label="Workspace navigation">
         <div className="brand-lockup">
           <div className="brand-mark">A</div>
@@ -656,6 +659,9 @@ function App() {
                   {portfolio.price_source === 'live' ? 'Live prices' : 'Stored prices'}
                 </span>
               </div>
+              {positions.length === 0 ? (
+                <div className="loading-row">No positions found. Import a broker CSV or add a manual trade.</div>
+              ) : (
               <div className="table-frame">
                 <table>
                   <thead>
@@ -687,11 +693,14 @@ function App() {
                   </tbody>
                 </table>
               </div>
+              )}
             </section>
           </>
         )}
 
-        {isPortfolioLoading && <div className="loading-row">Loading portfolio...</div>}
+        {isPortfolioLoading && (
+          <div className="loading-row" id="main-content">Loading portfolio...</div>
+        )}
       </section>
     </main>
   );

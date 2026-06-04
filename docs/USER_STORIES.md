@@ -87,6 +87,45 @@ without mixing their claims.
    - Demo: moat, compounding, valuation, concentration rules, audit trail, and
      data limits.
 
+## Accessibility Stories
+
+1. As a keyboard user, I can skip to main content so I can navigate the
+   workbench without tabbing through the sidebar.
+   - Demo: Tab once to reveal the "Skip to main content" link.
+   - Evidence: skip-link appears on focus and jumps to the workspace.
+
+2. As a screen reader user, I can identify all major sections by their
+   aria-labels so I can orient myself in the workbench.
+   - Evidence: sidebar, portfolio summary, deployment, providers, data
+     sources, portfolio source, decision log, and positions all carry
+     aria-label attributes.
+
+## Resilience Stories
+
+1. As a user, I can see clear error messages when a data provider fails so I
+   know which action to take.
+   - Current support: status blocks with danger/warning tones for portfolio,
+     recommendation, candidate, and source errors.
+   - Next support: per-provider retry buttons and error detail expansion.
+
+2. As a user on a mobile device, I can use the full workbench so I can check
+   my portfolio on the go.
+   - Current support: responsive grid collapses sidebar and multi-column
+     layouts at 980px and 640px breakpoints.
+   - Evidence: E2E test renders on a 390×844 viewport.
+
+## Data Quality Stories
+
+1. As an investor, I can see whether my price data is live or stored so I
+   know how fresh the numbers are.
+   - Current support: "Live prices" / "Stored prices" badge on the
+     positions section heading.
+   - Next support: per-position freshness timestamps.
+
+2. As an investor, I can see a warning when my cash is below the economic
+   order minimum so I understand why no orders are proposed.
+   - Current support: inline alert with the minimum threshold amount.
+
 ## Interface Principles
 
 - Load the operating surface before running slow network analysis.
@@ -95,3 +134,5 @@ without mixing their claims.
 - Separate editable portfolio state from reproducible reviewer fixtures.
 - Use restrained branding: distinctive enough for a pitch, quiet enough for
   repeat analytical work.
+- Provide keyboard-first navigation with visible focus indicators.
+- Degrade gracefully: show meaningful errors instead of blank panels.
