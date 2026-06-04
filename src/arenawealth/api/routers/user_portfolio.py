@@ -3,14 +3,15 @@
 from __future__ import annotations
 
 import json
+import tempfile
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
-from typing import Any
+from typing import Annotated, Any
 
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, File, HTTPException, Query, UploadFile, status
 from pydantic import BaseModel, Field
 from sqlmodel import select
 
@@ -276,6 +277,30 @@ def write_positions_csv(positions: list[Position], path: Path = MANUAL_PORTFOLIO
         )
     path.write_text("\n".join(rows) + "\n", encoding="utf-8")
     return path
+
+
+def store_uploaded_portfolio(content: bytes) -> tuple[Path, int]:
+    """Validate a broker CSV upload and store it as the newest inbox source.
+
+    The bytes are parsed before they are kept, so a malformed file never becomes
+    the active source. Parse failures propagate as ValueError for the caller to
+    surface. Returns the stored path and the number of positions parsed.
+    """
+    with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as handle:
+        handle.write(content)
+        staged = Path(handle.name)
+    try:
+        positions = import_csv(staged)
+    finally:
+        staged.unlink(missing_ok=True)
+    if not positions:
+        raise ValueError("The CSV parsed but contained no positions.")
+    inbox = holdings_inbox()
+    inbox.mkdir(parents=True, exist_ok=True)
+    stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
+    stored = inbox / f"upload-{stamp}.csv"
+    stored.write_bytes(content)
+    return stored, len(positions)
 
 
 def apply_manual_trade(request: ManualTradeRequest) -> Path:
@@ -714,6 +739,24 @@ async def get_user_candidates(
 @router.post("/user/trades", response_model=PortfolioResponse)
 async def record_manual_trade(request: ManualTradeRequest) -> PortfolioResponse:
     apply_manual_trade(request)
+    return build_snapshot(live=False)
+
+
+@router.post("/user/source/upload", response_model=PortfolioResponse)
+async def upload_portfolio_csv(file: Annotated[UploadFile, File()]) -> PortfolioResponse:
+    content = await file.read()
+    if not content:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The uploaded file is empty.",
+        )
+    try:
+        store_uploaded_portfolio(content)
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(error),
+        ) from error
     return build_snapshot(live=False)
 
 

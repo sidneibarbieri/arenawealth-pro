@@ -212,6 +212,21 @@ export async function recordManualTrade(request: ManualTradeRequest): Promise<Po
   return parseJsonResponse<PortfolioResponse>(response, 'Manual trade');
 }
 
+export async function uploadPortfolioCsv(file: File): Promise<PortfolioResponse> {
+  const body = new FormData();
+  body.append('file', file);
+  const response = await fetch('/api/v1/portfolio/user/source/upload', {
+    method: 'POST',
+    body,
+  });
+  if (!response.ok) {
+    // Surface the backend's parse error so the user can fix their CSV.
+    const detail = await response.json().catch(() => null);
+    throw new Error(detail?.detail ?? `Upload failed: ${response.status}`);
+  }
+  return (await response.json()) as PortfolioResponse;
+}
+
 export async function fetchPortfolioSource(signal: AbortSignal): Promise<PortfolioSource> {
   const response = await fetch('/api/v1/portfolio/user/source', { signal });
   return parseJsonResponse<PortfolioSource>(response, 'Portfolio source');

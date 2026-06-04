@@ -22,6 +22,7 @@ import {
   fetchRecommendation,
   recordManualTrade,
   clearManualPortfolio,
+  uploadPortfolioCsv,
   type Candidate,
   type CandidatesResponse,
   type DecisionLogEntry,
@@ -294,6 +295,20 @@ function App() {
     }
   }
 
+  async function uploadBrokerCsv(file: File): Promise<void> {
+    setTradeMessage(null);
+    setPortfolioError(null);
+    try {
+      const payload = await uploadPortfolioCsv(file);
+      setPortfolio(payload);
+      setTradeMessage(`Imported ${payload.positions.length} positions from ${file.name}.`);
+      setRefreshIndex((currentIndex) => currentIndex + 1);
+      setRecommendation(null);
+    } catch (error: unknown) {
+      setPortfolioError(error instanceof Error ? error.message : 'Unknown upload error');
+    }
+  }
+
   return (
     <main className="app-shell">
       <a href="#main-content" className="skip-link">
@@ -479,6 +494,9 @@ function App() {
                 source={portfolioSource}
                 onResetManual={() => {
                   void resetManualPortfolio();
+                }}
+                onUpload={(file) => {
+                  void uploadBrokerCsv(file);
                 }}
               />
             )}
@@ -777,9 +795,10 @@ function ProviderStatusPanel({ providers }: ProviderStatusPanelProps) {
 interface PortfolioSourcePanelProps {
   source: PortfolioSource;
   onResetManual: () => void;
+  onUpload: (file: File) => void;
 }
 
-function PortfolioSourcePanel({ source, onResetManual }: PortfolioSourcePanelProps) {
+function PortfolioSourcePanel({ source, onResetManual, onUpload }: PortfolioSourcePanelProps) {
   return (
     <section className="provider-panel" aria-label="Portfolio source">
       <div className="section-heading">
@@ -787,11 +806,27 @@ function PortfolioSourcePanel({ source, onResetManual }: PortfolioSourcePanelPro
           <p className="eyebrow">Portfolio source</p>
           <h2>Import status</h2>
         </div>
-        {source.manual_override && (
-          <button className="secondary-button" type="button" onClick={onResetManual}>
-            Use broker export
-          </button>
-        )}
+        <div className="source-actions">
+          <label className="secondary-button file-button">
+            Upload broker CSV
+            <input
+              type="file"
+              accept=".csv,text/csv"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) {
+                  onUpload(file);
+                }
+                event.target.value = '';
+              }}
+            />
+          </label>
+          {source.manual_override && (
+            <button className="secondary-button" type="button" onClick={onResetManual}>
+              Use broker export
+            </button>
+          )}
+        </div>
       </div>
       <div className="provider-list">
         <div className="provider-row">
@@ -820,8 +855,8 @@ function PortfolioSourcePanel({ source, onResetManual }: PortfolioSourcePanelPro
         </div>
       </div>
       <p className="mode-hint">
-        Drop a new broker CSV into the inbox to update the portfolio. Manual edits become the active
-        source until cleared.
+        Upload a broker CSV (for example, an Avenue export) to update the portfolio. Manual edits
+        become the active source until cleared.
       </p>
     </section>
   );

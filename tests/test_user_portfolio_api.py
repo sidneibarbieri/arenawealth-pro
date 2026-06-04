@@ -215,6 +215,77 @@ def test_clear_manual_portfolio_restores_broker_export(
     assert body["positions"][0]["ticker"] == "MSFT"
 
 
+def test_upload_avenue_csv_becomes_active_source(
+    api_client: TestClient,
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    import arenawealth.api.routers.user_portfolio as user_portfolio
+
+    inbox = tmp_path / "inbox"
+    inbox.mkdir()
+    monkeypatch.setenv("ARENAWEALTH_PORTFOLIO_INBOX", str(inbox))
+    monkeypatch.setattr(user_portfolio, "MANUAL_PORTFOLIO", inbox / "manual-portfolio.csv")
+
+    avenue_csv = (
+        "Symbol,Description,Total Quantity,Average Price,Current Price\n"
+        "NVDA,NVIDIA Corp,10,100.00,150.00\n"
+    )
+    response = api_client.post(
+        "/api/v1/portfolio/user/source/upload",
+        files={"file": ("portfolio-25-05-2026.csv", avenue_csv, "text/csv")},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    tickers = [position["ticker"] for position in body["positions"]]
+    assert "NVDA" in tickers
+    stored = list(inbox.glob("upload-*.csv"))
+    assert len(stored) == 1
+
+
+def test_upload_rejects_csv_without_ticker_column(
+    api_client: TestClient,
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    import arenawealth.api.routers.user_portfolio as user_portfolio
+
+    inbox = tmp_path / "inbox"
+    inbox.mkdir()
+    monkeypatch.setenv("ARENAWEALTH_PORTFOLIO_INBOX", str(inbox))
+    monkeypatch.setattr(user_portfolio, "MANUAL_PORTFOLIO", inbox / "manual-portfolio.csv")
+
+    response = api_client.post(
+        "/api/v1/portfolio/user/source/upload",
+        files={"file": ("bad.csv", "foo,bar\n1,2\n", "text/csv")},
+    )
+
+    assert response.status_code == 400
+    assert "ticker" in response.json()["detail"].lower()
+    assert not list(inbox.glob("upload-*.csv"))
+
+
+def test_upload_rejects_empty_file(
+    api_client: TestClient,
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    import arenawealth.api.routers.user_portfolio as user_portfolio
+
+    inbox = tmp_path / "inbox"
+    inbox.mkdir()
+    monkeypatch.setenv("ARENAWEALTH_PORTFOLIO_INBOX", str(inbox))
+    monkeypatch.setattr(user_portfolio, "MANUAL_PORTFOLIO", inbox / "manual-portfolio.csv")
+
+    response = api_client.post(
+        "/api/v1/portfolio/user/source/upload",
+        files={"file": ("empty.csv", "", "text/csv")},
+    )
+
+    assert response.status_code == 400
+
+
 def test_portfolio_candidates_offline_demo(api_client: TestClient) -> None:
     response = api_client.get("/api/v1/portfolio/user/candidates?offline_demo=true&limit=5")
 
