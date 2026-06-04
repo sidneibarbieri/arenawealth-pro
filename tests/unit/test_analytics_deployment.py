@@ -1,7 +1,30 @@
 """Unit tests for the deterministic deployment planner (no network)."""
 
-from arenawealth.analytics.deployment import MIN_ORDER_AMOUNT, order_fee, plan_deployment
+import math
+
+from arenawealth.analytics.deployment import (
+    MIN_ORDER_AMOUNT,
+    TRANCHE_SIZE,
+    order_fee,
+    plan_deployment,
+)
 from arenawealth.analytics.models import Holding, PositionAnalysis
+
+
+def test_kway_fee_neutrality_characterization():
+    """Proposition (k-way fee-neutrality): a split is fee-neutral iff the leg
+    tranche counts sum to the whole-budget tranche count, and the maximum number
+    of fee-neutral legs equals ceil(budget / T).
+    """
+    budget = 2500.0
+    whole_tranches = math.ceil(budget / TRANCHE_SIZE)  # 3
+    # Whole-tranche legs are fee-neutral and reach the ceil(a/T) bound.
+    legs = [TRANCHE_SIZE, TRANCHE_SIZE, budget - 2 * TRANCHE_SIZE]
+    assert len(legs) == whole_tranches
+    assert sum(order_fee(leg) for leg in legs) == order_fee(budget)
+    # Splitting into more legs than ceil(a/T) must overpay.
+    too_many = [budget / 4] * 4
+    assert sum(order_fee(leg) for leg in too_many) > order_fee(budget)
 
 
 def make_position(

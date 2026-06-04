@@ -342,6 +342,33 @@ test asserts $\,\text{planner fee}\le f(\text{cash})\,$ across the grid, and the
 engine premium is now zero everywhere it deploys (Figure~\ref{fig:premium},
 green).
 
+The two-order rule extends to any number of legs, which bounds how widely a
+budget can be diversified without paying for it.
+
+\begin{proposition}[$k$-way fee-neutrality]
+\label{prop:kway}
+A split of budget $a$ into legs $a_1,\dots,a_k$ ($\sum_i a_i=a$, $a_i>0$) is
+fee-neutral, $\sum_i f(a_i)=f(a)$, iff
+$\sum_i \lceil a_i/T\rceil = \lceil a/T\rceil$. The number of fee-neutral legs is
+therefore at most $\lceil a/T\rceil$, and this bound is achieved by giving each
+leg a full tranche. Requiring each leg also to be economic ($a_i\ge\mathrm{MIN}$)
+caps the breadth at $\min\!\big(\lceil a/T\rceil, \lfloor a/\mathrm{MIN}\rfloor\big)$.
+\end{proposition}
+\begin{proof}
+$f(a_i)=\lceil a_i/T\rceil c$ and $f(a)=\lceil a/T\rceil c$, so neutrality is
+exactly $\sum_i\lceil a_i/T\rceil=\lceil a/T\rceil$. Each leg contributes
+$\lceil a_i/T\rceil\ge 1$, so $k\le\sum_i\lceil a_i/T\rceil=\lceil a/T\rceil$;
+$k=\lceil a/T\rceil$ is reachable by allocating whole tranches. The economic
+constraint $a_i\ge\mathrm{MIN}$ admits at most $\lfloor a/\mathrm{MIN}\rfloor$
+legs, giving the stated minimum.
+\end{proof}
+
+This unifies the two guardrails: fee-neutrality limits diversification breadth to
+$\lceil a/T\rceil$ tranches, and the economic floor limits it to
+$\lfloor a/\mathrm{MIN}\rfloor$ orders; the planner funds the smaller of the two.
+For small incremental cash both bounds are one or two, which is why the planner
+rarely places more than a pair of orders.
+
 \section{The Guardrail Is a Fixed Point}
 \label{sec:guardrail}
 
@@ -359,6 +386,40 @@ Below \$250 the planner holds cash; a second economic order requires
 $2\,\mathrm{MIN}=\$500$. Figure~\ref{fig:guardrail} shows fee impact touching
 exactly $1\%$ at the floor and declining thereafter, with sawtooths only at the
 genuine tranche boundaries.
+
+The closed form $\mathrm{MIN}=c/\tau$ holds only while it stays inside the first
+tranche. The next proposition makes the regime explicit and shows what happens
+outside it.
+
+\begin{proposition}[Feasibility of the floor]
+\label{prop:floor}
+Let $g(a)=f(a)/a=\lceil a/T\rceil c/a$ be the fee impact of a single order of
+size $a$. Within tranche $k$ (for $a\in((k-1)T, kT]$) $g$ decreases from near
+$kc/((k-1)T)$ to its tranche minimum $g(kT)=c/T$; hence $\min_{a>0} g(a)=c/T$,
+attained at every boundary $a=kT$. Consequently, for a tolerance $\tau$:
+\begin{itemize}
+  \item if $\tau \ge c/T$, the smallest order meeting the tolerance is
+  $\mathrm{MIN}=c/\tau\le T$ (first tranche), the fixed point of
+  Eq.~(\ref{eq:min});
+  \item if $\tau < c/T$, no order meets the tolerance: $g(a)>\tau$ for all
+  $a>0$, and in particular the naive value $a=c/\tau>T$ pays
+  $\lceil a/T\rceil\,c/a \ge 2\tau$.
+\end{itemize}
+\end{proposition}
+\begin{proof}
+On tranche $k$, $\lceil a/T\rceil=k$ is constant, so $g(a)=kc/a$ is strictly
+decreasing; its infimum on the tranche is at the right endpoint $a=kT$, where
+$g=kc/(kT)=c/T$, independent of $k$. Thus the global minimum of $g$ is $c/T$. If
+$\tau\ge c/T$ the equation $c/a=\tau$ has its solution $a=c/\tau$ in $(0,T]$, and
+$g$ first reaches $\tau$ there; if $\tau<c/T$ then $g(a)\ge c/T>\tau$ everywhere.
+For $a=c/\tau>T$ we have $\lceil a/T\rceil\ge 2$, so $g(a)\ge 2c/a=2\tau$.
+\end{proof}
+
+With $c=\$2.50$ and $T=\$1000$ the feasibility threshold is $c/T=0.25\%$, so the
+$\$250$ floor is well inside the valid regime at $\tau=1\%$. The proposition also
+says the cost model has a hard floor on fee impact, $c/T$: no order, however
+large within a tranche, is cheaper than a quarter percent except exactly at a
+tranche boundary.
 
 \begin{figure}[t]
   \centering
