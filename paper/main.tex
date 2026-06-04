@@ -68,8 +68,44 @@ of which we did not anticipate.
   \item The economic order floor is not a tuned constant; it is the fixed point
   of the fee-impact constraint (Section~\ref{sec:guardrail}).
   \item On both a controlled ablation and a real backtest, sophisticated factor
-  weighting is dominated by equal weighting (Section~\ref{sec:weighting}).
+  weighting is dominated by equal weighting and risk parity
+  (Section~\ref{sec:weighting}).
 \end{enumerate}
+
+\section{Related Work}
+\label{sec:related}
+
+Our work sits at the intersection of three lines.
+
+\paragraph{What to own: quality and profitability.}
+Factor research establishes durable signals for security selection: gross
+profitability \cite{novyMarx2013} and the quality-minus-junk composite
+\cite{asness2019qmj}. We treat selection as given and do not propose a new
+factor; our scoring reuses these signals only to rank an existing basket. The
+contribution is orthogonal---the layer that decides \emph{how to deploy cash}
+into an already-chosen basket, net of frictions.
+
+\paragraph{How to trade it: transaction-cost-aware optimization.}
+The closest prior work optimizes portfolios under linear and fixed transaction
+costs \cite{lobo2007portfolio}, which renders the problem a mixed-integer or
+convex program. We differ in three ways. First, our fee is \emph{quantized}---a
+step function in order size---so the object of study is its subadditivity rather
+than a smooth cost term. Second, we analyze the recurring \emph{incremental}
+deployment of small cash rather than a one-shot rebalance. Third, we prioritize
+closed-form, auditable guardrails over numerical optimality, because a decision
+a retail investor cannot inspect is a decision they cannot trust.
+
+\paragraph{Whether to believe it: reproducibility over overfitting.}
+A large fraction of reported strategy performance does not survive out of
+sample; backtest overfitting is easy to produce and hard to detect
+\cite{bailey2014pseudo}, and naive $1/N$ diversification is a stubborn baseline
+\cite{demiguel2009naive}. We take the defensive posture these results imply: the
+engine is deterministic and every figure is regenerated from it, we tune nothing
+for performance, and we report a negative result (our weighting loses to equal
+weighting and risk parity) rather than search for a configuration that wins.
+This is the trustworthy-finance stance---explainable, reproducible, and
+auditable decisions---applied to the unglamorous but universal cash-deployment
+step.
 
 \section{System Design}
 
