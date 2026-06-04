@@ -220,15 +220,34 @@ tranche boundary (Figure~\ref{fig:premium}).
 The sweep did not merely confirm theory; it falsified an assumption in our own
 code. The planner's prior implementation aligned one leg to a whole tranche to
 preserve the single-order fee, which is correct for cash above one tranche but
-\emph{not} for sub-tranche cash. For cash in roughly $[\$625,\$1000]$ the planner
-split into two sub-tranche orders, paying two tranches (\$5.00) where one order
-costs one (\$2.50). The lower edge of the band is $\,\mathrm{MIN}/(1-\rho)\,$,
-where $\rho$ is the larger score share and $\mathrm{MIN}$ the order floor of
-Section~\ref{sec:guardrail}: it is the cash level at which the smaller leg first
-clears the floor. We now diversify \emph{only when it is fee-neutral}, otherwise
-consolidate. A property test asserts $\,\text{planner fee} \le f(\text{cash})\,$
-across the grid, and the engine premium is now zero everywhere it deploys
-(Figure~\ref{fig:premium}, green).
+\emph{not} for sub-tranche cash. The exact failure region has a closed form.
+Write $\mathrm{MIN}$ for the economic order floor derived in
+Section~\ref{sec:guardrail}, and let a budget $a$ be split by score share into
+legs $a\rho$ and $a(1-\rho)$ with the larger share $\rho\in[\tfrac12,1)$.
+
+\begin{proposition}[Sub-tranche fee-worsening]
+\label{prop:worsen}
+If both legs clear the floor and the budget fits one tranche, i.e.
+\[
+  \frac{\mathrm{MIN}}{1-\rho} \;\le\; a \;\le\; T,
+\]
+then the two-order split overpays consolidation by exactly one unit of cost:
+$f(a\rho)+f(a(1-\rho))-f(a)=c$.
+\end{proposition}
+\begin{proof}
+The lower bound gives $a(1-\rho)\ge\mathrm{MIN}>0$, and $\rho\ge\tfrac12$ gives
+$a\rho\ge a(1-\rho)>0$, so both legs are positive and each at most $a\le T$; hence
+$\lceil a\rho/T\rceil=\lceil a(1-\rho)/T\rceil=1$. The budget $a\le T$ gives
+$\lceil a/T\rceil=1$. The difference is $c(1+1)-c(1)=c$.
+\end{proof}
+
+With $\mathrm{MIN}=\$250$, $\rho=0.6$, $T=\$1000$ the band is $[\$625,\$1000]$,
+exactly the region the sweep flagged. The general fix follows from
+Proposition~\ref{prop:sub}: diversify \emph{only when it is fee-neutral}, i.e.
+keep the split iff $f(a\rho)+f(a(1-\rho))=f(a)$, otherwise consolidate. A property
+test asserts $\,\text{planner fee}\le f(\text{cash})\,$ across the grid, and the
+engine premium is now zero everywhere it deploys (Figure~\ref{fig:premium},
+green).
 
 \section{The Guardrail Is a Fixed Point}
 \label{sec:guardrail}

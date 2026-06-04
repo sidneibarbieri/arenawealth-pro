@@ -153,3 +153,27 @@ def test_planner_never_overpays_single_order_fee_across_grid():
         cash = cash_cents / 100
         plan = plan_deployment(positions, cash)
         assert plan.total_fee <= order_fee(cash) + 1e-9, f"overpaid at cash={cash}"
+
+
+def test_fee_worsening_band_matches_closed_form():
+    """Proposition (sub-tranche fee-worsening): with score share rho, the planner
+    consolidates exactly on MIN/(1-rho) <= cash <= T, where a naive split would
+    overpay one tranche.
+    """
+    # Scores 60/40 -> rho = 0.6; band lower edge = 250 / (1 - 0.6) = 625.
+    positions = [
+        make_position("A", 60.0, 10.0, "TA"),
+        make_position("B", 40.0, 10.0, "TB"),
+    ]
+    rho = 60.0 / (60.0 + 40.0)
+    lower_edge = MIN_ORDER_AMOUNT / (1 - rho)
+    assert lower_edge == 625.0
+    tranche = 1000.0
+    for cash in (lower_edge, 800.0, tranche):
+        plan = plan_deployment(positions, cash)
+        assert len(plan.orders) == 1, f"expected consolidation at cash={cash}"
+        assert plan.total_fee == order_fee(cash)
+    # Above the tranche the split becomes fee-neutral and two orders are allowed.
+    plan_two = plan_deployment(positions, 1100.0)
+    assert len(plan_two.orders) == 2
+    assert plan_two.total_fee == order_fee(1100.0)
