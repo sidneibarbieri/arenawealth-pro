@@ -1,0 +1,34 @@
+# Bit-exact reproduction of the paper's scientific results.
+# Builds a pinned Python environment, verifies data integrity, runs the test
+# suite, and regenerates every figure and JSON report from tracked inputs.
+# Frontend and LaTeX are out of scope here: this image reproduces the science,
+# not the product UI or the typeset PDF.
+#
+#   docker build -f Dockerfile.repro -t arenawealth-repro .
+#   docker run --rm arenawealth-repro
+#
+# Equivalent: make repro-docker
+
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    MPLBACKEND=Agg
+
+WORKDIR /artifact
+COPY pyproject.toml README.md ./
+COPY src ./src
+COPY scripts ./scripts
+COPY tests ./tests
+COPY paper ./paper
+
+RUN pip install --no-cache-dir -e ".[dev]"
+
+# Data integrity, tests, lint, then regenerate results from tracked inputs.
+CMD set -e; \
+    python scripts/hash_data.py; \
+    ruff check src scripts tests; \
+    pytest -q; \
+    python scripts/run_experiments.py; \
+    python scripts/run_ai_advisor_audit.py --reference; \
+    echo "Reproduction complete: data verified, tests passed, figures regenerated."

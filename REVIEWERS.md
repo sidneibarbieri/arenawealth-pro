@@ -1,11 +1,22 @@
 # Reviewer Guide
 
-This artifact accompanies the manuscript on deterministic cash deployment under a
-subadditive fee. It is anonymous and self-contained: every figure, table, and
-numerical claim in the paper is regenerated offline from the code and the tracked
-data in this snapshot. No network access, API key, or private data is required.
+This artifact accompanies the manuscript on auditing AI investment
+recommendations against a deterministic, replayable baseline. It is anonymous and
+self-contained: every figure, table, and numerical claim is regenerated offline
+from the code and the tracked data in this snapshot. No network access, API key,
+or private data is required.
 
-## One-command reproduction
+## Bit-exact reproduction in a container
+
+```bash
+make repro-docker
+```
+
+Builds a pinned Python image, verifies the data hashes, runs lint and the test
+suite, and regenerates every figure and JSON report from tracked inputs. This is
+the science end to end; it needs no host setup beyond Docker.
+
+## One-command reproduction on the host
 
 ```bash
 make all
@@ -13,19 +24,18 @@ make all
 
 This runs, in order:
 
-1. `setup` — create a virtualenv and install dependencies (`pip install -e ".[dev]"`)
-   plus the frontend packages.
+1. `setup` — virtualenv and dependencies (`pip install -e ".[dev]"`) plus frontend.
 2. `verify` — lint and the full test suite (no network, isolated SQLite).
 3. `experiments` — regenerate every paper figure under `paper/figures/` and the
-   numeric report under `exports/` from the production engine and the tracked
-   return matrix (`paper/data/returns_matrix.csv`).
+   JSON report under `exports/` from the engine and the tracked return matrix.
 4. `paper` — compile `paper/main.pdf` with `latexmk` (requires a TeX install).
 
-If you only want the science (no TeX, no frontend):
+Science only (no TeX, no frontend):
 
 ```bash
 python3.11 -m venv .venv && . .venv/bin/activate
 pip install -e ".[dev]"
+make verify-data   # SHA-256 of tracked inputs vs paper/data/DATA_HASHES.txt
 make verify        # tests + lint
 make experiments   # regenerate figures and the JSON report
 ```
@@ -40,6 +50,8 @@ make experiments   # regenerate figures and the JSON report
 | Ablation figure/table | `src/arenawealth/experiments/ablation.py` |
 | Backtest table/figure | `paper/data/price_backtest_reference.json` (tracked) |
 | Robustness figure + bootstrap CI | `src/arenawealth/experiments/robustness.py`, `paper/data/returns_matrix.csv` |
+| Audit protocol metrics + archetype table/figure | `src/arenawealth/experiments/ai_advisor.py`, `scripts/run_ai_advisor_audit.py`, `paper/data/ai_advisor_audit_reference.json` |
+| Audit scenarios (frozen) | `paper/data/ai_advisor_scenarios.json` |
 | Replay-determinism guarantee | `tests/test_user_portfolio_api.py::test_recommendation_is_replayable_from_same_inputs` |
 
 ## Determinism
@@ -52,6 +64,13 @@ statistics. The recommendation path is a pure function of
 ## Scope
 
 The bibliography under `paper/bibliography/` catalogs all cited works; paywalled
-PDFs are listed in `paper/bibliography/order.txt`. The findings are reported with
-their limitations: the backtest is a single-basket, non-point-in-time study, and
-the ablation uses deterministic synthetic fundamentals to demonstrate mechanism.
+PDFs are listed in `paper/bibliography/order.txt`. Findings are reported with
+their limitations: the audit protocol is demonstrated on deterministic archetype
+controls (not live model outputs); the backtest is a single-basket,
+non-point-in-time study; and the weighting ablation uses deterministic synthetic
+fundamentals to demonstrate mechanism.
+
+Collecting real model advisors is optional and isolated in
+`scripts/collect_advisor_runs.py`: it is budget-guarded, caches every run to
+JSON, and makes no calls without `--live` and Azure credentials. The reported
+results do not depend on it.
