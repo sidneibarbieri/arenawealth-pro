@@ -6,8 +6,8 @@
 \pagestyle{plain}
 \emergencystretch=2em
 
-\title{Cash Deployment as Deterministic Optimization under a Subadditive Fee
-Structure: Provable Guardrails and a Reproducibility-First Portfolio Artifact}
+\title{Auditing AI Investment Recommendations Against a Deterministic,
+Replayable Baseline}
 
 \author{Anonymous Author(s)}
 \affiliation{%
@@ -18,57 +18,64 @@ Structure: Provable Guardrails and a Reproducibility-First Portfolio Artifact}
 \email{anonymous@example.com}
 
 \begin{abstract}
-Retail portfolio tools present recommendations but rarely expose the cost
-structure or the data provenance behind them. We study the narrow but universal
-decision of deploying incremental cash into an existing equity portfolio, and
-show that when the broker fee is a step function of order size, the deployment
-problem is governed by a \emph{subadditive cost}. We prove that splitting a fixed
-budget can never reduce fees and we derive the economic order floor in closed
-form as a fixed point of the fee-impact constraint. Treating the recommendation
-engine as a pure, deterministic function lets us run exhaustive, reproducible
-parameter sweeps; these sweeps surfaced a latent fee defect in our own planner
-(a one-tranche overpayment for sub-tranche cash) which we characterize, fix, and
-guard with a property test. A weight-ablation experiment and a real
-2021--2026 backtest of a 17-name basket against four baselines---including
-minimum-variance and risk-parity allocators---converge on the same humbling
-observation: the fundamentals-weighted basket ranks third of five on
-risk-adjusted return, behind two allocators that use no fundamental data,
-echoing classical results on $1/N$ diversification \cite{demiguel2009naive}. Our
-principal contribution is therefore methodological: a decision engine whose cost
-behavior is provable and whose every claim is a reproducible artifact, with
-empirical findings that emerged from observation rather than assumption.
+Large language models increasingly generate investment recommendations, and a
+growing literature evaluates them by return or by agreement with a reference
+portfolio. We argue that agreement is the wrong yardstick and provide a better
+one: a \emph{deterministic, replayable baseline}---a quality, moat, and
+compounding policy with provable cost guardrails---together with an audit
+protocol that scores any advisor on three independent axes: operational
+\emph{validity} under explicit constraints, \emph{stability} across repeated
+runs, and \emph{agreement} with the baseline. On a set of frozen scenarios we
+show the axes are independent: a control that agrees perfectly with the policy
+and is perfectly stable is nonetheless \emph{invalid} because it wastes fees,
+while a valid control is unstable. An evaluation that reports only
+recommendation overlap would rank both as good advice. The baseline earns its
+role as a yardstick through reproducibility: its cost behavior is provable (the
+fee is subadditive and the economic order floor is a closed-form fixed point),
+its decisions are pure functions of their inputs, and a 2021--2026 backtest
+against minimum-variance, risk-parity, and equal-weight allocators shows the
+baseline does not overclaim---equal weighting matches it, consistent with the
+difficulty of beating $1/N$ \cite{demiguel2009naive}. The artifact regenerates
+every figure offline.
 \end{abstract}
 
-\keywords{computational finance, portfolio analytics, reproducibility,
-transaction costs, subadditivity, ablation}
+\keywords{AI in finance, investment recommendations, benchmark, trustworthy AI,
+reproducibility, transaction costs}
 
 \begin{document}
 \maketitle
 
 \section{Introduction}
 
-A self-directed investor who has decided \emph{what} to own still faces a
-recurring micro-decision: given a small amount of incremental cash, \emph{where}
-should it go, and is the trade even worth its fee? Consumer tools answer the
-first question and ignore the second. We take the second question seriously and
-find that it has more structure than it appears.
+Language models now produce investment recommendations, and recent work
+evaluates them by realized return or by agreement with a reference portfolio
+\cite{oh2025alpha, spadea2025flarko}. Both yardsticks are unsafe. Return is
+noisy and invites overfitting; agreement rewards an advisor for matching a
+reference even when its recommendation is operationally unusable or unstable
+across runs. Parallel evidence shows learned advisors are inconsistent under
+irrelevant changes and carry latent bias \cite{chawla2025riskadvice, lee2025bias},
+which a return or overlap score cannot detect.
 
-We build on established quality and profitability signals
-\cite{novyMarx2013, asness2019qmj}, but our contribution is not a new factor. It
-is a stance: the deployment engine should be a \emph{pure, deterministic
-function} of its inputs, so that its cost behavior can be reasoned about and its
-outputs can be replayed, diffed, and falsified. Adopting this stance let us
-treat the engine itself as an object of experiment. Three findings followed, two
-of which we did not anticipate.
+We take a different stance: evaluate an advisor against a \emph{deterministic,
+replayable baseline} on three axes that a single number conflates---operational
+\emph{validity} under explicit constraints, \emph{stability} across repeated
+runs, and \emph{agreement} with the baseline. The baseline is a transparent
+quality, moat, and compounding policy whose recommendations are pure functions
+of their inputs, so any run can be replayed and diffed. Its trustworthiness as a
+yardstick rests on reproducibility, not on a claim to beat the market.
 
 \begin{enumerate}
-  \item The broker fee is subadditive, so any policy that splits cash for
-  diversification pays a quantifiable premium (Section~\ref{sec:fees}). The same
-  analysis exposed a defect in our own planner.
-  \item The economic order floor is not a tuned constant; it is the fixed point
-  of the fee-impact constraint (Section~\ref{sec:guardrail}).
-  \item On both a controlled ablation and a real backtest, sophisticated factor
-  weighting is dominated by equal weighting and risk parity
+  \item An audit protocol and a frozen-scenario benchmark that score any advisor
+  on validity, stability, and agreement, and a finding that these axes are
+  \emph{independent}: a control can agree perfectly and be perfectly stable yet
+  be invalid, so agreement-only evaluation is misleading (Section~\ref{sec:audit}).
+  \item The deterministic baseline that makes the protocol trustworthy: its fee
+  is provably subadditive and its economic order floor is a closed-form fixed
+  point (Sections~\ref{sec:fees}--\ref{sec:guardrail}); exhaustive reproducible
+  sweeps even surfaced and fixed a latent defect in our own planner.
+  \item An honest calibration of the baseline: a 2021--2026 backtest against
+  minimum-variance, risk-parity, and equal-weight allocators shows it does not
+  overclaim---equal weighting matches it on risk-adjusted return
   (Section~\ref{sec:weighting}).
 \end{enumerate}
 
@@ -103,13 +110,21 @@ retail investor cannot inspect is a decision they cannot trust. The fixed-cost
 guardrail is the small-cash analogue of the no-trade region: below the floor, the
 optimal action is to hold.
 
-\paragraph{Against the grain: deterministic versus learned advice.}
-The dominant thread in AI for finance is learned models---deep networks, ensembles,
-and reinforcement learning---whose recognized open problems are interpretability,
-generalizability, and data quality \cite{elalami2025mlfinance}. We deliberately take
-the opposite stance for the deployment step: a deterministic engine that is
-auditable and reproducible by construction, intended as the transparent reference
-a learned recommender must beat, not as a competitor in predictive accuracy.
+\paragraph{Evaluating learned investment advice.}
+A fast-growing line uses language models to recommend assets or build portfolios
+and evaluates them mainly by return or by alignment with a reference: media-driven
+LLM portfolios report strong but short-horizon gains \cite{oh2025alpha}, and
+knowledge-graph-aligned recommenders are scored on behavioral alignment
+\cite{spadea2025flarko}. A complementary line documents failure modes a return or
+overlap score cannot see: LLM risk assessments vary with irrelevant demographic
+attributes \cite{chawla2025riskadvice}, and investment analyses carry latent,
+confirmation-seeking bias \cite{lee2025bias}; surveys flag interpretability and
+generalizability as open problems \cite{elalami2025mlfinance}. What is missing is
+a single evaluation that places a learned advisor against a transparent,
+replayable baseline and measures, together, whether its advice is operationally
+\emph{valid}, \emph{stable} across runs, and how far it \emph{agrees} with the
+baseline. We supply that baseline and protocol; the advisor under test may be an
+LLM, a robo-allocator, or a heuristic.
 
 \paragraph{Whether to believe it: reproducibility over overfitting.}
 A large fraction of reported strategy performance does not survive out of
@@ -154,6 +169,84 @@ The composite score is a linear functional of three bounded sub-scores,
 with $(w_m,w_c,w_v)=(0.40,0.35,0.25)$. Holdings already above $1.3\times$ equal
 weight, or in a theme at its concentration cap, are excluded; the planner then
 ranks the remainder by $s$ and sizes orders against available cash.
+
+\section{The Audit Protocol}
+\label{sec:audit}
+
+We evaluate an advisor not by how well it agrees with the baseline but by three
+axes a single number conflates. Fix a \emph{scenario}: current holdings,
+available cash, an allowed universe, per-scenario constraints (a recommendation
+cap, add-only or trim rules, the economic order floor of
+Section~\ref{sec:guardrail}), and the baseline's own recommendation. An advisor
+returns a set of tickers (optionally with dollar amounts and cited facts). We
+score it on:
+
+\begin{description}
+  \item[Validity.] The fraction of runs with no constraint violation:
+  recommending outside the universe, exceeding the cap, buying an already-owned
+  name under add-only, exceeding cash, ordering below the economic floor, or
+  splitting cash so that the fee exceeds the single-order fee
+  (Section~\ref{sec:fees}). Citing a fact absent from the scenario snapshot is
+  also a violation, giving a check on explanation faithfulness.
+  \item[Stability.] The mean pairwise Jaccard overlap of the recommended sets
+  across repeated runs of the same scenario. A trustworthy advisor should not
+  change its mind when nothing changed.
+  \item[Agreement.] Overlap at $k$ and Jaccard against the baseline's ranking.
+  This is reported, not optimized: disagreement may be useful novelty or a
+  mistake, which only validity and realized outcome can disambiguate.
+\end{description}
+
+\paragraph{The axes are independent.}
+To show that no single axis substitutes for the others, we run the protocol on
+seven deterministic \emph{archetype} controls across frozen scenarios---failure
+modes by construction, not model outputs (Table~\ref{tab:audit},
+Figure~\ref{fig:audit}). Two are decisive. A \emph{naive diversifier} that
+agrees perfectly with the baseline ($\mathrm{agree}=1.0$) and never wavers
+($\mathrm{stab}=1.0$) is nonetheless \emph{invalid} ($\mathrm{valid}=0.0$): it
+splits sub-tranche cash and pays an avoidable fee. Conversely a
+\emph{valid-but-disagreeing} control is fully valid and stable yet shares
+nothing with the baseline ($\mathrm{agree}=0.0$). An evaluation reporting only
+agreement would rank the first as ideal and the second as worst---exactly
+inverting their operational validity. Validity, stability, and agreement are
+therefore independent axes; an advisor benchmark must report all three.
+
+\begin{table}[t]
+  \caption{Audit of seven archetype controls (means over frozen scenarios).
+  Agreement does not imply validity or stability, nor the converse. Controls are
+  failure modes by construction, not model results.}
+  \label{tab:audit}
+  \begin{tabular}{lrrr}
+    \toprule
+    Advisor archetype & Valid & Agree & Stable \\
+    \midrule
+    Deterministic policy (baseline) & $1.00$ & $1.00$ & $1.00$ \\
+    Naive diversifier & $\mathbf{0.00}$ & $1.00$ & $1.00$ \\
+    Valid but low agreement & $1.00$ & $\mathbf{0.00}$ & $1.00$ \\
+    Drifting advisor & $1.00$ & $0.40$ & $\mathbf{0.07}$ \\
+    Underdeploying advisor & $0.00$ & $0.50$ & $0.50$ \\
+    Popularity chaser & $0.00$ & $0.13$ & $0.40$ \\
+    Constraint breaker & $0.00$ & $0.00$ & $0.00$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/ai_advisor_audit.png}
+  \caption{Validity, agreement, and stability for the archetype controls. The
+  naive diversifier (high agreement and stability, zero validity) and the
+  valid-but-disagreeing control (high validity and stability, zero agreement)
+  show that the axes do not substitute for one another.}
+  \Description{Grouped bar chart of validity, agreement, and stability across
+  seven advisor archetypes, showing that high agreement does not coincide with
+  high validity.}
+  \label{fig:audit}
+\end{figure}
+
+The archetypes establish the protocol and its discriminating power offline and
+deterministically. Running real language-model advisors through the same frozen
+scenarios is the natural next study; the protocol, scenarios, and metrics are
+already in place to receive their outputs without changing the rules.
 
 \section{The Fee Structure as an Object of Study}
 \label{sec:fees}
@@ -455,12 +548,15 @@ claim without overstating performance.
 \section{Discussion}
 
 \paragraph{Principal contribution.}
-We set out to let the contribution emerge from observation. It did, and it is
-methodological rather than a performance claim. The defensible, novel core is the
-treatment of cash deployment as deterministic optimization under a subadditive
-cost: Propositions and Equations (\ref{eq:fee})--(\ref{eq:min}) are provable, and
-the engine is held to them by tests. The empirical sections are evidence
-\emph{for the method}, including evidence against our own initial design.
+The contribution is a way to evaluate investment advice: an audit protocol that
+scores any advisor on validity, stability, and agreement against a deterministic,
+replayable baseline, and the finding that these axes are independent so an
+agreement- or return-only score is misleading (Section~\ref{sec:audit}). The
+baseline earns the role of yardstick by being provably reproducible---its fee is
+subadditive and its order floor is a closed-form fixed point
+(Equations~(\ref{eq:fee})--(\ref{eq:min}))---not by claiming to beat the market.
+This is a performance-free, falsifiable basis for asking when learned advice
+actually helps.
 
 \paragraph{Takeaways and a useful negative result.}
 First, in fee-quantized markets, diversification is not free; the right default
@@ -477,16 +573,23 @@ decision cheap, bounded, and auditable.
 \paragraph{Serendipity of measurement.}
 Each finding came from instrumenting a deterministic engine rather than from a
 prior hypothesis. The fee defect was invisible in code review and obvious in a
-parameter sweep; the band's lower edge turned out to depend on the score split,
-not a constant. Reproducibility was not a compliance checkbox but the instrument
-that produced the science.
+parameter sweep. The audit's central finding was the same kind of surprise: a
+control built only to ``agree with the policy'' scored a perfect agreement and
+stability yet was invalid, which is what convinced us that agreement-only
+evaluation---common in LLM-advice studies---hides operational failure.
+Reproducibility was not a compliance checkbox but the instrument that produced
+the science.
 
 \section{Limitations}
 
-The backtest is a current-basket study on free adjusted closes; it is subject to
-survivorship and selection bias and is \emph{not} a point-in-time
-stock-selection backtest. The ablation uses deterministic synthetic fundamentals
-and demonstrates mechanism, not security-level claims. The cost model is the
+The audit protocol is demonstrated on deterministic archetype controls, not on
+live language-model outputs; the controls establish that the three axes
+discriminate, but a study of real advisors is required to draw conclusions about
+any specific model, and is the immediate next step. The backtest is a
+current-basket study on free adjusted closes; it is subject to survivorship and
+selection bias and is \emph{not} a point-in-time stock-selection backtest. The
+ablation uses deterministic synthetic fundamentals and demonstrates mechanism,
+not security-level claims. The cost model is the
 fixed per-order tranche fee only: it omits bid-ask spreads, slippage,
 integer-lot constraints, and taxes, and it applies where brokers charge such a
 fee (common for international or non-US-equity access) rather than under
@@ -501,14 +604,17 @@ legal, compliance, data-licensing, and suitability review.
 
 \section{Conclusion}
 
-Taking determinism seriously turned a consumer recommendation engine into an
-analyzable object. The fee structure is provably subadditive, the order floor is
-a fixed point, and exhaustive reproducible sweeps both proved guardrails and
-caught a real defect. The empirical results are deliberately modest and partly
-self-critical---equal weighting is hard to beat---because they were observed, not
-assumed. We argue this is the right posture for computational-finance artifacts:
-make every claim reproducible, and let measurement, not narrative, decide what
-the contribution is.
+As language models enter investment advice, the field needs a way to ask whether
+their advice is trustworthy that does not reduce to a noisy return or a
+misleading agreement score. We offered one: a deterministic, replayable baseline
+whose cost behavior is provable, and an audit protocol that scores any advisor on
+validity, stability, and agreement at once. The protocol's own finding---that
+these axes are independent, so agreement alone certifies nothing---is the kind of
+hidden failure a benchmark exists to expose. The baseline is deliberately
+self-critical: equal weighting matches it, so it makes no performance claim and
+serves purely as the transparent reference a learned advisor must be measured
+against. Dropping real models into the frozen scenarios is the natural next study,
+and the artifact is built to receive them without changing the rules.
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{references}
