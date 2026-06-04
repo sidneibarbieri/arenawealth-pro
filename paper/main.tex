@@ -75,7 +75,7 @@ of which we did not anticipate.
 \section{Related Work}
 \label{sec:related}
 
-Our work sits at the intersection of three lines.
+Our work sits at the intersection of four lines.
 
 \paragraph{What to own: quality and profitability.}
 Factor research establishes durable signals for security selection: gross
@@ -85,15 +85,31 @@ factor; our scoring reuses these signals only to rank an existing basket. The
 contribution is orthogonal---the layer that decides \emph{how to deploy cash}
 into an already-chosen basket, net of frictions.
 
-\paragraph{How to trade it: transaction-cost-aware optimization.}
-The closest prior work optimizes portfolios under linear and fixed transaction
-costs \cite{lobo2007portfolio}, which renders the problem a mixed-integer or
-convex program. We differ in three ways. First, our fee is \emph{quantized}---a
-step function in order size---so the object of study is its subadditivity rather
-than a smooth cost term. Second, we analyze the recurring \emph{incremental}
-deployment of small cash rather than a one-shot rebalance. Third, we prioritize
-closed-form, auditable guardrails over numerical optimality, because a decision
-a retail investor cannot inspect is a decision they cannot trust.
+\paragraph{How to trade it: transaction-cost theory and planning.}
+Classical theory shows that transaction costs induce a \emph{no-trade region}:
+proportional costs make the optimal policy a band around the target where one
+does not rebalance \cite{constantinides1986capital, davis1990portfolio}. Fixed
+plus linear costs turn allocation into a mixed-integer or convex program
+\cite{lobo2007portfolio}, and richer institutional models add liquidity and
+market-impact terms \cite{zhang2019dynamic}. On the operational side, rebalancing
+under fixed per-transaction fees can be cast as a planning problem solved by
+linear programming or heuristic search \cite{delarosa2023planning}. We differ on
+three axes. First, our fee is \emph{quantized}---a step function in order
+size---so the object of study is its subadditivity, not a smooth or purely linear
+cost. Second, we analyze the recurring \emph{incremental} deployment of small
+cash rather than a one-shot rebalance or a full trade plan. Third, we prioritize
+closed-form, auditable guardrails over numerical optimality, because a decision a
+retail investor cannot inspect is a decision they cannot trust. The fixed-cost
+guardrail is the small-cash analogue of the no-trade region: below the floor, the
+optimal action is to hold.
+
+\paragraph{Against the grain: deterministic versus learned advice.}
+The dominant thread in AI for finance is learned models---deep networks, ensembles,
+and reinforcement learning---whose recognized open problems are interpretability,
+generalizability, and data quality \cite{elalami2025mlfinance}. We deliberately take
+the opposite stance for the deployment step: a deterministic engine that is
+auditable and reproducible by construction, intended as the transparent reference
+a learned recommender must beat, not as a competitor in predictive accuracy.
 
 \paragraph{Whether to believe it: reproducibility over overfitting.}
 A large fraction of reported strategy performance does not survive out of

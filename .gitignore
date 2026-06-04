@@ -90,3 +90,6 @@ project-framework/
 notes/brand-assets/
 /.playwright-mcp/
 portfolio-editor-*.png
+
+# Bibliography PDFs: copyrighted, large; track only the catalog and order list
+paper/bibliography/pdfs/
