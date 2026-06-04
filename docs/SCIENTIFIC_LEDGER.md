@@ -31,17 +31,24 @@ Evidence:
 - `MIN_ORDER_AMOUNT` in `src/arenawealth/analytics/deployment.py`
 - `paper/figures/guardrail.png`
 
-### F3. Equal weighting is hard to beat on the current basket
+### F3. The fundamentals-weighted basket ranks third of five against allocator baselines
 
-The current-basket price study shows equal weight outperforming current weight
-over the tested window. This does not prove a general strategy; it is a useful
-negative result consistent with the literature on naive diversification.
+Backtested 2021-01-05 to 2026-05-28 (1355 days), the score-weighted basket beats
+SPY (+4.80 pp CAGR, +0.15 Sharpe) and minimum variance on return (+4.16 pp CAGR),
+but ranks third of five on Sharpe ratio: equal weight (1.19) and risk parity
+(1.18) both beat the tuned weighting (1.10), while minimum variance gives the
+shallowest drawdown (-19.1% vs -28.9%) at the cost of return. Two of the
+strongest baselines (equal weight, risk parity) use no fundamental data. This is
+a useful negative result consistent with the literature on naive diversification;
+it clarifies that the contribution is methodological, not performance.
 
 Evidence:
 
-- `paper/data/price_backtest_reference.json`
+- `src/arenawealth/analytics/allocators.py` (min-variance, risk-parity)
+- `tests/unit/test_analytics_allocators.py`
+- `paper/data/price_backtest_reference.json` (`sota_baselines`, `sota_comparisons`)
 - `paper/figures/backtest.png`
-- `paper/main.tex`
+- `paper/main.tex` (Table 2)
 
 ### F4. Factor weights may be less important than selection
 

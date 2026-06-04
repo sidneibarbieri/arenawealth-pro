@@ -169,25 +169,41 @@ def figure_ablation(ablation_rows, path: Path) -> None:
     plt.close(fig)
 
 
+STRATEGY_PALETTE = {
+    "current_weight": GOLD,
+    "equal_weight": BLUE,
+    "benchmark": MUTED,
+    "min_variance": SUCCESS,
+    "risk_parity": "#7c3aed",  # arena-violet, defined inline to avoid token sprawl
+}
+
+
+def _collect_strategies(export: dict) -> dict[str, dict]:
+    """Merge baselines and SOTA baselines into a single ordered dict for plotting."""
+    strategies = dict(export["baselines"])
+    for name, stats in export.get("sota_baselines", {}).items():
+        strategies[name] = stats
+    return strategies
+
+
 def figure_backtest(export: dict, path: Path) -> None:
-    baselines = export["baselines"]
-    names = list(baselines.keys())
-    cagr = [baselines[n]["cagr"] * 100 for n in names]
-    sharpe = [baselines[n]["sharpe_ratio"] for n in names]
-    palette = {"current_weight": GOLD, "equal_weight": BLUE, "benchmark": MUTED}
-    colors = [palette.get(n, CARBON) for n in names]
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 3.6), dpi=150)
+    strategies = _collect_strategies(export)
+    names = list(strategies.keys())
+    cagr = [strategies[name]["cagr"] * 100 for name in names]
+    sharpe = [strategies[name]["sharpe_ratio"] for name in names]
+    colors = [STRATEGY_PALETTE.get(name, CARBON) for name in names]
+    fig, (ax_cagr, ax_sharpe) = plt.subplots(1, 2, figsize=(9.5, 3.6), dpi=150)
     fig.patch.set_facecolor("white")
-    ax1.bar(names, cagr, color=colors)
-    ax1.set_title("CAGR (%)", color=CARBON, fontweight="bold")
-    ax2.bar(names, sharpe, color=colors)
-    ax2.set_title("Sharpe ratio", color=CARBON, fontweight="bold")
-    for ax in (ax1, ax2):
-        ax.set_xticks(range(len(names)))
-        ax.set_xticklabels([n.replace("_", "\n") for n in names], fontsize=8)
-        _style_axes(ax)
+    ax_cagr.bar(names, cagr, color=colors)
+    ax_cagr.set_title("CAGR (%)", color=CARBON, fontweight="bold")
+    ax_sharpe.bar(names, sharpe, color=colors)
+    ax_sharpe.set_title("Sharpe ratio", color=CARBON, fontweight="bold")
+    for axis in (ax_cagr, ax_sharpe):
+        axis.set_xticks(range(len(names)))
+        axis.set_xticklabels([name.replace("_", "\n") for name in names], fontsize=8)
+        _style_axes(axis)
     fig.suptitle(
-        f"Basket vs baselines, {export['start_date']}..{export['end_date']}",
+        f"Basket versus baselines, {export['start_date']}..{export['end_date']}",
         color=CARBON,
         fontweight="bold",
     )
@@ -255,19 +271,26 @@ def main() -> None:
 def _summarize_backtest(export: dict | None) -> dict | None:
     if export is None:
         return None
-    return {
+    def metrics(values: dict) -> dict:
+        return {
+            "cagr": values["cagr"],
+            "sharpe_ratio": values["sharpe_ratio"],
+            "max_drawdown": values["max_drawdown"],
+        }
+
+    summary: dict = {
         "window": [export["start_date"], export["end_date"]],
-        "baselines": {
-            name: {
-                "cagr": values["cagr"],
-                "sharpe_ratio": values["sharpe_ratio"],
-                "max_drawdown": values["max_drawdown"],
-            }
-            for name, values in export["baselines"].items()
-        },
+        "baselines": {name: metrics(values) for name, values in export["baselines"].items()},
         "comparisons": export.get("comparisons"),
         "limitations": export.get("limitations"),
     }
+    sota_baselines = export.get("sota_baselines")
+    if sota_baselines:
+        summary["sota_baselines"] = {
+            name: metrics(values) for name, values in sota_baselines.items()
+        }
+        summary["sota_comparisons"] = export.get("sota_comparisons")
+    return summary
 
 
 def _print_summary(findings: dict, out: Path) -> None:
@@ -276,11 +299,10 @@ def _print_summary(findings: dict, out: Path) -> None:
     print("== Fee landscape ==")
     print(f"  guardrail fixed point: ${fee['guardrail']['one_percent_fixed_point']:.0f}")
     if band:
-        lo = min(p["cash"] for p in band)
-        hi = max(p["cash"] for p in band)
-        print(
-            f"  engine overpay band: ${lo:.0f}..${hi:.0f} (max ${fee['max_engine_premium']:.2f})"
-        )
+        low = min(point["cash"] for point in band)
+        high = max(point["cash"] for point in band)
+        peak = fee["max_engine_premium"]
+        print(f"  engine overpay band: ${low:.0f}..${high:.0f} (max ${peak:.2f})")
     else:
         print("  engine overpay band: none (fee-optimal everywhere)")
     print(f"  worst naive premium: ${fee['worst_naive_premium']['proportional_premium']:.2f}")
@@ -293,11 +315,16 @@ def _print_summary(findings: dict, out: Path) -> None:
     print(
         f"  top-2 stable under +/-10% weight perturbation: {findings['ablation']['top_k_stable']}"
     )
-    bt = findings["backtest"]
-    if bt:
+    backtest = findings["backtest"]
+    if backtest:
         print("== Backtest (real data) ==")
-        for name, v in bt["baselines"].items():
-            print(f"  {name:>16}: CAGR={v['cagr'] * 100:5.2f}% Sharpe={v['sharpe_ratio']:.3f}")
+        strategies = {**backtest["baselines"], **backtest.get("sota_baselines", {})}
+        for name, stats in strategies.items():
+            print(
+                f"  {name:>16}: CAGR={stats['cagr'] * 100:5.2f}% "
+                f"Sharpe={stats['sharpe_ratio']:.3f} "
+                f"MaxDD={stats['max_drawdown'] * 100:6.1f}%"
+            )
     print(f"\nWrote {out}")
 
 

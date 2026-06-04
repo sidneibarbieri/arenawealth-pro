@@ -118,6 +118,17 @@ def study_to_payload(study: PriceBacktestStudy, generated_utc: str) -> dict[str,
             "rebalanced_current": result_to_payload(study.rebalanced_current),
             "current_vs_rebalanced": comparison_to_payload(study.current_vs_rebalanced),
         }
+    if study.min_variance is not None and study.risk_parity is not None:
+        payload["sota_baselines"] = {
+            "min_variance": result_to_payload(study.min_variance),
+            "risk_parity": result_to_payload(study.risk_parity),
+        }
+        payload["sota_comparisons"] = {
+            "current_vs_min_variance": comparison_to_payload(study.current_vs_min_variance),
+            "current_vs_risk_parity": comparison_to_payload(study.current_vs_risk_parity),
+        }
+        if study.sota_weights is not None:
+            payload["sota_weights"] = study.sota_weights
     return payload
 
 

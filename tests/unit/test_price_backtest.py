@@ -84,6 +84,7 @@ def test_run_price_backtest_study_adds_equal_weight_and_rebalance_ablations():
         periods_per_year=1,
         rebalance_every=1,
         cost_rate=0.001,
+        include_sota_baselines=False,
     )
 
     assert study.current_weight.total_return > study.equal_weight.total_return

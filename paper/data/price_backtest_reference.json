@@ -1,7 +1,7 @@
 {
-  "generated_utc": "20260525_111437",
+  "generated_utc": "20260529_005114",
   "start_date": "2021-01-05",
-  "end_date": "2026-05-22",
+  "end_date": "2026-05-28",
   "tickers": [
     "ASML",
     "AVGO",
@@ -24,48 +24,48 @@
   "benchmark_ticker": "SPY",
   "baselines": {
     "current_weight": {
-      "periods": 1352,
+      "periods": 1355,
       "rebalances": 0,
-      "total_return": 1.699429483293092,
-      "cagr": 0.2033307513452034,
-      "annualized_volatility": 0.18616797896661444,
-      "sharpe_ratio": 1.0875032105421911,
-      "max_drawdown": -0.2892485912272619,
+      "total_return": 1.7341473132488305,
+      "cagr": 0.2056998419164493,
+      "annualized_volatility": 0.18600869644583864,
+      "sharpe_ratio": 1.0988576737696012,
+      "max_drawdown": -0.28924858948557397,
       "total_cost": 0.0
     },
     "equal_weight": {
-      "periods": 1352,
+      "periods": 1355,
       "rebalances": 0,
-      "total_return": 1.9609434838962394,
-      "cagr": 0.22424999453744943,
-      "annualized_volatility": 0.18795656377488038,
-      "sharpe_ratio": 1.1707171223100319,
-      "max_drawdown": -0.27107281269638495,
+      "total_return": 2.010970108272762,
+      "cagr": 0.22752063059750727,
+      "annualized_volatility": 0.18781420385140146,
+      "sharpe_ratio": 1.1856798526443626,
+      "max_drawdown": -0.2710727824278115,
       "total_cost": 0.0
     },
     "benchmark": {
-      "periods": 1352,
+      "periods": 1355,
       "rebalances": 0,
-      "total_return": 1.1718567359195515,
-      "cagr": 0.15553243922425453,
-      "annualized_volatility": 0.16872795679635655,
-      "sharpe_ratio": 0.9412095618087333,
-      "max_drawdown": -0.2449640302629169,
+      "total_return": 1.1979549828127052,
+      "cagr": 0.1577316953098633,
+      "annualized_volatility": 0.16857456330248857,
+      "sharpe_ratio": 0.9531993970043244,
+      "max_drawdown": -0.24496380915025462,
       "total_cost": 0.0
     }
   },
   "comparisons": {
     "current_vs_equal_weight": {
-      "excess_total_return": -0.26151400060314733,
-      "excess_cagr": -0.02091924319224603,
-      "sharpe_delta": -0.08321391176784076,
-      "max_drawdown_delta": -0.01817577853087693
+      "excess_total_return": -0.27682279502393126,
+      "excess_cagr": -0.021820788681057968,
+      "sharpe_delta": -0.0868221788747614,
+      "max_drawdown_delta": -0.01817580705776245
     },
     "current_vs_benchmark": {
-      "excess_total_return": 0.5275727473735405,
-      "excess_cagr": 0.04779831212094887,
-      "sharpe_delta": 0.14629364873345785,
-      "max_drawdown_delta": -0.044284560964344966
+      "excess_total_return": 0.5361923304361254,
+      "excess_cagr": 0.04796814660658599,
+      "sharpe_delta": 0.14565827676527676,
+      "max_drawdown_delta": -0.04428478033531935
     }
   },
   "limitations": [
@@ -75,20 +75,96 @@
   ],
   "ablations": {
     "rebalanced_current": {
-      "periods": 1352,
+      "periods": 1355,
       "rebalances": 21,
-      "total_return": 1.4603256952851456,
-      "cagr": 0.18270741428649728,
-      "annualized_volatility": 0.1784021728696233,
-      "sharpe_ratio": 1.0299636014639988,
-      "max_drawdown": -0.29746186664641183,
-      "total_cost": 0.0015735143265008962
+      "total_return": 1.4668047530407233,
+      "cagr": 0.1828464927457547,
+      "annualized_volatility": 0.178241031178302,
+      "sharpe_ratio": 1.0313939495807078,
+      "max_drawdown": -0.2974618762654939,
+      "total_cost": 0.0015735141948977232
     },
     "current_vs_rebalanced": {
-      "excess_total_return": 0.23910378800794652,
-      "excess_cagr": 0.020623337058706115,
-      "sharpe_delta": 0.05753960907819233,
-      "max_drawdown_delta": 0.008213275419149957
+      "excess_total_return": 0.2673425602081072,
+      "excess_cagr": 0.022853349170694592,
+      "sharpe_delta": 0.06746372418889335,
+      "max_drawdown_delta": 0.008213286779919948
+    }
+  },
+  "sota_baselines": {
+    "min_variance": {
+      "periods": 1355,
+      "rebalances": 0,
+      "total_return": 1.2642541183625555,
+      "cagr": 0.16414807087348504,
+      "annualized_volatility": 0.15552151697131844,
+      "sharpe_ratio": 1.0553549744985962,
+      "max_drawdown": -0.19139386676964942,
+      "total_cost": 0.0
+    },
+    "risk_parity": {
+      "periods": 1355,
+      "rebalances": 0,
+      "total_return": 1.768373540238755,
+      "cagr": 0.20849261641961414,
+      "annualized_volatility": 0.17398693092769127,
+      "sharpe_ratio": 1.175741322522203,
+      "max_drawdown": -0.2449651074649265,
+      "total_cost": 0.0
+    }
+  },
+  "sota_comparisons": {
+    "current_vs_min_variance": {
+      "excess_total_return": 0.469893194886275,
+      "excess_cagr": 0.04155177104296426,
+      "sharpe_delta": 0.04350269927100503,
+      "max_drawdown_delta": -0.09785472271592455
+    },
+    "current_vs_risk_parity": {
+      "excess_total_return": -0.0342262269899245,
+      "excess_cagr": -0.002792774503164841,
+      "sharpe_delta": -0.0768836487526019,
+      "max_drawdown_delta": -0.04428348202064747
+    }
+  },
+  "sota_weights": {
+    "min_variance": {
+      "ASML": 0.0,
+      "AVGO": 0.0,
+      "EQIX": 0.071136308107573,
+      "GOOGL": 0.008899190114758596,
+      "ISRG": 0.0,
+      "JPM": 0.1510861458858067,
+      "LIN": 0.16275952127253135,
+      "LLY": 0.09063877130744899,
+      "MSFT": 0.05045834676023207,
+      "NVO": 0.011567813639823505,
+      "PLD": 0.016431032623492735,
+      "RELX": 0.1738729062245776,
+      "ROP": 0.13583315772294977,
+      "SPGI": 0.0,
+      "TDG": 0.0,
+      "TSM": 0.01049768881989555,
+      "UNH": 0.1168191175209101
+    },
+    "risk_parity": {
+      "ASML": 0.033854386949060254,
+      "AVGO": 0.038942701624924005,
+      "EQIX": 0.060540591146832544,
+      "GOOGL": 0.05089572501817107,
+      "ISRG": 0.04423973427867619,
+      "JPM": 0.07175229461144733,
+      "LIN": 0.0735074552184881,
+      "LLY": 0.06895925406477783,
+      "MSFT": 0.055407184837616356,
+      "NVO": 0.054925493775430205,
+      "PLD": 0.05988829552712317,
+      "RELX": 0.07315312273196951,
+      "ROP": 0.07164348676528444,
+      "SPGI": 0.05851055773331036,
+      "TDG": 0.05608224468169201,
+      "TSM": 0.043959838794948206,
+      "UNH": 0.08373763224024855
     }
   }
 }

@@ -29,13 +29,14 @@ engine as a pure, deterministic function lets us run exhaustive, reproducible
 parameter sweeps; these sweeps surfaced a latent fee defect in our own planner
 (a one-tranche overpayment for sub-tranche cash) which we characterize, fix, and
 guard with a property test. A weight-ablation experiment and a real
-2021--2026 backtest of a 17-name basket converge on the same humbling
-observation: the elaborate factor weighting is dominated by naive equal
-weighting, echoing classical results on $1/N$ diversification
-\cite{demiguel2009naive}. Our principal contribution is therefore methodological:
-a decision engine whose cost behavior is provable and whose every claim is a
-reproducible artifact, with empirical findings that emerged from observation
-rather than assumption.
+2021--2026 backtest of a 17-name basket against four baselines---including
+minimum-variance and risk-parity allocators---converge on the same humbling
+observation: the fundamentals-weighted basket ranks third of five on
+risk-adjusted return, behind two allocators that use no fundamental data,
+echoing classical results on $1/N$ diversification \cite{demiguel2009naive}. Our
+principal contribution is therefore methodological: a decision engine whose cost
+behavior is provable and whose every claim is a reproducible artifact, with
+empirical findings that emerged from observation rather than assumption.
 \end{abstract}
 
 \keywords{computational finance, portfolio analytics, reproducibility,
@@ -228,29 +229,40 @@ claim about specific securities.)
   \label{fig:ablation}
 \end{figure}
 
-\paragraph{Backtest (real data).}
-We backtested the 17-name basket against an equal-weight version and SPY over
-2021-01-05 to 2026-05-22 (1352 trading days) using free adjusted closes
-(Table~\ref{tab:backtest}, Figure~\ref{fig:backtest}). The basket beat the
-benchmark (+4.78 pp CAGR, $+0.15$ Sharpe), but equal weighting beat the
-market-value weighting (+2.09 pp CAGR, $+0.08$ Sharpe), and periodic
-rebalancing \emph{reduced} return to $18.27\%$ from the $20.33\%$ buy-and-hold
-figure despite low explicit cost. The ablation and the backtest, one synthetic
-and one real, point the same way.
+\paragraph{Backtest against allocator baselines (real data).}
+We backtested the 17-name basket against four baselines over 2021-01-05 to
+2026-05-28 (1355 trading days) using free adjusted closes
+(Table~\ref{tab:backtest}, Figure~\ref{fig:backtest}). Two are naive
+(market-value ``current'' weighting and equal weighting); two are allocator
+baselines computable from the return matrix alone---long-only minimum variance
+and equal-risk-contribution (risk parity)---so no baseline uses information the
+others lack. The score-weighted basket beats the SPY benchmark by a wide margin
+($+4.80$ pp CAGR, $+0.15$ Sharpe) and beats minimum variance on return
+($+4.16$ pp CAGR), but it ranks \emph{third of five} on the Sharpe ratio: equal
+weighting ($1.19$) and risk parity ($1.18$) both edge out the tuned weighting
+($1.10$), and minimum variance delivers the shallowest drawdown ($-19.1\%$ versus
+$-28.9\%$) at the cost of return. Periodic rebalancing \emph{reduced} CAGR to
+$18.3\%$ from the $20.6\%$ buy-and-hold figure despite low explicit cost. The
+synthetic ablation and the real backtest point the same way: on this basket, two
+allocators that use \emph{no} fundamental data match or beat the
+fundamentals-weighted strategy on risk-adjusted return.
 
 \begin{table}[t]
-  \caption{Current-basket backtest, 2021--2026. Not point-in-time; see
-  limitations.}
+  \caption{Current-basket backtest, 2021-01-05 to 2026-05-28 (1355 days), buy
+  and hold unless noted. Allocator baselines use the return matrix only. Not
+  point-in-time; see limitations.}
   \label{tab:backtest}
   \begin{tabular}{lrrr}
     \toprule
     Strategy & CAGR & Sharpe & Max DD \\
     \midrule
-    Current weight & $20.3\%$ & $1.09$ & $-28.9\%$ \\
-    Equal weight & $22.4\%$ & $1.17$ & $-27.1\%$ \\
-    Benchmark (SPY) & $15.6\%$ & $0.94$ & $-24.5\%$ \\
+    Equal weight & $22.8\%$ & $\mathbf{1.19}$ & $-27.1\%$ \\
+    Risk parity & $20.9\%$ & $1.18$ & $-24.5\%$ \\
+    Current weight (ours) & $20.6\%$ & $1.10$ & $-28.9\%$ \\
+    Minimum variance & $16.4\%$ & $1.06$ & $\mathbf{-19.1\%}$ \\
+    Benchmark (SPY) & $15.8\%$ & $0.95$ & $-24.5\%$ \\
     \midrule
-    Rebalanced current & $18.3\%$ & $1.03$ & --- \\
+    Rebalanced current & $18.3\%$ & $1.03$ & $-29.7\%$ \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -258,11 +270,13 @@ and one real, point the same way.
 \begin{figure}[t]
   \centering
   \includegraphics[width=\columnwidth]{figures/backtest.png}
-  \caption{Basket versus baselines. Equal weighting matches or beats the tuned
-  weighting on both return and risk-adjusted return.}
-  \Description{Cumulative return chart from 2021 to 2026 showing the
-  equal-weight basket above the current-weight basket, with both above the SPY
-  benchmark.}
+  \caption{Basket versus four baselines. Equal weighting and risk parity, which
+  use no fundamental data, match or beat the fundamentals-weighted basket on both
+  return and risk-adjusted return; minimum variance trades return for the
+  shallowest drawdown.}
+  \Description{Grouped bar chart of CAGR and Sharpe ratio for five strategies:
+  current weight, equal weight, benchmark, minimum variance, and risk parity.
+  Equal weight and risk parity have the highest Sharpe ratios.}
   \label{fig:backtest}
 \end{figure}
 
@@ -279,10 +293,14 @@ the engine is held to them by tests. The empirical sections are evidence
 \paragraph{Takeaways and a useful negative result.}
 First, in fee-quantized markets, diversification is not free; the right default
 is to diversify only when fee-neutral. Second, the cost guardrail is derivable,
-not tunable. Third---the result we did not expect---factor weighting added little
-over equal weighting on this basket, consistent with $1/N$ diversification being
-hard to beat \cite{demiguel2009naive}. Selection appears to matter more than
-weighting here; we would rather report this than hide it.
+not tunable. Third---the result we did not expect---the fundamentals-weighted
+basket ranks third of five on risk-adjusted return, behind both equal weighting
+and risk parity, two allocators that consume no fundamental data. This is
+consistent with $1/N$ diversification being hard to beat \cite{demiguel2009naive}.
+Selection appears to matter more than weighting here; we would rather report this
+than hide it. The result also clarifies where the contribution does \emph{not}
+lie: not in outperforming standard allocators, but in making each deployment
+decision cheap, bounded, and auditable.
 
 \paragraph{Serendipity of measurement.}
 Each finding came from instrumenting a deterministic engine rather than from a
