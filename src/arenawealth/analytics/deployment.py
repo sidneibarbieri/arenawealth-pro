@@ -102,7 +102,8 @@ def plan_deployment(analyses: Sequence[PositionAnalysis], cash: float) -> Deploy
     overweight = tuple(
         item.holding.ticker for item in analyses if item.weight_pct > overweight_limit
     )
-    ranked = sorted(eligible, key=lambda item: item.composite_score, reverse=True)
+    # Break score ties by ticker so the ranking is independent of input order.
+    ranked = sorted(eligible, key=lambda item: (-item.composite_score, item.holding.ticker))
     picks, theme_blocked = pick_top_two(ranked, theme_weights(analyses))
     orders = size_orders(picks, cash)
     return DeploymentPlan(

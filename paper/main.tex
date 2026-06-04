@@ -123,7 +123,11 @@ depends on live data or hidden state. The purity is enforced, not merely
 asserted: a replay test feeds the same input tuple twice and checks that the
 orders, exclusions, and ranked candidates are byte-identical. This is the
 auditability guarantee a compliance reviewer needs---any past recommendation can
-be regenerated and diffed from its logged inputs.
+be regenerated and diffed from its logged inputs. Determinism is engineered, not
+incidental: the engine draws no random numbers, ranking ties are broken by ticker
+so the order does not depend on input ordering, and the scoring and sizing
+arithmetic uses ordinary IEEE-754 doubles whose operations are reproducible
+across platforms for these magnitudes.
 
 The composite score is a linear functional of three bounded sub-scores,
 \begin{equation}
@@ -138,29 +142,46 @@ ranks the remainder by $s$ and sizes orders against available cash.
 \section{The Fee Structure as an Object of Study}
 \label{sec:fees}
 
-The broker charges per started tranche of an order:
+The broker charges a fixed cost $c$ per \emph{started} tranche of size $T$ in a
+single-symbol order. A partially used tranche is billed in full, so the fee is
+the \emph{ceiling} (not the floor) of the tranche count:
 \begin{equation}
   f(a) = \left\lceil \tfrac{a}{T} \right\rceil c,
   \qquad T = \$1000,\ c = \$2.50.
   \label{eq:fee}
 \end{equation}
+For example $f(\$1{,}001)=\lceil 1.001\rceil c = 2c = \$5.00$, the same as
+$f(\$2{,}000)$; a single dollar past a boundary starts a new tranche. The fee is
+charged per order for one symbol, so deploying cash across $k$ distinct symbols
+incurs $k$ separate fees. We assume fractional shares, so order size is
+continuous in dollars; integer-share rounding would only add a second, smaller
+quantization on top of the tranche effect and does not change the argument.
 
 \begin{proposition}[Subadditivity]
 \label{prop:sub}
-For all $a,b \ge 0$, $f(a+b) \le f(a) + f(b)$.
+$f$ is subadditive: for all $a,b \ge 0$, $f(a+b) \le f(a) + f(b)$.
 \end{proposition}
 \begin{proof}
-$\lceil x+y\rceil \le \lceil x\rceil + \lceil y\rceil$ for all reals, and
-multiplying by $c>0$ preserves the inequality with $x=a/T$, $y=b/T$.
+The ceiling is subadditive, $\lceil x+y\rceil \le \lceil x\rceil + \lceil y\rceil$
+for all reals $x,y$, because $\lceil x\rceil + \lceil y\rceil$ is an integer that
+is $\ge x+y$ and the ceiling is the least such integer. Setting $x=a/T$, $y=b/T$
+and multiplying by $c>0$ gives the claim. (The floor is \emph{super}additive, so
+a floor-based fee would not yield this inequality; the ``per started tranche''
+billing is what makes the cost subadditive.)
 \end{proof}
 
 The consequence is immediate and practical: \emph{consolidating cash into one
-order weakly minimizes fees}. Any split into orders $a_1,\dots,a_k$ pays a
+single-symbol order weakly minimizes fees}. Splitting a fixed budget across
+orders $a_1,\dots,a_k$ (necessarily across distinct symbols) pays a
 \emph{diversification fee premium}
 \begin{equation}
-  \pi(a_1,\dots,a_k) = \sum_i f(a_i) - f\!\Big(\sum_i a_i\Big) \;\ge\; 0.
+  \pi(a_1,\dots,a_k) = \sum_i f(a_i) - f\!\Big(\sum_i a_i\Big) \;\ge\; 0,
   \label{eq:premium}
 \end{equation}
+where the single-order reference $f(\sum_i a_i)$ is the hypothetical cost of the
+same dollars in one symbol; it is a lower bound on any multi-symbol split, not an
+achievable diversified portfolio. The premium quantifies what diversification
+costs under this fee, and motivates the fee-aware planner below.
 
 We swept cash from \$250 to \$5000 and compared three policies against the
 single-order lower bound: a \emph{naive} split strictly proportional to score, a
@@ -276,7 +297,14 @@ We backtested the 17-name basket against four baselines over 2021-01-05 to
 (market-value ``current'' weighting and equal weighting); two are allocator
 baselines computable from the return matrix alone---long-only minimum variance
 and equal-risk-contribution (risk parity)---so no baseline uses information the
-others lack. The score-weighted basket beats the SPY benchmark by a wide margin
+others lack. Both allocators estimate the sample covariance over the full window
+with no shrinkage, are long-only and fully invested ($w\ge 0$, $\mathbf{1}^\top
+w=1$), and set weights once at the start (buy and hold, no rebalancing), so they
+are compared on the same footing as the other buy-and-hold baselines; minimum
+variance uses an active-set reduction on the closed-form solution and risk parity
+the Maillard fixed-point iteration. Reported estimation choices are deliberately
+plain, since the point is a fair reference, not a tuned competitor. The
+score-weighted basket beats the SPY benchmark by a wide margin
 ($+4.80$ pp CAGR, $+0.15$ Sharpe) and beats minimum variance on return
 ($+4.16$ pp CAGR), but it ranks \emph{third of five} on the Sharpe ratio: equal
 weighting ($1.19$) and risk parity ($1.18$) both edge out the tuned weighting
@@ -354,12 +382,16 @@ that produced the science.
 The backtest is a current-basket study on free adjusted closes; it is subject to
 survivorship and selection bias and is \emph{not} a point-in-time
 stock-selection backtest. The ablation uses deterministic synthetic fundamentals
-and demonstrates mechanism, not security-level claims. Out-of-sample
-point-in-time evaluation, transaction-cost and tax modeling beyond the explicit
-fee, and threshold-sensitivity studies remain future work. ArenaWealth Pro is
-not a registered investment adviser, broker-dealer, or execution system;
-commercial use requires legal, compliance, data-licensing, and suitability
-review.
+and demonstrates mechanism, not security-level claims. The cost model is the
+fixed per-order tranche fee only: it omits bid-ask spreads, slippage,
+integer-lot constraints, and taxes, and it applies where brokers charge such a
+fee (common for international or non-US-equity access) rather than under
+zero-commission US-equity trading. The guardrail generalizes to any fee with a
+fixed per-order component, but the specific \$250 floor is a function of the
+$(c,\tau)$ pair. Out-of-sample point-in-time evaluation, richer cost models, and
+multi-basket robustness remain future work. ArenaWealth Pro is not a registered
+investment adviser, broker-dealer, or execution system; commercial use requires
+legal, compliance, data-licensing, and suitability review.
 
 \section{Conclusion}
 
