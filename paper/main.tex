@@ -243,6 +243,33 @@ therefore independent axes; an advisor benchmark must report all three.
   \label{fig:audit}
 \end{figure}
 
+\paragraph{Metrics, precisely.}
+For an advisor that returns sets of tickers $r_1,\dots,r_n$ over $n$ repeated
+runs of a scenario with baseline top-$k$ set $b$, we report
+\[
+  V = \tfrac1n\!\sum_j \mathbf{1}[\,\mathrm{viol}(r_j)=\varnothing\,],\quad
+  S = \binom{n}{2}^{-1}\!\!\sum_{i<j}\! J(r_i,r_j),\quad
+  A = \tfrac1n\!\sum_j \tfrac{|r_j\cap b|}{k},
+\]
+where $J$ is the Jaccard overlap and $\mathrm{viol}$ the constraint set of
+Section~\ref{sec:audit}. Validity $V$ and stability $S$ are intrinsic to the
+advisor; agreement $A$ is relative to the baseline and reported, never optimized.
+All three are deterministic given the runs, so the audit of a fixed set of
+outputs is itself replayable.
+
+\paragraph{What the protocol does and does not certify.}
+It certifies \emph{process}---that advice is admissible, repeatable, and grounded
+in the scenario---not \emph{outcome}. A valid, stable, agreeing advisor can still
+be wrong if the baseline itself is wrong; this is exactly why we calibrate the
+baseline against standard allocators and report that it does not beat them
+(Section~\ref{sec:weighting}). Agreement is descriptive: disagreement may be
+useful novelty or error, separable only by realized outcome. Stability is
+measured over ticker sets, so an advisor consistent in names but erratic in
+sizing would need an amount-aware extension. The archetypes are controls that
+establish discriminating power, not claims about any model. These boundaries are
+what keep the protocol honest: it tells a practitioner whether an advisor is
+\emph{safe to deploy}, a prerequisite that return curves alone never establish.
+
 The archetypes establish the protocol and its discriminating power offline and
 deterministically. Running real language-model advisors through the same frozen
 scenarios is the natural next study; the protocol, scenarios, and metrics are
