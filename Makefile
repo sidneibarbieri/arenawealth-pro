@@ -2,7 +2,7 @@ PYTHON ?= .venv/bin/python
 PIP ?= .venv/bin/pip
 UVICORN ?= .venv/bin/uvicorn
 
-.PHONY: setup verify verify-e2e metrics recommendation price-backtest experiments configure-env api ui app run paper all package clean
+.PHONY: setup verify verify-e2e metrics recommendation price-backtest experiments ai-advisor-audit configure-env api ui app run paper all package clean
 
 setup:
 	python3.11 -m venv .venv
@@ -27,6 +27,9 @@ price-backtest:
 experiments:
 	$(PYTHON) scripts/run_experiments.py
 
+ai-advisor-audit:
+	$(PYTHON) scripts/run_ai_advisor_audit.py --reference
+
 configure-env:
 	bash scripts/configure_env.sh
 
@@ -45,7 +48,7 @@ run:
 paper:
 	cd paper && latexmk -pdf main.tex
 
-all: setup verify experiments paper
+all: setup verify experiments ai-advisor-audit paper
 	@echo "Artifact reproduced end-to-end: tests, figures, and PDF are up to date."
 
 package:

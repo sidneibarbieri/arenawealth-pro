@@ -9,6 +9,7 @@
 | The live recommendation uses external data when provider keys are available. | Provider mode in CLI/API output | Supported with provider availability |
 | Data-source readiness is visible without exposing secrets. | `GET /api/v1/data-sources/health` and app Data Sources Health panel | Supported |
 | The artifact can run free price-history baselines and a rebalancing ablation. | `make price-backtest` | Supported for current-basket price history |
+| The artifact can audit frozen advisor outputs for validity, stability, and policy agreement. | `make ai-advisor-audit` | Supported for offline scenarios and synthetic failure-mode controls |
 | SEC fundamentals can be filtered point-in-time by filing date. | `tests/unit/test_sec_facts.py` | Supported as a foundation |
 | The method beats market or advisor baselines. | Current-basket price history is available, but point-in-time selection backtests and factor-adjusted baselines are not complete. | Not supported |
 | The system is ready for regulated commercial advice. | Compliance, licensing, audit, and suitability workflows remain open. | Not supported |

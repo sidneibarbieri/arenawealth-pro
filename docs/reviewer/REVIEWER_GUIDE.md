@@ -47,6 +47,18 @@ rebalancing ablation with transaction costs. It is useful for checking risk and
 benchmark behavior of the current basket. It does not claim point-in-time
 stock-selection performance.
 
+## Offline AI-Advisor Audit
+
+```bash
+make ai-advisor-audit
+```
+
+This path evaluates frozen advisor-output scenarios without calling an external
+model. It writes a reference JSON report to
+`paper/data/ai_advisor_audit_reference.json` and a figure to
+`paper/figures/ai_advisor_audit.png`. The included non-policy advisors are
+synthetic failure-mode controls, not claimed LLM results.
+
 ## Local App
 
 ```bash

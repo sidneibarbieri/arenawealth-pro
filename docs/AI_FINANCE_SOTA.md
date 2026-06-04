@@ -124,9 +124,18 @@ breaking constraints, changing hidden assumptions, or losing replayability.
    - explanation faithfulness to logged facts.
 
    Initial offline metric support lives in
-   `src/arenawealth/experiments/ai_advisor.py`. It deliberately does not call an
-   LLM; it evaluates model outputs after they are collected, so experiments can
-   remain replayable and model access can be optional.
+   `src/arenawealth/experiments/ai_advisor.py`. Frozen scenario support now
+   lives in `paper/data/ai_advisor_scenarios.json`, with the reference audit in
+   `paper/data/ai_advisor_audit_reference.json` and
+   `paper/figures/ai_advisor_audit.png`. This first version deliberately does
+   not call an LLM; it evaluates deterministic-policy outputs and synthetic
+   failure-mode controls so model access can be optional and future model runs
+   use the same measurement surface.
+
+   First observation: policy agreement is insufficient. A naive split can agree
+   with the policy ticker and remain stable while still violating fee
+   constraints. Validity, stability, and agreement must therefore be reported
+   separately.
 
 3. **Advisor workflow audit.**
    Treat a consultant as a multi-portfolio operator. Test whether the same policy

@@ -99,6 +99,17 @@ The key question is not "Can an LLM pick stocks?" The stronger question is:
 > a deterministic buy-and-hold policy, and when does it introduce instability or
 > bias?
 
+Implemented first step: `paper/data/ai_advisor_scenarios.json` freezes three
+offline scenarios and `scripts/run_ai_advisor_audit.py` evaluates deterministic
+outputs plus synthetic failure-mode controls. The reference output is
+`paper/data/ai_advisor_audit_reference.json`. This is not yet a model study; it
+is the measurement surface for future model outputs.
+
+Serendipity: one synthetic baseline has top-k agreement 1.0 with the policy and
+stability 1.0, but is still invalid because it splits sub-tranche cash and pays
+an unnecessary fee. This shows why an AI-advisor benchmark cannot rely only on
+recommendation overlap.
+
 ## Implications for the paper
 
 The current fee paper should not be discarded. It becomes an internal case study

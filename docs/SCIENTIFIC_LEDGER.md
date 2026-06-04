@@ -145,6 +145,28 @@ Evidence:
 - downloaded PDFs in `paper/bibliography/pdfs/` (git-ignored)
 - `src/arenawealth/experiments/ai_advisor.py`
 
+### F10. Advisor agreement is not enough without operational validity
+
+The offline AI-advisor audit suite evaluates frozen scenarios with synthetic
+failure-mode controls. It separates three quantities that are often conflated:
+validity under constraints, agreement with the deterministic policy, and
+repeated-run stability. The first result is a useful negative control:
+`naive_diversifier` reaches policy agreement 1.0 and stability 1.0 in the
+sub-tranche cash scenario, but remains invalid because it pays an
+unnecessary split fee. Conversely, `valid_but_low_agreement` is fully valid and
+stable while disagreeing with the policy. Takeaway: overlap@k cannot certify
+investment advice; operational constraints must be measured beside ranking.
+This is not yet an LLM result. It is the frozen measurement surface that future
+LLM outputs must use.
+
+Evidence:
+
+- `paper/data/ai_advisor_scenarios.json`
+- `paper/data/ai_advisor_audit_reference.json`
+- `paper/figures/ai_advisor_audit.png`
+- `scripts/run_ai_advisor_audit.py`
+- tests in `tests/unit/test_ai_advisor_benchmark.py`
+
 ## State-of-the-Art Reference Points
 
 The project should be compared against these families, not against vague
@@ -192,6 +214,7 @@ Current honest position:
 | Property-based testing across a grid | `test_planner_never_overpays_single_order_fee_across_grid`. |
 | Rank correlation (Spearman) | Comparing orderings across weight sets without distributional assumptions. |
 | Lipschitz-style stability check | Top-k stability under bounded weight perturbations. |
+| Constraint-product audit | F10; a recommendation must satisfy ranking, cash, fee, ownership, and fact constraints together. |
 
 ## Serendipity
 
@@ -206,6 +229,10 @@ Current honest position:
 - The best-paper pattern from recent AI-in-finance work is not maximum model
   complexity. It is a clean evaluation object plus a failure mode that becomes
   measurable.
+- The advisor audit exposed a metric trap: a recommendation can be stable and
+  agree with the policy while still being operationally invalid. This gives the
+  paper a stronger reason to insist on deterministic constraints rather than
+  only comparing top-k recommendations.
 
 ## Hypotheses to Test Next
 
@@ -227,9 +254,9 @@ Current honest position:
 2. A broad candidate universe with survivorship limitations stated.
 3. Baselines: broad market, equal weight, risk parity, minimum variance, quality
    factor, moat-like selection, and current-weight hold.
-4. AI-advisor benchmark: frozen scenarios, repeated prompts, stability,
-   constraint violations, explanation faithfulness, and performance under the
-   same backtest harness.
+4. AI-advisor benchmark: frozen scenarios now exist; next collect repeated
+   model outputs, add explanation-faithfulness scoring, and connect valid
+   outputs to performance under the same backtest harness.
 5. Ablations: moat, compounding, valuation, concentration caps, rebalance
    interval, transaction costs, and AI augmentation.
 6. Decision replay bundles: decision id -> frozen inputs -> regenerated output.
