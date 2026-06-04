@@ -114,6 +114,11 @@ breaking constraints, changing hidden assumptions, or losing replayability.
    - realized performance in the same backtest harness;
    - explanation faithfulness to logged facts.
 
+   Initial offline metric support lives in
+   `src/arenawealth/experiments/ai_advisor.py`. It deliberately does not call an
+   LLM; it evaluates model outputs after they are collected, so experiments can
+   remain replayable and model access can be optional.
+
 3. **Advisor workflow audit.**
    Treat a consultant as a multi-portfolio operator. Test whether the same policy
    remains deterministic per client while allowing separate constraints, cash,
