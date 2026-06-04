@@ -27,6 +27,7 @@ import matplotlib.pyplot as plt
 
 from arenawealth.analytics.fundamentals import DemoFundamentalsProvider
 from arenawealth.analytics.models import Holding
+from arenawealth.analytics.performance import sharpe_ratio
 from arenawealth.analytics.universe import FINANCIAL_TICKERS, THEME_BY_TICKER
 from arenawealth.analytics.workflow import analyze_holdings
 from arenawealth.experiments.ablation import (
@@ -45,11 +46,41 @@ from arenawealth.experiments.fee_sensitivity import (
     reference_schedules,
     schedule_floors,
 )
+from arenawealth.experiments.robustness import (
+    block_bootstrap_sharpe_diff,
+    equal_weights,
+    fixed_weight_returns,
+    rolling_comparison,
+)
 
 ROOT = Path(__file__).resolve().parent.parent
 SEED_CSV = ROOT / "tests" / "fixtures" / "seed_portfolio_avenue.csv"
+RETURN_MATRIX_CSV = ROOT / "paper" / "data" / "returns_matrix.csv"
 FIG_DIR = ROOT / "paper" / "figures"
 EXPORT_DIR = ROOT / "exports"
+
+
+def load_return_matrix(path: Path) -> dict[str, tuple[float, ...]]:
+    """Read the tracked date-indexed return matrix into per-ticker series."""
+    with path.open(encoding="utf-8") as handle:
+        reader = csv.reader(handle)
+        header = next(reader)
+        tickers = header[1:]
+        columns: dict[str, list[float]] = {ticker: [] for ticker in tickers}
+        for row in reader:
+            for ticker, value in zip(tickers, row[1:], strict=True):
+                columns[ticker].append(float(value))
+    return {ticker: tuple(values) for ticker, values in columns.items()}
+
+
+def current_weights_from_seed(path: Path) -> dict[str, float]:
+    """Market-value weights from the seed holdings (benchmark excluded)."""
+    weights: dict[str, float] = {}
+    with path.open(encoding="utf-8") as handle:
+        for row in csv.DictReader(handle):
+            ticker = row["ticker"].strip().upper()
+            weights[ticker] = float(row["shares"]) * float(row["current_price"])
+    return weights
 
 # Arena palette
 CARBON = "#11161c"
@@ -179,6 +210,44 @@ def figure_sensitivity(path: Path) -> None:
     plt.close(fig)
 
 
+def figure_robustness(
+    asset_returns: dict[str, tuple[float, ...]],
+    weights_equal: dict[str, float],
+    weights_current: dict[str, float],
+    path: Path,
+    window: int = 252,
+    step: int = 21,
+) -> None:
+    """Rolling 1-year excess Sharpe of equal weighting over current weighting."""
+    returns_equal = fixed_weight_returns(asset_returns, weights_equal)
+    returns_current = fixed_weight_returns(asset_returns, weights_current)
+    length = len(returns_equal)
+    starts = list(range(0, length - window + 1, step))
+    excess = [
+        sharpe_ratio(returns_equal[start : start + window], 252.0)
+        - sharpe_ratio(returns_current[start : start + window], 252.0)
+        for start in starts
+    ]
+    window_index = list(range(1, len(excess) + 1))
+    positive = sum(1 for value in excess if value > 0)
+    fig, ax = plt.subplots(figsize=(7, 3.6), dpi=150)
+    fig.patch.set_facecolor("white")
+    colors = [SUCCESS if value > 0 else RED for value in excess]
+    ax.bar(window_index, excess, color=colors)
+    ax.axhline(0.0, color=CARBON, linewidth=1)
+    ax.set_xlabel("Rolling 1-year window (monthly step)")
+    ax.set_ylabel("Sharpe(equal) - Sharpe(current)")
+    ax.set_title(
+        f"Equal weighting wins {positive}/{len(excess)} rolling windows",
+        color=CARBON,
+        fontweight="bold",
+    )
+    _style_axes(ax)
+    fig.tight_layout()
+    fig.savefig(path, facecolor="white")
+    plt.close(fig)
+
+
 def figure_ablation(ablation_rows, path: Path) -> None:
     labels = [row.label.replace("_", "\n") for row in ablation_rows]
     spearman = [row.spearman_vs_baseline for row in ablation_rows]
@@ -274,6 +343,22 @@ def main() -> None:
     # Experiment E: reuse the most recent real backtest export
     backtest = latest_backtest_export()
 
+    # Experiment F: robustness of the equal-weight-beats-current result
+    robustness = None
+    if RETURN_MATRIX_CSV.exists():
+        asset_returns = load_return_matrix(RETURN_MATRIX_CSV)
+        current_raw = current_weights_from_seed(SEED_CSV)
+        basket = sorted(ticker for ticker in current_raw if ticker in asset_returns)
+        basket_returns = {ticker: asset_returns[ticker] for ticker in basket}
+        weights_current = {ticker: current_raw[ticker] for ticker in basket}
+        weights_equal = equal_weights(basket)
+        robustness = {
+            "rolling": rolling_comparison(basket_returns, weights_equal, weights_current),
+            "bootstrap": block_bootstrap_sharpe_diff(
+                basket_returns, weights_equal, weights_current
+            ),
+        }
+
     # Figures
     figure_fee_premium(landscape, FIG_DIR / "fee_premium.png")
     figure_guardrail(landscape, guardrail.one_percent_fixed_point, FIG_DIR / "guardrail.png")
@@ -281,6 +366,10 @@ def main() -> None:
     figure_ablation(ablation_rows, FIG_DIR / "ablation.png")
     if backtest is not None:
         figure_backtest(backtest, FIG_DIR / "backtest.png")
+    if robustness is not None:
+        figure_robustness(
+            basket_returns, weights_equal, weights_current, FIG_DIR / "robustness.png"
+        )
 
     findings = {
         "generated_utc": stamp,
@@ -299,6 +388,14 @@ def main() -> None:
             "schedule_floors": [asdict(row) for row in fee_schedule_floors],
             "floor_is_tranche_invariant": True,
         },
+        "robustness": (
+            {
+                "rolling": asdict(robustness["rolling"]),
+                "bootstrap": asdict(robustness["bootstrap"]),
+            }
+            if robustness is not None
+            else None
+        ),
         "ablation": {
             "baseline_order": baseline_order,
             "rows": [asdict(row) for row in ablation_rows],

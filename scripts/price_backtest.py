@@ -15,12 +15,35 @@ from arenawealth.analytics import (
     BacktestComparison,
     BacktestResult,
     PriceBacktestStudy,
+    align_price_history,
     run_price_backtest_study,
 )
 
 DEFAULT_HOLDINGS = Path("data/carteira_atual.csv")
 DEFAULT_FIXTURE = Path("tests/fixtures/seed_portfolio_avenue.csv")
 DEFAULT_OUTPUT_DIR = Path("exports")
+RETURN_MATRIX_PATH = Path("paper/data/returns_matrix.csv")
+
+
+def write_return_matrix(
+    histories: dict[str, dict[str, float]], path: Path = RETURN_MATRIX_PATH
+) -> Path:
+    """Persist the aligned daily-return matrix as a date-indexed CSV.
+
+    One row per trading date, one column per ticker. This is the tracked,
+    offline input for the robustness experiments, so a reviewer can reproduce
+    rolling-window and bootstrap analyses without network access.
+    """
+    aligned = align_price_history(histories)
+    tickers = sorted(aligned.returns)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    header = "date," + ",".join(tickers)
+    lines = [header]
+    for index, date in enumerate(aligned.dates):
+        cells = [f"{aligned.returns[ticker][index]:.10f}" for ticker in tickers]
+        lines.append(date + "," + ",".join(cells))
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return path
 
 
 def holdings_path(path: Path) -> Path:
@@ -170,6 +193,8 @@ def main() -> None:
     generated_utc = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
     payload = study_to_payload(study, generated_utc)
     output_path = write_payload(payload, arguments.output_dir)
+    matrix_path = write_return_matrix(histories)
+    print(f"Return matrix {matrix_path}")
     print(
         "Price backtest study "
         f"{study.start_date}..{study.end_date} "

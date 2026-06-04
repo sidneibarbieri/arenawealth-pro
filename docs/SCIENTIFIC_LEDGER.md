@@ -33,14 +33,19 @@ Evidence:
 
 ### F3. The fundamentals-weighted basket ranks third of five against allocator baselines
 
-Backtested 2021-01-05 to 2026-05-28 (1355 days), the score-weighted basket beats
-SPY (+4.80 pp CAGR, +0.15 Sharpe) and minimum variance on return (+4.16 pp CAGR),
+Backtested 2021-01-05 to 2026-06-04 (1360 days), the score-weighted basket beats
+SPY (+4.80 pp CAGR, +0.15 Sharpe) and minimum variance on return (+3.8 pp CAGR),
 but ranks third of five on Sharpe ratio: equal weight (1.19) and risk parity
 (1.18) both beat the tuned weighting (1.10), while minimum variance gives the
-shallowest drawdown (-19.1% vs -28.9%) at the cost of return. Two of the
+shallowest drawdown (-19.2% vs -28.9%) at the cost of return. Two of the
 strongest baselines (equal weight, risk parity) use no fundamental data. This is
 a useful negative result consistent with the literature on naive diversification;
 it clarifies that the contribution is methodological, not performance.
+
+Robustness (F5 method): the equal-weight-beats-current result holds in 47 of 53
+rolling one-year windows (89%); a 21-day block bootstrap (2000 resamples, fixed
+seed) gives a Sharpe difference of +0.076 with 95% CI [-0.008, +0.168] and
+P(equal better)=96%. Direction robust, magnitude not decisive at 5%.
 
 Evidence:
 

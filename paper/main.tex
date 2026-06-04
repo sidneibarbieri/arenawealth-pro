@@ -363,11 +363,11 @@ the Maillard fixed-point iteration. Reported estimation choices are deliberately
 plain, since the point is a fair reference, not a tuned competitor. The
 score-weighted basket beats the SPY benchmark by a wide margin
 ($+4.80$ pp CAGR, $+0.15$ Sharpe) and beats minimum variance on return
-($+4.16$ pp CAGR), but it ranks \emph{third of five} on the Sharpe ratio: equal
+($+3.8$ pp CAGR), but it ranks \emph{third of five} on the Sharpe ratio: equal
 weighting ($1.19$) and risk parity ($1.18$) both edge out the tuned weighting
-($1.10$), and minimum variance delivers the shallowest drawdown ($-19.1\%$ versus
+($1.10$), and minimum variance delivers the shallowest drawdown ($-19.2\%$ versus
 $-28.9\%$) at the cost of return. Periodic rebalancing \emph{reduced} CAGR to
-$18.3\%$ from the $20.6\%$ buy-and-hold figure despite low explicit cost. The
+$18.5\%$ from the $20.6\%$ buy-and-hold figure despite low explicit cost. The
 synthetic ablation and the real backtest point the same way: on this basket, two
 allocators that use \emph{no} fundamental data match or beat the
 fundamentals-weighted strategy on risk-adjusted return.
@@ -384,10 +384,10 @@ fundamentals-weighted strategy on risk-adjusted return.
     Equal weight & $22.8\%$ & $\mathbf{1.19}$ & $-27.1\%$ \\
     Risk parity & $20.9\%$ & $1.18$ & $-24.5\%$ \\
     Current weight (ours) & $20.6\%$ & $1.10$ & $-28.9\%$ \\
-    Minimum variance & $16.4\%$ & $1.06$ & $\mathbf{-19.1\%}$ \\
+    Minimum variance & $16.8\%$ & $1.07$ & $\mathbf{-19.2\%}$ \\
     Benchmark (SPY) & $15.8\%$ & $0.95$ & $-24.5\%$ \\
     \midrule
-    Rebalanced current & $18.3\%$ & $1.03$ & $-29.7\%$ \\
+    Rebalanced current & $18.5\%$ & $1.04$ & $-29.7\%$ \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -403,6 +403,34 @@ fundamentals-weighted strategy on risk-adjusted return.
   current weight, equal weight, benchmark, minimum variance, and risk parity.
   Equal weight and risk parity have the highest Sharpe ratios.}
   \label{fig:backtest}
+\end{figure}
+
+\paragraph{Is the result robust?}
+A single full-sample comparison cannot separate structure from luck, so we probe
+the equal-versus-current result two ways over the same daily-return matrix, using
+fixed-weight (daily-rebalanced) portfolios for a clean Sharpe comparison. First,
+rolling one-year windows stepped monthly: equal weighting has the higher Sharpe in
+$47$ of $53$ windows ($89\%$; Figure~\ref{fig:robustness}), failing only in a
+single 2024--2025 stretch. Second, a circular block bootstrap ($2{,}000$ resamples
+of 21-day blocks, fixed seed) on the full-period Sharpe difference
+$\mathrm{Sharpe}(\text{equal})-\mathrm{Sharpe}(\text{current})$ gives a point
+estimate of $+0.076$ with a $95\%$ interval $[-0.008, +0.168]$ and
+$P(\text{equal better})=96\%$. The direction is robust; the magnitude is
+\emph{not} decisive at the $5\%$ level, the interval grazing zero. We therefore
+state the finding precisely: on this basket equal weighting is reliably at least
+as good as the tuned weighting, which is enough to support the methodological
+claim without overstating performance.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/robustness.png}
+  \caption{Rolling one-year excess Sharpe of equal over current weighting. The
+  difference is positive in $47$ of $53$ windows; the negative band is a single
+  2024--2025 stretch.}
+  \Description{Bar chart of the rolling one-year Sharpe difference between equal
+  and current weighting across 53 windows, mostly positive with a short run of
+  negative bars near windows 41 to 45.}
+  \label{fig:robustness}
 \end{figure}
 
 \section{Discussion}
@@ -445,8 +473,10 @@ integer-lot constraints, and taxes, and it applies where brokers charge such a
 fee (common for international or non-US-equity access) rather than under
 zero-commission US-equity trading. The guardrail generalizes to any fee with a
 fixed per-order component, but the specific \$250 floor is a function of the
-$(c,\tau)$ pair. Out-of-sample point-in-time evaluation, richer cost models, and
-multi-basket robustness remain future work. ArenaWealth Pro is not a registered
+$(c,\tau)$ pair. We probe the weighting result with rolling windows and a block
+bootstrap, but on a single basket; out-of-sample point-in-time evaluation, richer
+cost models, and \emph{cross-universe} robustness over independent baskets remain
+future work. ArenaWealth Pro is not a registered
 investment adviser, broker-dealer, or execution system; commercial use requires
 legal, compliance, data-licensing, and suitability review.
 
