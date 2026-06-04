@@ -103,6 +103,25 @@ def test_portfolio_recommendation_offline_demo(api_client: TestClient) -> None:
     assert body["ranked_positions"]
 
 
+def test_recommendation_is_replayable_from_same_inputs(api_client: TestClient) -> None:
+    """The decision is a pure function of (holdings, cash, policy, provider mode).
+
+    Replaying the same input tuple must regenerate an identical recommendation.
+    Only the wall-clock timestamp may differ; orders, exclusions, and the ranked
+    candidate list must be byte-identical. This is the auditability guarantee the
+    paper relies on.
+    """
+    url = "/api/v1/portfolio/user/recommendation?cash=1511.18&offline_demo=true"
+    first = api_client.get(url).json()
+    second = api_client.get(url).json()
+
+    replayable = {key: value for key, value in first.items() if key != "generated_at"}
+    replayed = {key: value for key, value in second.items() if key != "generated_at"}
+    assert replayable == replayed
+    assert first["orders"] == second["orders"]
+    assert first["ranked_positions"] == second["ranked_positions"]
+
+
 def test_portfolio_recommendation_rejects_uneconomic_cash(
     api_client: TestClient,
 ) -> None:

@@ -119,7 +119,11 @@ recommendation is a pure function of the tuple
 Referential transparency is what makes the rest of this paper possible. Every
 figure and table below is produced by a single offline driver
 (\texttt{scripts/run\_experiments.py}) and is regression-tested; no result
-depends on live data or hidden state.
+depends on live data or hidden state. The purity is enforced, not merely
+asserted: a replay test feeds the same input tuple twice and checks that the
+orders, exclusions, and ranked candidates are byte-identical. This is the
+auditability guarantee a compliance reviewer needs---any past recommendation can
+be regenerated and diffed from its logged inputs.
 
 The composite score is a linear functional of three bounded sub-scores,
 \begin{equation}
