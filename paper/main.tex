@@ -260,6 +260,47 @@ genuine tranche boundaries.
   \label{fig:guardrail}
 \end{figure}
 
+\paragraph{Sensitivity and generality.}
+The \$250 number is specific to our $(c,\tau)$; the \emph{formula} is not. Since
+$\mathrm{MIN}=c/\tau$, the floor is linear in the fixed cost and inverse in the
+tolerance, and it is \emph{independent of the tranche size} $T$: any positive
+order starts exactly one tranche, so the binding fee at the floor is one unit of
+$c$ regardless of $T$ (which only rescales the premium bands of
+Section~\ref{sec:fees}). Figure~\ref{fig:sensitivity} sweeps the floor over a
+plausible range of costs and three tolerances; Table~\ref{tab:schedules} reports
+the implied floor for several broker schedules at $\tau=1\%$. The guardrail thus
+transfers to any schedule with a fixed per-order component---common for
+international or non-US-equity access---and degenerates to ``always trade'' under
+zero-commission ($c=0$).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/sensitivity.png}
+  \caption{The guardrail generalizes. The economic order floor $\mathrm{MIN}=c/\tau$
+  is a smooth family of lines in the fixed cost $c$; our operating point
+  $(\$2.50,1\%)\!\to\!\$250$ is one point on it.}
+  \Description{Three straight lines of economic order floor versus fixed cost per
+  order, one per tolerance level, with the operating point at 2.50 dollars and
+  one percent marked at 250 dollars.}
+  \label{fig:sensitivity}
+\end{figure}
+
+\begin{table}[t]
+  \caption{Implied economic order floor at $\tau=1\%$ for several fixed-fee
+  schedules. The floor depends only on $c$, not on the tranche size.}
+  \label{tab:schedules}
+  \begin{tabular}{lrr}
+    \toprule
+    Schedule & Fixed cost $c$ & Floor at $1\%$ \\
+    \midrule
+    Tranche \$2.50 / \$1k (studied) & \$2.50 & \$250 \\
+    Flat \$1.00 & \$1.00 & \$100 \\
+    Flat \$5.00 & \$5.00 & \$500 \\
+    Flat \$9.99 & \$9.99 & \$999 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
 \section{What Actually Drives the Decision}
 \label{sec:weighting}
 

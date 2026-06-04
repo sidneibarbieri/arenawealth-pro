@@ -40,6 +40,11 @@ from arenawealth.experiments.fee_landscape import (
     guardrail_report,
     worst_case_premium,
 )
+from arenawealth.experiments.fee_sensitivity import (
+    guardrail_floor,
+    reference_schedules,
+    schedule_floors,
+)
 
 ROOT = Path(__file__).resolve().parent.parent
 SEED_CSV = ROOT / "tests" / "fixtures" / "seed_portfolio_avenue.csv"
@@ -142,6 +147,38 @@ def figure_guardrail(landscape, fixed_point: float, path: Path) -> None:
     plt.close(fig)
 
 
+def figure_sensitivity(path: Path) -> None:
+    """The guardrail floor as a family of curves: MIN = c / tau over cost."""
+    costs = [round(0.5 * step, 2) for step in range(1, 25)]  # $0.50 .. $12.00
+    tolerance_lines = [
+        (0.005, BLUE, "tau = 0.5%"),
+        (0.01, GOLD, "tau = 1%"),
+        (0.02, SUCCESS, "tau = 2%"),
+    ]
+    fig, ax = plt.subplots(figsize=(7, 3.6), dpi=150)
+    fig.patch.set_facecolor("white")
+    for tolerance, color, label in tolerance_lines:
+        floors = [guardrail_floor(cost, tolerance) for cost in costs]
+        ax.plot(costs, floors, color=color, linewidth=2, label=label)
+    ax.scatter([2.50], [guardrail_floor(2.50, 0.01)], color=CARBON, zorder=5)
+    ax.annotate(
+        "operating point\n(c=2.50, tau=1%) = 250 USD",
+        xy=(2.50, 250),
+        xytext=(4.2, 320),
+        fontsize=9,
+        color=CARBON,
+        arrowprops={"arrowstyle": "->", "color": CARBON},
+    )
+    ax.set_xlabel("Fixed cost per order c (USD)")
+    ax.set_ylabel("Economic order floor MIN (USD)")
+    ax.set_title("The guardrail generalizes: MIN = c / tau", color=CARBON, fontweight="bold")
+    ax.legend(frameon=False)
+    _style_axes(ax)
+    fig.tight_layout()
+    fig.savefig(path, facecolor="white")
+    plt.close(fig)
+
+
 def figure_ablation(ablation_rows, path: Path) -> None:
     labels = [row.label.replace("_", "\n") for row in ablation_rows]
     spearman = [row.spearman_vs_baseline for row in ablation_rows]
@@ -231,12 +268,16 @@ def main() -> None:
     sensitivity_rows = weight_sensitivity(analyses)
     baseline_order = rank_under_weights(analyses, standard_weight_sets()["baseline_40_35_25"])
 
+    # Experiment D: guardrail sensitivity to the fee parameters
+    fee_schedule_floors = schedule_floors(reference_schedules())
+
     # Experiment E: reuse the most recent real backtest export
     backtest = latest_backtest_export()
 
     # Figures
     figure_fee_premium(landscape, FIG_DIR / "fee_premium.png")
     figure_guardrail(landscape, guardrail.one_percent_fixed_point, FIG_DIR / "guardrail.png")
+    figure_sensitivity(FIG_DIR / "sensitivity.png")
     figure_ablation(ablation_rows, FIG_DIR / "ablation.png")
     if backtest is not None:
         figure_backtest(backtest, FIG_DIR / "backtest.png")
@@ -253,6 +294,10 @@ def main() -> None:
             ],
             "max_engine_premium": max(point.engine_premium for point in landscape),
             "max_naive_premium": max(point.proportional_premium for point in landscape),
+        },
+        "fee_sensitivity": {
+            "schedule_floors": [asdict(row) for row in fee_schedule_floors],
+            "floor_is_tranche_invariant": True,
         },
         "ablation": {
             "baseline_order": baseline_order,
