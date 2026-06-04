@@ -30,6 +30,9 @@ experiments:
 ai-advisor-audit:
 	$(PYTHON) scripts/run_ai_advisor_audit.py --reference
 
+collect-advisor-runs:
+	$(PYTHON) scripts/collect_advisor_runs.py --model gpt-4o --runs 3
+
 configure-env:
 	bash scripts/configure_env.sh
 
