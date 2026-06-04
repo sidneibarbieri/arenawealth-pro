@@ -61,6 +61,35 @@ Evidence:
 - `src/arenawealth/experiments/ablation.py`
 - `paper/figures/ablation.png`
 
+### F5. The fixed-cost guardrail is the small-cash analogue of the no-trade region
+
+Classical transaction-cost theory shows proportional costs induce a no-trade
+region: a band around the target where rebalancing is not worth the cost
+(Constantinides 1986; Davis-Norman 1990). Our $250 fixed-cost floor is the same
+idea under a quantized fee: below the floor the optimal action is to hold cash.
+This connection situates a simple guardrail inside established theory and was the
+serendipitous payoff of answering a reviewer's "missing related work" critique.
+
+Evidence:
+
+- `paper/main.tex` (Related Work, thread 2)
+- `paper/references.bib` (`constantinides1986capital`, `davis1990portfolio`)
+
+### F6. A competent reviewer misread the ceiling fee as a floor
+
+The fee is correctly defined with a ceiling (per started tranche) in both code
+(`math.ceil`) and paper (`\lceil`), and the subadditivity proof is valid. Yet a
+reviewer read it as a floor and recommended rejection. Finding: being correct is
+not enough; notation that can be misread will be. We added an explicit "ceiling,
+not floor" statement, a worked example, and a proof that contrasts the
+superadditive floor. Takeaway for the artifact: presentation robustness is a
+first-class requirement, not a polish step.
+
+Evidence:
+
+- `paper/main.tex` (Section "The Fee Structure as an Object of Study")
+- `src/arenawealth/analytics/deployment.py` (`order_fee`, `math.ceil`)
+
 ## State-of-the-Art Reference Points
 
 The project should be compared against these families, not against vague
