@@ -199,8 +199,8 @@ score it on:
 \paragraph{The axes are independent.}
 To show that no single axis substitutes for the others, we run the protocol on
 seven deterministic \emph{archetype} controls across frozen scenarios---failure
-modes by construction, not model outputs (Table~\ref{tab:audit},
-Figure~\ref{fig:audit}). Two are decisive. A \emph{naive diversifier} that
+modes by construction, not model outputs
+(Figure~\ref{fig:audit}). Two are decisive. A \emph{naive diversifier} that
 agrees perfectly with the baseline ($\mathrm{agree}=1.0$) and never wavers
 ($\mathrm{stab}=1.0$) is nonetheless \emph{invalid} ($\mathrm{valid}=0.0$): it
 splits sub-tranche cash and pays an avoidable fee. Conversely a
@@ -209,26 +209,6 @@ nothing with the baseline ($\mathrm{agree}=0.0$). An evaluation reporting only
 agreement would rank the first as ideal and the second as worst---exactly
 inverting their operational validity. Validity, stability, and agreement are
 therefore independent axes; an advisor benchmark must report all three.
-
-\begin{table}[t]
-  \caption{Audit of seven archetype controls (means over frozen scenarios).
-  Agreement does not imply validity or stability, nor the converse. Controls are
-  failure modes by construction, not model results.}
-  \label{tab:audit}
-  \begin{tabular}{lrrr}
-    \toprule
-    Advisor archetype & Valid & Agree & Stable \\
-    \midrule
-    Deterministic policy (baseline) & $1.00$ & $1.00$ & $1.00$ \\
-    Naive diversifier & $\mathbf{0.00}$ & $1.00$ & $1.00$ \\
-    Valid but low agreement & $1.00$ & $\mathbf{0.00}$ & $1.00$ \\
-    Drifting advisor & $1.00$ & $0.40$ & $\mathbf{0.07}$ \\
-    Underdeploying advisor & $0.00$ & $0.50$ & $0.50$ \\
-    Popularity chaser & $0.00$ & $0.13$ & $0.40$ \\
-    Constraint breaker & $0.00$ & $0.00$ & $0.00$ \\
-    \bottomrule
-  \end{tabular}
-\end{table}
 
 \begin{figure}[t]
   \centering
@@ -467,8 +447,7 @@ tolerance, and it is \emph{independent of the tranche size} $T$: any positive
 order starts exactly one tranche, so the binding fee at the floor is one unit of
 $c$ regardless of $T$ (which only rescales the premium bands of
 Section~\ref{sec:fees}). Figure~\ref{fig:sensitivity} sweeps the floor over a
-plausible range of costs and three tolerances; Table~\ref{tab:schedules} reports
-the implied floor for several broker schedules at $\tau=1\%$. The guardrail thus
+plausible range of costs and three tolerances. The guardrail thus
 transfers to any schedule with a fixed per-order component---common for
 international or non-US-equity access---and degenerates to ``always trade'' under
 zero-commission ($c=0$).
@@ -485,21 +464,12 @@ zero-commission ($c=0$).
   \label{fig:sensitivity}
 \end{figure}
 
-\begin{table}[t]
-  \caption{Implied economic order floor at $\tau=1\%$ for several fixed-fee
-  schedules. The floor depends only on $c$, not on the tranche size.}
-  \label{tab:schedules}
-  \begin{tabular}{lrr}
-    \toprule
-    Schedule & Fixed cost $c$ & Floor at $1\%$ \\
-    \midrule
-    Tranche \$2.50 / \$1k (studied) & \$2.50 & \$250 \\
-    Flat \$1.00 & \$1.00 & \$100 \\
-    Flat \$5.00 & \$5.00 & \$500 \\
-    Flat \$9.99 & \$9.99 & \$999 \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+\paragraph{Fee floor under other schedules.}
+Proposition~\ref{prop:floor} characterizes the floor for any schedule with additive fixed cost $c$.
+At $\tau=1\%$, a flat \$1 fee yields floor \$100; a flat \$5 yields \$500; a flat \$9.99 yields \$999.
+The floor scales linearly with $c$, independent of tranche size. All results port to alternative
+schedules at their respective fixed costs; the studied \$2.50 tranche (floor \$250) is typical
+for brokered accounts.
 
 \section{What Actually Drives the Decision}
 \label{sec:weighting}
@@ -511,30 +481,12 @@ recomposed from per-position sub-scores without re-fetching data.
 \paragraph{Ablation (mechanism).}
 On a fixed, deterministic basket we recomposed the ranking under single-factor
 and equal weights and measured Spearman correlation to the baseline ordering and
-the churn in the funded top-2 (Table~\ref{tab:ablation},
-Figure~\ref{fig:ablation}). Single factors reorder the basket sharply---moat-only
+the churn in the funded top-2 (Figure~\ref{fig:ablation}). Single factors reorder the basket sharply---moat-only
 and valuation-only are \emph{anti-correlated} with the baseline---while equal
 thirds reproduce the baseline almost exactly ($\rho=0.97$, zero churn). The
 funded picks are stable under $\pm10\%$ weight perturbation. (This basket uses
 deterministic synthetic fundamentals; it demonstrates the \emph{mechanism}, not a
 claim about specific securities.)
-
-\begin{table}[t]
-  \caption{Weight ablation versus the baseline ordering. $\rho$ is Spearman rank
-  correlation; churn is the number of top-2 picks that change.}
-  \label{tab:ablation}
-  \begin{tabular}{lrr}
-    \toprule
-    Weighting & $\rho$ vs.\ baseline & Top-2 churn \\
-    \midrule
-    Baseline $(0.40,0.35,0.25)$ & $1.00$ & $0$ \\
-    Moat only & $-0.49$ & $2$ \\
-    Compounding only & $0.90$ & $1$ \\
-    Valuation only & $-0.50$ & $2$ \\
-    Equal thirds & $0.97$ & $0$ \\
-    \bottomrule
-  \end{tabular}
-\end{table}
 
 \begin{figure}[t]
   \centering
@@ -689,6 +641,30 @@ cost models, and \emph{cross-universe} robustness over independent baskets remai
 future work. The system is not a registered
 investment adviser, broker-dealer, or execution system; commercial use requires
 legal, compliance, data-licensing, and suitability review.
+
+\section{The Audit Protocol's Decision Space}
+\label{sec:decision-space}
+
+The independence of the three axes (valid, agree, stab) creates an operational
+decision space where an AI advisor's output can be characterized precisely. Each
+axis is measured over frozen scenarios with deterministic controls, producing a
+point $(v,a,s)\in[0,1]^3$.
+
+The discovery that independence holds has two implications. First, practitioners
+and regulators can no longer rely on a single metric (e.g., agreement via overlap@k,
+which several LLM-advice papers report). Second, the protocol can be calibrated
+around a safety threshold---e.g., $v > \tau_v$ (regulatory guardrail), $s >
+\tau_s$ (operational stability floor)---which a real advisor either crosses or does
+not. This turns evaluation from a ranking into a compliance gate.
+
+The existing baseline (deterministic policy) occupies $(1,1,1)$, the corner of
+validity, perfect agreement, and stability. The archetype controls form a
+polytope around it: naive diversifier at $(0,1,1)$, valid-but-disagreeing at
+$(1,0,1)$, and drifting advisor at $(1,0.4,0.07)$. Real advisors will land
+inside or outside this convex hull. A venue focused on LLM robustness should
+measure all three; a compliance regime should set thresholds and audit membership.
+The auditor is thus simultaneously a research tool (showing what can fail in each
+dimension) and a deployment gate (showing what threshold an advisor must clear).
 
 \section{Conclusion}
 
