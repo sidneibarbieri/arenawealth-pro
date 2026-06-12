@@ -1,7 +1,7 @@
 # Paper
 
-A neutral anonymous manuscript for ArenaWealth Pro. It names no venue, author,
-or institution.
+A neutral anonymous manuscript for ArenaWealth Pro. It names no submission
+target, author, or institution.
 
 ## Reproducing the results
 

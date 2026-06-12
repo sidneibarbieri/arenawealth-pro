@@ -2,7 +2,7 @@
 # Build an anonymized, self-contained reviewer artifact from tracked files.
 #
 # Exports the git-tracked snapshot (no history, respects .gitignore), drops the
-# venue-specific and build-tooling material, anonymizes the author identity read
+# submission-specific and build-tooling material, anonymizes the author identity read
 # from pyproject (no hardcoded name), and zips the result under dist/.
 set -euo pipefail
 

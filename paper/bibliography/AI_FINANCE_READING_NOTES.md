@@ -1,8 +1,8 @@
-# AI-in-Finance Conference SOTA Notes
+# AI-in-Finance Reading Notes
 
 This note tracks recent and award-level AI-in-finance papers as research input.
-It is not a submission target file and it is not part of the runtime artifact.
-The runtime artifact remains venue-neutral.
+It is not a submission-target file and it is not part of the runtime artifact.
+The runtime artifact remains target-neutral.
 
 ## What the strongest papers tend to do
 

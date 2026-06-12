@@ -1,0 +1,142 @@
+{
+  "description": "Local PDF index. PDFs are not part of the public artifact; this file records what was available in the local research library.",
+  "entries": [
+    {
+      "bib_key": "hean2024personalfinance",
+      "bytes": 996021,
+      "filename": "hean2024personal_finance.pdf",
+      "pdf_url": "https://arxiv.org/pdf/2412.19784",
+      "sha256": "da278879565c29ffe10a00c3a74ea01c8c679129641865c2d4f4cc0447c2ffa6",
+      "source_url": "https://arxiv.org/abs/2412.19784"
+    },
+    {
+      "bib_key": "lee2024stockrec",
+      "bytes": 1108914,
+      "filename": "lee2024stock_recommendations.pdf",
+      "pdf_url": "https://arxiv.org/pdf/2409.00048",
+      "sha256": "6745039d870e101b7c9ff6f1680332689b3e90b2b53ffe87acb107328e52e9c6",
+      "source_url": "https://arxiv.org/abs/2409.00048"
+    },
+    {
+      "bib_key": "chawla2025riskadvice",
+      "bytes": 704392,
+      "filename": "chawla2025riskadvice.pdf",
+      "pdf_url": "https://arxiv.org/pdf/2505.18953",
+      "sha256": "59ceef537f367491cb7338111c2792f5b3cf56fa4b5b8957be7ae59c9cf2eb7c",
+      "source_url": "https://arxiv.org/abs/2505.18953"
+    },
+    {
+      "bib_key": "lee2025bias",
+      "bytes": 2062352,
+      "filename": "lee2025your_ai_not_your_view.pdf",
+      "pdf_url": "https://arxiv.org/pdf/2507.20957",
+      "sha256": "55b3359d1a934f9283b960dcc8c37859b6230a9ed0a58e5b293f23c4163ff458",
+      "source_url": "https://arxiv.org/abs/2507.20957"
+    },
+    {
+      "bib_key": "oh2025alpha",
+      "bytes": 6400855,
+      "filename": "oh2025democratizing_alpha.pdf",
+      "pdf_url": "https://arxiv.org/pdf/2505.07078",
+      "sha256": "53bdb5d23fea7269260f6c4318fc0020053aa94143cd74adea592c555a66821f",
+      "source_url": "https://arxiv.org/abs/2505.07078"
+    },
+    {
+      "bib_key": "spadea2025flarko",
+      "bytes": 665088,
+      "filename": "spadea2025flarko.pdf",
+      "pdf_url": "https://arxiv.org/pdf/2510.15993",
+      "sha256": "d0d63676e326517017a0c8a5d1ce002f96357b000004ba1e79d49b19063cafaf",
+      "source_url": "https://arxiv.org/abs/2510.15993"
+    },
+    {
+      "bib_key": "zhi2025productbias",
+      "bytes": 555016,
+      "filename": "zhi2025product_bias.pdf",
+      "pdf_url": "https://arxiv.org/pdf/2503.08750",
+      "sha256": "bae8a1a1c9ccf39b09be319b3c314e60af67dbcd33ee99e200c95f2c86dce564",
+      "source_url": "https://arxiv.org/abs/2503.08750"
+    },
+    {
+      "bib_key": "bailey2014pseudo",
+      "bytes": 3011500,
+      "filename": "bailey2014pseudo.pdf",
+      "pdf_url": "https://www.ams.org/journals/notices/201405/rnoti-p458.pdf",
+      "sha256": "5a1bca86ab7c690681c4cd38c5f0c58459ecc014e2c04dc54fbeca861611ee3c",
+      "source_url": "https://www.ams.org/journals/notices/201405/"
+    },
+    {
+      "bib_key": "yang2023fingpt",
+      "bytes": 575777,
+      "filename": "yang2023fingpt.pdf",
+      "pdf_url": "https://arxiv.org/pdf/2306.06031",
+      "sha256": "0991f4ce0ec84084d0c73bbabb099c2cfc14958a4c580c00de68ea63db7bb2f0",
+      "source_url": "https://arxiv.org/abs/2306.06031"
+    },
+    {
+      "bib_key": "liu2024financialai",
+      "bytes": 508659,
+      "filename": "liu2024financialai.pdf",
+      "pdf_url": "https://arxiv.org/pdf/2411.12747",
+      "sha256": "5de5b9e776e9af2b77025eee063cb5542dfba1ba6a5aeb6ef9b116787dea34a6",
+      "source_url": "https://arxiv.org/abs/2411.12747"
+    },
+    {
+      "bib_key": "yang2024finrobot",
+      "bytes": 5414564,
+      "filename": "yang2024finrobot.pdf",
+      "pdf_url": "https://arxiv.org/pdf/2405.14767",
+      "sha256": "f8abdfce54787799822c70778960acda3ccb9f3f7c6e077116bf40ccddd3dcea",
+      "source_url": "https://arxiv.org/abs/2405.14767"
+    },
+    {
+      "bib_key": "chen2025stockbench",
+      "bytes": 1926697,
+      "filename": "chen2025stockbench.pdf",
+      "pdf_url": "https://arxiv.org/pdf/2510.02209",
+      "sha256": "84a68755c94df2e86a8ab32ac348f2b033aa5df7a4e895e26f9d469f2af2c51b",
+      "source_url": "https://arxiv.org/abs/2510.02209"
+    },
+    {
+      "bib_key": "elalami2025mlfinance",
+      "bytes": 1144658,
+      "filename": "elalami2025mlfinance.pdf",
+      "pdf_url": "https://arxiv.org/pdf/2511.21588",
+      "sha256": "1b3107ffa8b750228264a442a113ddffd77c69fd1cc5600bcdc9f2340df0fd4f",
+      "source_url": "https://arxiv.org/abs/2511.21588"
+    },
+    {
+      "bib_key": "gu2024spoofability",
+      "bytes": 1370522,
+      "filename": "gu2024spoofability.pdf",
+      "pdf_url": "https://arxiv.org/pdf/2409.01766",
+      "sha256": "abaf3a1d4d9d517fbaed745e0b2f3d22c3e86649c9c03ee327aeb39ffea83255",
+      "source_url": "https://arxiv.org/abs/2409.01766"
+    },
+    {
+      "bib_key": "lobo2007portfolio",
+      "bytes": 596097,
+      "filename": "lobo2007portfolio.pdf",
+      "pdf_url": "https://web.stanford.edu/~boyd/papers/pdf/portfolio.pdf",
+      "sha256": "904910555f0c04e57627903f5e9629895a120de9459ff6ceb69e4cfcff51b9fe",
+      "source_url": "https://web.stanford.edu/~boyd/papers/portfolio.html"
+    },
+    {
+      "bib_key": "zhang2019dynamic",
+      "bytes": 892034,
+      "filename": "zhang2019dynamic.pdf",
+      "pdf_url": "https://arxiv.org/pdf/1909.06126",
+      "sha256": "99d992d60267a5d01f001e7fcfcb7f88bdae78e1b92535bc1bb3b06026e8ea3d",
+      "source_url": "https://arxiv.org/abs/1909.06126"
+    },
+    {
+      "bib_key": "delarosa2023planning",
+      "bytes": 391662,
+      "filename": "delarosa2023planning.pdf",
+      "pdf_url": "https://arxiv.org/pdf/2311.16204",
+      "sha256": "f576de30a2bdeffa241de5512c0489dd19c96a91d1c253533f4a87e66ff4c47f",
+      "source_url": "https://arxiv.org/abs/2311.16204"
+    }
+  ],
+  "pdf_count": 17
+}

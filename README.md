@@ -133,6 +133,18 @@ This regenerates the fee, guardrail, ablation, and backtest figures under
 experiments use the production engine and are the source for the manuscript's
 findings. The current research ledger is `docs/SCIENTIFIC_LEDGER.md`.
 
+## Bibliography Library
+
+```bash
+make bibliography
+```
+
+This refreshes `paper/bibliography/CATALOG.md`,
+`paper/bibliography/PDF_INDEX.json`, and `paper/bibliography/_order.txt` from
+`paper/bibliography/sources.json`. The command downloads only open PDFs and
+leaves paywalled or interactive sources in `_order.txt` for manual, licensed
+download. PDFs are ignored by Git and are not required to reproduce the artifact.
+
 ## API
 
 ```bash
@@ -176,8 +188,8 @@ The Playwright config starts the API and frontend when needed.
 
 ## Paper Scaffold
 
-The LaTeX paper scaffold is under `paper/`. It is anonymous and names no venue,
-author, or institution. Venue-specific submission packets live under
+The LaTeX paper scaffold is under `paper/`. It is anonymous and names no
+submission target, author, or institution. Submission packets live under
 `submissions/` and are not required to run the artifact.
 
 ## Scope Notes

@@ -24,8 +24,8 @@ AI_RESEARCH_ALLOWLIST = {
     Path("docs/AI_FINANCE_SOTA.md"),
     Path("docs/SCIENTIFIC_LEDGER.md"),
     Path("paper/bibliography/CATALOG.md"),
-    Path("paper/bibliography/CONFERENCE_SOTA.md"),
-    Path("paper/bibliography/order.txt"),
+    Path("paper/bibliography/AI_FINANCE_READING_NOTES.md"),
+    Path("paper/bibliography/_order.txt"),
     Path("paper/references.bib"),
 }
 

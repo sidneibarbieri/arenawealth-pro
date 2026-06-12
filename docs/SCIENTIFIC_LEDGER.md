@@ -140,7 +140,7 @@ ArenaWealth should be the deterministic audit harness for AI investment advice.
 
 Evidence:
 
-- `paper/bibliography/CONFERENCE_SOTA.md`
+- `paper/bibliography/AI_FINANCE_READING_NOTES.md`
 - downloaded PDFs in `paper/bibliography/pdfs/` (git-ignored)
 - `src/arenawealth/experiments/ai_advisor.py`
 
@@ -223,7 +223,7 @@ Reference anchors:
 - Morningstar Wide Moat Focus methodology, as a public moat-plus-valuation
   reference point.
 - Financial AI and robo-advisory work tracked in `docs/AI_FINANCE_SOTA.md`.
-- Conference SOTA reading notes tracked in `paper/bibliography/CONFERENCE_SOTA.md`.
+- AI-in-finance reading notes tracked in `paper/bibliography/AI_FINANCE_READING_NOTES.md`.
 
 Current honest position:
 

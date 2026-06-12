@@ -56,7 +56,7 @@ whether AI advice is stable, faithful to constraints, and better than a
 transparent moat/quality/compounding baseline.
 
 The latest conference reading notes are tracked in
-`paper/bibliography/CONFERENCE_SOTA.md`.
+`paper/bibliography/AI_FINANCE_READING_NOTES.md`.
 
 ### 3. Quality, moat, and compounding
 

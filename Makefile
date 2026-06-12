@@ -2,7 +2,7 @@ PYTHON ?= .venv/bin/python
 PIP ?= .venv/bin/pip
 UVICORN ?= .venv/bin/uvicorn
 
-.PHONY: setup verify verify-e2e metrics recommendation price-backtest experiments ai-advisor-audit collect-advisor-runs verify-data repro-docker configure-env api ui app run paper all package clean
+.PHONY: setup verify verify-e2e metrics recommendation price-backtest experiments ai-advisor-audit bibliography collect-advisor-runs verify-data repro-docker configure-env api ui app run paper all package clean
 
 setup:
 	python3.11 -m venv .venv
@@ -29,6 +29,9 @@ experiments:
 
 ai-advisor-audit:
 	$(PYTHON) scripts/run_ai_advisor_audit.py --reference
+
+bibliography:
+	$(PYTHON) scripts/manage_bibliography.py
 
 collect-advisor-runs:
 	$(PYTHON) scripts/collect_advisor_runs.py --model gpt-4o --runs 3

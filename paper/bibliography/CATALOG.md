@@ -1,105 +1,80 @@
 # Bibliography Catalog
 
-Indexed catalog of works cited in the manuscript or tracked as active
-state-of-the-art candidates. The BibTeX source of truth is
-`paper/references.bib`. PDFs of open-access works live in `pdfs/` (git-ignored);
-paywalled works are listed in `order.txt` for manual download.
+This catalog is generated from `paper/bibliography/sources.json`.
+`paper/references.bib` remains the BibTeX source used by the manuscript.
+PDFs are local research material under `paper/bibliography/pdfs/` and are
+ignored by Git; `_order.txt` lists missing or manually downloadable papers.
 
 ## Status legend
 
-- `have` — open-access PDF downloaded into `pdfs/`.
-- `order` — listed in `order.txt`; PDF not auto-fetchable.
+- `have` — local PDF exists.
+- `open-missing` — marked open, but the PDF is not present locally.
+- `manual` — requires manual, licensed, or author-copy download.
 
-## Thread 1 — What to own: quality and profitability
+## AI and Robo Advice
 
-| BibKey | Work | Year | Venue | Status |
-| --- | --- | --- | --- | --- |
-| `novyMarx2013` | The Other Side of Value: The Gross Profitability Premium | 2013 | J. Financial Economics | order |
-| `asness2019qmj` | Quality Minus Junk | 2019 | Review of Accounting Studies | order |
-| `kanuri2016moat` | Sustainable Competitive Advantage and Stock Performance | 2016 | Applied Economics | order |
-| `otero2025quality` | How to Improve Quality Investing | 2025 | BRQ Business Research Quarterly | order |
-| `lee2024stockrec` | Stock Recommendations for Individual Investors | 2024 | AI-in-Finance proceedings | have |
+| BibKey | Work | Year | Publication | Role | Status |
+| --- | --- | --- | --- | --- | --- |
+| `dacunto2019robo` | The Promises and Pitfalls of Robo-Advising | 2019 | Review of Financial Studies | robo-advice evidence | manual |
+| `hean2024personalfinance` | Can AI Help with Your Personal Finances? | 2024 | arXiv | personal-finance advice comparator | have |
+| `ko2024chatgpt` | Can ChatGPT Improve Investment Decisions? From a Portfolio Management Perspective | 2024 | Finance Research Letters | LLM portfolio-management comparator | manual |
+| `lee2024stockrec` | Stock Recommendations for Individual Investors | 2024 | AI-in-Finance proceedings | individual-stock recommendation comparator | have |
+| `oehler2024chatgpt` | Does ChatGPT Provide Better Advice than Robo-Advisors? | 2024 | Finance Research Letters | robo-advice LLM comparator | manual |
+| `chawla2025riskadvice` | Evaluating AI for Finance: Is AI Credible at Assessing Investment Risk? | 2025 | arXiv | risk-profile audit comparator | have |
+| `lee2025bias` | Your AI, Not Your View: The Bias of LLMs in Investment Analysis | 2025 | AI-in-Finance proceedings | LLM investment-bias comparator | have |
+| `oh2025alpha` | Democratizing Alpha: LLM-Driven Portfolio Construction for Retail Investors Using Public Financial Media | 2025 | AI-in-Finance proceedings | LLM portfolio-construction comparator | have |
+| `spadea2025flarko` | Aligning Language Models with Investor and Market Behavior for Financial Recommendations | 2025 | AI-in-Finance proceedings | LLM financial recommendation comparator | have |
+| `zhi2025productbias` | Exposing Product Bias in LLM Investment Recommendation | 2025 | arXiv | LLM product-bias comparator | have |
 
-Relevance: establish the selection signals our scoring reuses. We propose no new
-factor; the contribution is the orthogonal cash-deployment layer.
+## Baselines and Overfitting
 
-Research gap: economic moat and quality investing are studied as selection
-signals, but the artifact still lacks a point-in-time benchmark that tests
-whether a transparent moat/compounding policy beats simple quality, equal-weight,
-and AI-advisor baselines.
+| BibKey | Work | Year | Publication | Role | Status |
+| --- | --- | --- | --- | --- | --- |
+| `demiguel2009naive` | Optimal Versus Naive Diversification: How Inefficient Is the 1/N Portfolio Strategy? | 2009 | Review of Financial Studies | naive diversification baseline | manual |
+| `bailey2014pseudo` | Pseudo-Mathematics and Financial Charlatanism: The Effects of Backtest Overfitting on Out-of-Sample Performance | 2014 | Notices of the AMS | backtest-overfitting warning | have |
 
-## Thread 2 — How to trade it: transaction-cost theory and planning
+## Financial AI Systems
 
-| BibKey | Work | Year | Venue | Status |
-| --- | --- | --- | --- | --- |
-| `constantinides1986capital` | Capital Market Equilibrium with Transaction Costs | 1986 | J. Political Economy | order |
-| `davis1990portfolio` | Portfolio Selection with Transaction Costs | 1990 | Mathematics of Operations Research | order |
-| `lobo2007portfolio` | Portfolio Optimization with Linear and Fixed Transaction Costs | 2007 | Annals of Operations Research | have |
-| `zhang2019dynamic` | Dynamic Portfolio Optimization with Liquidity Cost and Market Impact | 2019 | Quantitative Finance | have |
-| `delarosa2023planning` | Planning for the Efficient Updating of Mutual Fund Portfolios | 2023 | arXiv:2311.16204 | have |
+| BibKey | Work | Year | Publication | Role | Status |
+| --- | --- | --- | --- | --- | --- |
+| `yang2023fingpt` | FinGPT: Open-Source Financial Large Language Models | 2023 | arXiv | financial LLM system precedent | have |
+| `liu2024financialai` | A Survey of Financial AI: Architectures, Advances and Open Challenges | 2024 | arXiv | financial AI taxonomy | have |
+| `yang2024finrobot` | FinRobot: An Open-Source AI Agent Platform for Financial Applications using Large Language Models | 2024 | arXiv | financial agent-system comparator | have |
+| `chen2025stockbench` | StockBench: Can LLM Agents Trade Stocks Profitably in Real-world Markets? | 2025 | arXiv | LLM trading-agent benchmark comparator | have |
+| `elalami2025mlfinance` | Machine Learning and Deep Learning in Computational Finance: A Systematic Review | 2025 | arXiv | computational-finance survey | have |
+| `saha2025agents` | Large Language Model Agents for Investment Management | 2025 | SSRN | investment-management agent survey | manual |
 
-Relevance: the closest prior art. No-trade regions (Constantinides; Davis-Norman)
-are the proportional-cost analogue of our fixed-cost guardrail; Lobo-Fazel-Boyd
-formalize fixed+linear costs; Zhang et al. add liquidity/impact; de la Rosa casts
-rebalancing under fixed fees as planning. We differ by studying a quantized fee,
-incremental deployment, and closed-form auditable guardrails.
+## Market Simulation and Audit
 
-## Thread 3 — Against the grain: deterministic vs learned advice
+| BibKey | Work | Year | Publication | Role | Status |
+| --- | --- | --- | --- | --- | --- |
+| `gu2024spoofability` | The Effect of Liquidity on the Spoofability of Financial Markets | 2024 | AI-in-Finance proceedings | award-level style reference | have |
 
-| BibKey | Work | Year | Venue | Status |
-| --- | --- | --- | --- | --- |
-| `liu2024financialai` | A Survey of Financial AI | 2024 | arXiv:2411.12747 | have |
-| `elalami2025mlfinance` | Machine Learning and Deep Learning in Computational Finance | 2025 | arXiv:2511.21588 | have |
-| `yang2023fingpt` | FinGPT | 2023 | arXiv:2306.06031 | order |
-| `yang2024finrobot` | FinRobot | 2024 | arXiv:2405.14767 | have |
-| `chawla2025riskadvice` | Evaluating AI for Finance | 2025 | arXiv:2505.18953 | have |
-| `gu2024spoofability` | The Effect of Liquidity on the Spoofability of Financial Markets | 2024 | AI-in-Finance proceedings | have |
-| `saha2025agents` | Large Language Model Agents for Investment Management | 2025 | SSRN | order |
+## Quality and Profitability
 
-Relevance: documents the ML-in-finance mainstream and its open problems
-(interpretability, generalizability, data quality). We position our deterministic
-engine as the transparent reference a learned recommender must beat.
+| BibKey | Work | Year | Publication | Role | Status |
+| --- | --- | --- | --- | --- | --- |
+| `novyMarx2013` | The Other Side of Value: The Gross Profitability Premium | 2013 | Journal of Financial Economics | quality factor baseline | manual |
+| `kanuri2016moat` | Sustainable Competitive Advantage and Stock Performance: The Case for Wide Moat Stocks | 2016 | Applied Economics | moat-investing comparator | manual |
+| `asness2019qmj` | Quality Minus Junk | 2019 | Review of Accounting Studies | quality factor baseline | manual |
+| `gu2020machine` | Empirical Asset Pricing via Machine Learning | 2020 | Review of Financial Studies | machine-learning asset-pricing baseline | manual |
+| `otero2025quality` | How to Improve Quality Investing | 2025 | BRQ Business Research Quarterly | quality-investing comparator | manual |
 
-Research gap: current financial-AI systems emphasize agents, workflows,
-forecasting, and risk profiling. The missing benchmark is an auditable,
-deterministic buy-and-hold recommendation baseline with replayable inputs,
-explicit constraints, and free data.
+## Transaction Costs
 
-## Thread 4 — AI and robo-advisory recommendations
+| BibKey | Work | Year | Publication | Role | Status |
+| --- | --- | --- | --- | --- | --- |
+| `constantinides1986capital` | Capital Market Equilibrium with Transaction Costs | 1986 | Journal of Political Economy | transaction-cost theory | manual |
+| `davis1990portfolio` | Portfolio Selection with Transaction Costs | 1990 | Mathematics of Operations Research | transaction-cost theory | manual |
+| `liu2004transaction` | Optimal Consumption and Investment with Transaction Costs and Multiple Risky Assets | 2004 | Journal of Finance | multi-asset transaction-cost theory | manual |
+| `lobo2007portfolio` | Portfolio Optimization with Linear and Fixed Transaction Costs | 2007 | Annals of Operations Research | fixed-cost optimization precedent | have |
+| `garleanu2013dynamic` | Dynamic Trading with Predictable Returns and Transaction Costs | 2013 | Journal of Finance | dynamic trading with costs | manual |
+| `zhang2019dynamic` | Dynamic Portfolio Optimization with Liquidity Cost and Market Impact | 2019 | Quantitative Finance | liquidity and market-impact precedent | have |
+| `delarosa2023planning` | Planning for the Efficient Updating of Mutual Fund Portfolios | 2023 | arXiv | portfolio-update planning precedent | have |
 
-| BibKey | Work | Year | Venue | Status |
-| --- | --- | --- | --- | --- |
-| `oehler2024chatgpt` | Does ChatGPT Provide Better Advice than Robo-Advisors? | 2024 | Finance Research Letters | order |
-| `ko2024chatgpt` | Can ChatGPT Improve Investment Decisions? | 2024 | Finance Research Letters | order |
-| `spadea2025flarko` | Aligning Language Models with Investor and Market Behavior | 2025 | AI-in-Finance proceedings | have |
-| `lee2025bias` | Your AI, Not Your View | 2025 | AI-in-Finance proceedings | have |
-| `oh2025alpha` | Democratizing Alpha | 2025 | Generative AI in Finance workshop | have |
+## Reproducibility note
 
-Relevance: closest application-level comparators. They evaluate LLMs as
-investment-advice or portfolio-selection aids. Our opportunity is not to replace
-the deterministic policy with an LLM, but to measure whether LLM-generated
-recommendations can beat, explain, or faithfully augment a deterministic,
-replayable baseline.
-
-See also `CONFERENCE_SOTA.md` for the detailed reading notes and the current
-candidate experiment.
-
-## Thread 5 — Whether to believe it: reproducibility over overfitting
-
-| BibKey | Work | Year | Venue | Status |
-| --- | --- | --- | --- | --- |
-| `bailey2014pseudo` | Pseudo-Mathematics and Financial Charlatanism | 2014 | Notices of the AMS | order |
-| `demiguel2009naive` | Optimal Versus Naive Diversification (1/N) | 2009 | Review of Financial Studies | order |
-
-Relevance: motivate the tune-nothing, report-the-negative-result stance. Backtest
-overfitting is easy to produce; 1/N is hard to beat. Our equal-weight/risk-parity
-result is consistent with both.
-
-## Reproducing this catalog
-
-1. Open-access PDFs are fetched by re-running the download block in the project
-   history, or directly from the URLs in `order.txt`.
-2. Paywalled PDFs: follow `order.txt`, save each under the bracketed filename in
-   `pdfs/`.
-3. All BibKeys above must appear in `paper/references.bib` and be cited in
-   `paper/main.tex`; CI for the paper is `make paper` (no undefined citations).
+The paper and artifact do not require these PDFs to run. The bibliography
+library is a research aid for reading, related-work synthesis, and citation
+auditing. Run `make bibliography` to refresh local downloads, the catalog,
+`PDF_INDEX.json`, and `_order.txt`.
