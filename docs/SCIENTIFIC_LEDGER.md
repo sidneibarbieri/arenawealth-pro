@@ -175,6 +175,24 @@ Evidence:
 - `scripts/run_ai_advisor_audit.py`
 - tests in `tests/unit/test_ai_advisor_benchmark.py`
 
+### F11. Top-finance related work narrows the claim to auditability
+
+Adding anchors from empirical asset pricing, transaction-cost optimization, and
+robo-advising clarified the defensible gap. Prior finance work already owns
+stock-selection alpha, multi-asset trading with costs, and household
+robo-advice outcomes. The project should not claim state-of-the-art investment
+performance without factor-adjusted evidence. Its current delta is the
+reproducible audit boundary between generated advice and executable portfolio
+decisions: frozen inputs, deterministic replay, operational validity, stability,
+and agreement reported as separate axes.
+
+Evidence:
+
+- `paper/main.tex` (Related Work)
+- `paper/references.bib` (`gu2020machine`, `liu2004transaction`,
+  `garleanu2013dynamic`, `dacunto2019robo`)
+- `paper/figures/ai_advisor_audit.tikz`
+
 ## State-of-the-Art Reference Points
 
 The project should be compared against these families, not against vague
@@ -197,6 +215,11 @@ Reference anchors:
 - Novy-Marx (2013), gross profitability premium.
 - Asness, Frazzini, and Pedersen (2019), quality-minus-junk.
 - DeMiguel, Garlappi, and Uppal (2009), naive `1/N` diversification.
+- Gu, Kelly, and Xiu (2020), machine learning asset pricing.
+- Liu (2004), multi-asset trading with transaction costs.
+- Garleanu and Pedersen (2013), dynamic trading with predictable returns and
+  transaction costs.
+- D'Acunto, Prabhala, and Rossi (2019), robo-advising benefits and limits.
 - Morningstar Wide Moat Focus methodology, as a public moat-plus-valuation
   reference point.
 - Financial AI and robo-advisory work tracked in `docs/AI_FINANCE_SOTA.md`.

@@ -5,6 +5,11 @@
 \renewcommand\footnotetextcopyrightpermission[1]{}
 \pagestyle{plain}
 \emergencystretch=2em
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\definecolor{arenaGreen}{HTML}{00C78A}
+\definecolor{arenaGold}{HTML}{F5C84C}
+\definecolor{arenaBlue}{HTML}{3BA4FF}
 
 \title{Auditing AI Investment Recommendations Against a Deterministic,
 Replayable Baseline}
@@ -26,8 +31,8 @@ compounding policy with provable cost guardrails---together with an audit
 protocol that scores any advisor on three independent axes: operational
 \emph{validity} under explicit constraints, \emph{stability} across repeated
 runs, and \emph{agreement} with the baseline. On a set of frozen scenarios we
-show the axes are independent: a control that agrees perfectly with the policy
-and is perfectly stable is nonetheless \emph{invalid} because it wastes fees,
+show the axes are independent: a control with $\mathrm{agree}=1.0$ and
+$\mathrm{stab}=1.0$ is nonetheless \emph{invalid} because it wastes fees,
 while a valid control is unstable. An evaluation that reports only
 recommendation overlap would rank both as good advice. The baseline earns its
 role as a yardstick through reproducibility: its cost behavior is provable (the
@@ -67,8 +72,9 @@ yardstick rests on reproducibility, not on a claim to beat the market.
 \begin{enumerate}
   \item An audit protocol and a frozen-scenario benchmark that score any advisor
   on validity, stability, and agreement, and a finding that these axes are
-  \emph{independent}: a control can agree perfectly and be perfectly stable yet
-  be invalid, so agreement-only evaluation is misleading (Section~\ref{sec:audit}).
+  \emph{independent}: a control can reach $\mathrm{agree}=1.0$ and
+  $\mathrm{stab}=1.0$ yet be invalid, so agreement-only evaluation is
+  misleading (Section~\ref{sec:audit}).
   \item The deterministic baseline that makes the protocol trustworthy: its fee
   is provably subadditive and its economic order floor is a closed-form fixed
   point (Sections~\ref{sec:fees}--\ref{sec:guardrail}); exhaustive reproducible
@@ -86,45 +92,46 @@ Our work sits at the intersection of four lines.
 
 \paragraph{What to own: quality and profitability.}
 Factor research establishes durable signals for security selection: gross
-profitability \cite{novyMarx2013} and the quality-minus-junk composite
-\cite{asness2019qmj}. We treat selection as given and do not propose a new
-factor; our scoring reuses these signals only to rank an existing basket. The
-contribution is orthogonal---the layer that decides \emph{how to deploy cash}
-into an already-chosen basket, net of frictions.
+profitability \cite{novyMarx2013}, the quality-minus-junk composite
+\cite{asness2019qmj}, and high-dimensional machine-learning predictors in the
+cross-section \cite{gu2020machine}. We treat selection as given and do not
+propose a new factor; our scoring reuses such signals only to rank an existing
+basket. This choice matters for scope. A stock-picking paper must show
+out-of-sample alpha against factor and machine-learning baselines. Our claim is
+orthogonal---the layer that audits \emph{whether advice can be executed}
+replayably and cheaply once a candidate set exists.
 
 \paragraph{How to trade it: transaction-cost theory and planning.}
 Classical theory shows that transaction costs induce a \emph{no-trade region}:
 proportional costs make the optimal policy a band around the target where one
-does not rebalance \cite{constantinides1986capital, davis1990portfolio}. Fixed
-plus linear costs turn allocation into a mixed-integer or convex program
-\cite{lobo2007portfolio}, and richer institutional models add liquidity and
-market-impact terms \cite{zhang2019dynamic}. On the operational side, rebalancing
-under fixed per-transaction fees can be cast as a planning problem solved by
-linear programming or heuristic search \cite{delarosa2023planning}. We differ on
-three axes. First, our fee is \emph{quantized}---a step function in order
-size---so the object of study is its subadditivity, not a smooth or purely linear
-cost. Second, we analyze the recurring \emph{incremental} deployment of small
-cash rather than a one-shot rebalance or a full trade plan. Third, we prioritize
-closed-form, auditable guardrails over numerical optimality, because a decision a
-retail investor cannot inspect is a decision they cannot trust. The fixed-cost
-guardrail is the small-cash analogue of the no-trade region: below the floor, the
-optimal action is to hold.
+does not rebalance \cite{constantinides1986capital, davis1990portfolio}. With
+multiple assets, costs produce explicit no-trade geometry
+\cite{liu2004transaction}, partial adjustment under predictable returns
+\cite{garleanu2013dynamic}, mixed-integer or convex programs
+\cite{lobo2007portfolio}, and liquidity or market-impact terms
+\cite{zhang2019dynamic}. Fixed-fee rebalancing can also be posed as linear
+programming or heuristic search \cite{delarosa2023planning}. Our object is
+narrower and more auditable: recurring small-cash deployment under a quantized
+step fee. The fixed-cost guardrail is the small-cash analogue of the no-trade
+region: below the floor, the optimal action is to hold.
 
 \paragraph{Evaluating learned investment advice.}
 A fast-growing line uses language models to recommend assets or build portfolios
 and evaluates them mainly by return or by alignment with a reference: media-driven
 LLM portfolios report strong but short-horizon gains \cite{oh2025alpha}, and
 knowledge-graph-aligned recommenders are scored on behavioral alignment
-\cite{spadea2025flarko}. A complementary line documents failure modes a return or
-overlap score cannot see: LLM risk assessments vary with irrelevant demographic
-attributes \cite{chawla2025riskadvice}, and investment analyses carry latent,
-confirmation-seeking bias \cite{lee2025bias}; surveys flag interpretability and
-generalizability as open problems \cite{elalami2025mlfinance}. What is missing is
-a single evaluation that places a learned advisor against a transparent,
-replayable baseline and measures, together, whether its advice is operationally
-\emph{valid}, \emph{stable} across runs, and how far it \emph{agrees} with the
-baseline. We supply that baseline and protocol; the advisor under test may be an
-LLM, a robo-allocator, or a heuristic.
+\cite{spadea2025flarko}. Top-finance evidence on robo-advice is more cautious:
+large-scale field evidence shows that automated advice can reduce behavioral
+biases but does not eliminate them \cite{dacunto2019robo}. A complementary line
+documents failure modes a return or overlap score cannot see: LLM risk
+assessments vary with irrelevant demographic attributes \cite{chawla2025riskadvice},
+and investment analyses carry latent, confirmation-seeking bias \cite{lee2025bias};
+surveys flag interpretability and generalizability as open problems
+\cite{elalami2025mlfinance}. What is missing is a single evaluation that places a
+learned advisor against a transparent, replayable baseline and measures, together,
+whether its advice is operationally \emph{valid}, \emph{stable} across runs, and
+how far it \emph{agrees} with the baseline. We supply that baseline and protocol;
+the advisor under test may be an LLM, a robo-allocator, or a heuristic.
 
 \paragraph{Whether to believe it: reproducibility over overfitting.}
 A large fraction of reported strategy performance does not survive out of
@@ -200,8 +207,8 @@ score it on:
 To show that no single axis substitutes for the others, we run the protocol on
 seven deterministic \emph{archetype} controls across frozen scenarios---failure
 modes by construction, not model outputs
-(Figure~\ref{fig:audit}). Two are decisive. A \emph{naive diversifier} that
-agrees perfectly with the baseline ($\mathrm{agree}=1.0$) and never wavers
+(Figure~\ref{fig:audit}). Two are decisive. A \emph{naive diversifier} with
+$\mathrm{agree}=1.0$ against the baseline and no repeated-run drift
 ($\mathrm{stab}=1.0$) is nonetheless \emph{invalid} ($\mathrm{valid}=0.0$): it
 splits sub-tranche cash and pays an avoidable fee. Conversely a
 \emph{valid-but-disagreeing} control is fully valid and stable yet shares
@@ -212,7 +219,7 @@ therefore independent axes; an advisor benchmark must report all three.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\columnwidth]{figures/ai_advisor_audit.png}
+  \input{figures/ai_advisor_audit.tikz}
   \caption{Validity, agreement, and stability for the archetype controls. The
   naive diversifier (high agreement and stability, zero validity) and the
   valid-but-disagreeing control (high validity and stability, zero agreement)

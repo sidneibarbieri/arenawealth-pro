@@ -33,6 +33,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_SCENARIOS = ROOT / "paper" / "data" / "ai_advisor_scenarios.json"
 REFERENCE_OUTPUT = ROOT / "paper" / "data" / "ai_advisor_audit_reference.json"
 FIGURE_OUTPUT = ROOT / "paper" / "figures" / "ai_advisor_audit.png"
+TIKZ_OUTPUT = ROOT / "paper" / "figures" / "ai_advisor_audit.tikz"
 EXPORT_DIR = ROOT / "exports"
 
 CARBON = "#11161c"
@@ -214,6 +215,65 @@ def figure_advisor_audit(summary: dict[str, Any], path: Path) -> None:
     plt.close(fig)
 
 
+def write_advisor_audit_tikz(summary: dict[str, Any], path: Path) -> None:
+    labels = sorted(summary["by_advisor"], key=advisor_sort_key)
+    rows = [
+        (
+            display_label(label).replace("\n", "\\\\"),
+            summary["by_advisor"][label]["mean_valid_rate"],
+            summary["by_advisor"][label]["mean_policy_jaccard"],
+            summary["by_advisor"][label]["mean_stability"],
+        )
+        for label in labels
+    ]
+    coordinates = {
+        "valid": " ".join(
+            f"({index + 1},{valid:.3f})"
+            for index, (_, valid, _, _) in enumerate(rows)
+        ),
+        "agreement": " ".join(
+            f"({index + 1},{agreement:.3f})"
+            for index, (_, _, agreement, _) in enumerate(rows)
+        ),
+        "stability": " ".join(
+            f"({index + 1},{stability:.3f})"
+            for index, (_, _, _, stability) in enumerate(rows)
+        ),
+        "labels": ",".join(label for label, *_ in rows),
+    }
+    path.write_text(
+        rf"""\begin{{tikzpicture}}
+\begin{{axis}}[
+  ybar,
+  width=\columnwidth,
+  height=0.42\columnwidth,
+  ymin=0,
+  ymax=1.05,
+  bar width=2.6pt,
+  enlarge x limits=0.08,
+  ylabel={{Score}},
+  symbolic x coords={{1,2,3,4,5,6,7}},
+  xtick={{1,2,3,4,5,6,7}},
+  xticklabels={{{coordinates["labels"]}}},
+  x tick label style={{font=\scriptsize, align=center}},
+  ymajorgrids=true,
+  grid style={{draw=black!12}},
+  axis line style={{draw=black!45}},
+  tick style={{draw=black!45}},
+  legend style={{draw=none, fill=none, font=\scriptsize, at={{(0.98,0.98)}}, anchor=north east}},
+  legend columns=3,
+]
+\addplot+[draw=none, fill=arenaGreen] coordinates {{{coordinates["valid"]}}};
+\addplot+[draw=none, fill=arenaGold] coordinates {{{coordinates["agreement"]}}};
+\addplot+[draw=none, fill=arenaBlue] coordinates {{{coordinates["stability"]}}};
+\legend{{Valid,Agreement,Stability}}
+\end{{axis}}
+\end{{tikzpicture}}
+""",
+        encoding="utf-8",
+    )
+
+
 def advisor_sort_key(label: str) -> tuple[int, str]:
     order = {
         "deterministic_policy": 0,
@@ -229,13 +289,13 @@ def advisor_sort_key(label: str) -> tuple[int, str]:
 
 def display_label(label: str) -> str:
     names = {
-        "constraint_breaker": "breaks\nconstraints",
-        "deterministic_policy": "deterministic\npolicy",
-        "drifting_advisor": "drifting\nadvisor",
+        "constraint_breaker": "breaks",
+        "deterministic_policy": "policy",
+        "drifting_advisor": "drift",
         "naive_diversifier": "naive\nsplit",
-        "popularity_chaser": "popularity\nchaser",
-        "underdeploying_advisor": "underdeploys",
-        "valid_but_low_agreement": "valid, low\nagreement",
+        "popularity_chaser": "popular",
+        "underdeploying_advisor": "underdeploy",
+        "valid_but_low_agreement": "valid\nlow-agree",
     }
     return names.get(label, label.replace("_", "\n"))
 
@@ -247,6 +307,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--reference", action="store_true")
     parser.add_argument("--markdown", type=Path)
     parser.add_argument("--figure", type=Path, default=FIGURE_OUTPUT)
+    parser.add_argument("--tikz", type=Path, default=TIKZ_OUTPUT)
     return parser.parse_args()
 
 
@@ -265,6 +326,8 @@ def main() -> None:
     write_markdown(summary, markdown)
     args.figure.parent.mkdir(parents=True, exist_ok=True)
     figure_advisor_audit(summary, args.figure)
+    args.tikz.parent.mkdir(parents=True, exist_ok=True)
+    write_advisor_audit_tikz(summary, args.tikz)
     print(
         "AI advisor audit: "
         f"valid={summary['overall']['mean_valid_rate']:.3f} "
@@ -274,6 +337,7 @@ def main() -> None:
     print(f"Wrote {output}")
     print(f"Wrote {markdown}")
     print(f"Wrote {args.figure}")
+    print(f"Wrote {args.tikz}")
 
 
 if __name__ == "__main__":
