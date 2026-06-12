@@ -34,7 +34,7 @@ bibliography:
 	$(PYTHON) scripts/manage_bibliography.py
 
 collect-advisor-runs:
-	$(PYTHON) scripts/collect_advisor_runs.py --model gpt-4o --runs 3
+	$(PYTHON) scripts/collect_advisor_runs.py --runs 3
 
 verify-data:
 	$(PYTHON) scripts/hash_data.py

@@ -21,12 +21,39 @@ def test_prompt_lists_constraints_deterministically():
     assert "MSFT, AAPL" in prompt
     assert "at most 3" in prompt
     assert "1511.18" in prompt
+    assert "Do not recommend already-owned tickers" in prompt
 
 
 def test_parse_clean_json():
     parsed = parse_response('{"tickers": ["ma", "adbe"], "cited_fact_ids": ["fact_a"]}')
     assert parsed["tickers"] == ("MA", "ADBE")
+    assert parsed["amounts"] == ()
     assert parsed["cited_fact_ids"] == ("fact_a",)
+
+
+def test_prompt_allows_owned_tickers_when_add_only_is_false():
+    prompt = build_prompt(
+        {
+            "name": "top_up",
+            "cash": 900.0,
+            "allowed_tickers": ["TSM", "NVO"],
+            "owned_tickers": ["TSM", "NVO", "MSFT"],
+            "available_fact_ids": [],
+            "max_recommendations": 2,
+            "add_only": False,
+            "amounts_required": True,
+        }
+    )
+
+    assert "You may recommend already-owned tickers" in prompt
+    assert 'Include an "amounts" array' in prompt
+
+
+def test_parse_amounts_when_present():
+    parsed = parse_response('{"tickers": ["TSM"], "amounts": [900.0], "cited_fact_ids": []}')
+
+    assert parsed["tickers"] == ("TSM",)
+    assert parsed["amounts"] == (900.0,)
 
 
 def test_parse_extracts_json_from_surrounding_prose():

@@ -10,8 +10,9 @@ Recommended reading order:
 4. `PRODUCT_STRATEGY.md` for product modes and reviewer stories.
 5. `AI_FINANCE_SOTA.md` for the state-of-the-art map and research direction.
 6. `SCIENTIFIC_LEDGER.md` for findings, negative results, and open hypotheses.
-7. `guides/architecture.md` for system structure.
-8. `guides/fundamental_analysis.md` and `guides/compounding.md` for scoring logic.
+7. `ADVISOR_LLM_PROVIDERS.md` for provider setup and model-run evidence rules.
+8. `guides/architecture.md` for system structure.
+9. `guides/fundamental_analysis.md` and `guides/compounding.md` for scoring logic.
 
 Strategic notes that are not part of the reviewer artifact live under `notes/`.
 Submission-specific packets live under `submissions/` and are not runtime
