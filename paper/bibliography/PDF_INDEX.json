@@ -2,6 +2,14 @@
   "description": "Local PDF index. PDFs are not part of the public artifact; this file records what was available in the local research library.",
   "entries": [
     {
+      "bib_key": "dacunto2019robo",
+      "bytes": 771844,
+      "filename": "dacunto2019robo.pdf",
+      "pdf_url": null,
+      "sha256": "ef6aa8b1453926b511bfe7fe72f1cfa24a6c884b0cea434e28e3051811b033c4",
+      "source_url": "https://doi.org/10.1093/rfs/hhz014"
+    },
+    {
       "bib_key": "hean2024personalfinance",
       "bytes": 996021,
       "filename": "hean2024personal_finance.pdf",
@@ -10,12 +18,28 @@
       "source_url": "https://arxiv.org/abs/2412.19784"
     },
     {
+      "bib_key": "ko2024chatgpt",
+      "bytes": 667173,
+      "filename": "ko2024chatgpt.pdf",
+      "pdf_url": null,
+      "sha256": "44cac74992ce451b2f11f7003167cf357818c484f75d26a3f52fecc84fd41ce8",
+      "source_url": "https://doi.org/10.1016/j.frl.2024.105433"
+    },
+    {
       "bib_key": "lee2024stockrec",
       "bytes": 1108914,
       "filename": "lee2024stock_recommendations.pdf",
       "pdf_url": "https://arxiv.org/pdf/2409.00048",
       "sha256": "6745039d870e101b7c9ff6f1680332689b3e90b2b53ffe87acb107328e52e9c6",
       "source_url": "https://arxiv.org/abs/2409.00048"
+    },
+    {
+      "bib_key": "oehler2024chatgpt",
+      "bytes": 429638,
+      "filename": "oehler2024chatgpt.pdf",
+      "pdf_url": null,
+      "sha256": "25afeb41d308b4da63647ab9022280a302c2eaaf1f4e00741d0eedb9baa8388c",
+      "source_url": "https://doi.org/10.1016/j.frl.2023.104898"
     },
     {
       "bib_key": "chawla2025riskadvice",
@@ -56,6 +80,14 @@
       "pdf_url": "https://arxiv.org/pdf/2503.08750",
       "sha256": "bae8a1a1c9ccf39b09be319b3c314e60af67dbcd33ee99e200c95f2c86dce564",
       "source_url": "https://arxiv.org/abs/2503.08750"
+    },
+    {
+      "bib_key": "demiguel2009naive",
+      "bytes": 343906,
+      "filename": "demiguel2009naive.pdf",
+      "pdf_url": null,
+      "sha256": "9e3368a75238fde8b975c3a94fd8e61b798fb20a53c86dfc18f654ee10dde83b",
+      "source_url": "https://doi.org/10.1093/rfs/hhm075"
     },
     {
       "bib_key": "bailey2014pseudo",
@@ -106,6 +138,14 @@
       "source_url": "https://arxiv.org/abs/2511.21588"
     },
     {
+      "bib_key": "saha2025agents",
+      "bytes": 2856760,
+      "filename": "saha2025agents.pdf",
+      "pdf_url": null,
+      "sha256": "d0f8e4b483cdc95ef575c38a935cd2c59e16c82694a7c577391adb9a5a838e1b",
+      "source_url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5447274"
+    },
+    {
       "bib_key": "gu2024spoofability",
       "bytes": 1370522,
       "filename": "gu2024spoofability.pdf",
@@ -114,12 +154,76 @@
       "source_url": "https://arxiv.org/abs/2409.01766"
     },
     {
+      "bib_key": "novyMarx2013",
+      "bytes": 596921,
+      "filename": "novyMarx2013.pdf",
+      "pdf_url": null,
+      "sha256": "4f2f294bed37a6bf0b534070d38e62f114742c138a7138e092aca82d3e61304b",
+      "source_url": "https://doi.org/10.1016/j.jfineco.2013.01.003"
+    },
+    {
+      "bib_key": "asness2019qmj",
+      "bytes": 1904397,
+      "filename": "asness2019qmj.pdf",
+      "pdf_url": null,
+      "sha256": "280a25407677e0335251fb1fc3bf6851b99b42d7cd6e410079ab974763593e90",
+      "source_url": "https://doi.org/10.1007/s11142-018-9470-2"
+    },
+    {
+      "bib_key": "gu2020machine",
+      "bytes": 1148611,
+      "filename": "gu2020machine.pdf",
+      "pdf_url": null,
+      "sha256": "7ba5f45e5ec7edc262e9e80fa315220b4f65f7039f90dc1a7c1377e2337d8190",
+      "source_url": "https://doi.org/10.1093/rfs/hhaa009"
+    },
+    {
+      "bib_key": "otero2025quality",
+      "bytes": 349509,
+      "filename": "otero2025quality.pdf",
+      "pdf_url": null,
+      "sha256": "49e1acdf14d40374d910a6cbd41c6a5ab88e5421f67319c75b751f0e48189e4c",
+      "source_url": "https://doi.org/10.1177/23409444231202810"
+    },
+    {
+      "bib_key": "constantinides1986capital",
+      "bytes": 1774238,
+      "filename": "constantinides1986capital.pdf",
+      "pdf_url": null,
+      "sha256": "5ec69b8c626c50d065d235cba6a3746bd1ca812f2b4888d1253304933ea90578",
+      "source_url": "https://doi.org/10.1086/261410"
+    },
+    {
+      "bib_key": "davis1990portfolio",
+      "bytes": 1310478,
+      "filename": "davis1990portfolio.pdf",
+      "pdf_url": null,
+      "sha256": "b064423ad5d47d74ec100423e0a5de97489b82cc1a40f4a71ba806da57f1178a",
+      "source_url": "https://doi.org/10.1287/moor.15.4.676"
+    },
+    {
+      "bib_key": "liu2004transaction",
+      "bytes": 431108,
+      "filename": "liu2004transaction.pdf",
+      "pdf_url": null,
+      "sha256": "fef35bd7ba4e2e97a78844d264368887f0673cdc3002a21b683b83add8850199",
+      "source_url": "https://doi.org/10.1111/j.1540-6261.2004.00634.x"
+    },
+    {
       "bib_key": "lobo2007portfolio",
       "bytes": 596097,
       "filename": "lobo2007portfolio.pdf",
       "pdf_url": "https://web.stanford.edu/~boyd/papers/pdf/portfolio.pdf",
       "sha256": "904910555f0c04e57627903f5e9629895a120de9459ff6ceb69e4cfcff51b9fe",
       "source_url": "https://web.stanford.edu/~boyd/papers/portfolio.html"
+    },
+    {
+      "bib_key": "garleanu2013dynamic",
+      "bytes": 497857,
+      "filename": "garleanu2013dynamic.pdf",
+      "pdf_url": null,
+      "sha256": "352b9949901a986f4f60142b43e934a0a496fb3a63e4e4d72617f98523cdf588",
+      "source_url": "https://doi.org/10.1111/jofi.12080"
     },
     {
       "bib_key": "zhang2019dynamic",
@@ -138,5 +242,5 @@
       "source_url": "https://arxiv.org/abs/2311.16204"
     }
   ],
-  "pdf_count": 17
+  "pdf_count": 30
 }

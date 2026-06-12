@@ -25,6 +25,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import httpx
+from dotenv import load_dotenv
 
 from arenawealth.experiments.advisor_prompts import build_prompt, parse_response
 from arenawealth.experiments.ai_advisor import (
@@ -34,6 +35,8 @@ from arenawealth.experiments.ai_advisor import (
 )
 
 ROOT = Path(__file__).resolve().parent.parent
+load_dotenv(ROOT / ".env")
+
 SCENARIOS_PATH = ROOT / "paper" / "data" / "ai_advisor_scenarios.json"
 CACHE_ROOT = ROOT / "paper" / "data" / "advisor_runs"
 API_VERSION = os.getenv("AZURE_OPENAI_API_VERSION", "2024-06-01")
@@ -54,6 +57,17 @@ class CallBudget:
 
 def load_scenarios(path: Path) -> list[dict]:
     return json.loads(path.read_text(encoding="utf-8"))["scenarios"]
+
+
+def require_azure_configuration() -> None:
+    missing = [
+        name
+        for name in ("AZURE_OPENAI_ENDPOINT", "AZURE_OPENAI_API_KEY")
+        if not os.getenv(name)
+    ]
+    if missing:
+        joined = ", ".join(missing)
+        raise SystemExit(f"missing Azure OpenAI configuration: {joined}")
 
 
 def cache_path(model: str, scenario_name: str, run_index: int) -> Path:
@@ -169,6 +183,8 @@ def parse_arguments() -> argparse.Namespace:
 def main() -> None:
     arguments = parse_arguments()
     scenarios = load_scenarios(arguments.scenarios)
+    if arguments.live:
+        require_azure_configuration()
     budget = CallBudget(arguments.max_calls)
     planned = len(scenarios) * arguments.runs
     if arguments.live and planned > arguments.max_calls:

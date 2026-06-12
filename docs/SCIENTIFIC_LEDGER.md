@@ -193,6 +193,24 @@ Evidence:
   `garleanu2013dynamic`, `dacunto2019robo`)
 - `paper/figures/ai_advisor_audit.tikz`
 
+### F12. AI advice can be treated as a candidate program with a deterministic verifier
+
+The manually completed bibliography suggests a stronger computer-science
+framing: a language model is not the final investment policy, but a
+nondeterministic candidate generator. The artifact supplies the deterministic
+contract: frozen facts, allowed universe, portfolio constraints, fee semantics,
+and replayable policy output. This converts AI advice into a verification
+problem: parse the candidate recommendation, reject non-executable or ungrounded
+actions, and only then measure novelty or realized outcome. This is the current
+best-paper-grade hypothesis to test with real model runs.
+
+Evidence:
+
+- `paper/bibliography/RESEARCH_SYNTHESIS.md`
+- `paper/bibliography/PDF_INDEX.json` (30 local PDFs indexed)
+- `paper/bibliography/_order.txt` (only `kanuri2016moat.pdf` remains manual)
+- `scripts/collect_advisor_runs.py`
+
 ## State-of-the-Art Reference Points
 
 The project should be compared against these families, not against vague

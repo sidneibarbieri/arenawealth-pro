@@ -15,11 +15,11 @@ ignored by Git; `_order.txt` lists missing or manually downloadable papers.
 
 | BibKey | Work | Year | Publication | Role | Status |
 | --- | --- | --- | --- | --- | --- |
-| `dacunto2019robo` | The Promises and Pitfalls of Robo-Advising | 2019 | Review of Financial Studies | robo-advice evidence | manual |
+| `dacunto2019robo` | The Promises and Pitfalls of Robo-Advising | 2019 | Review of Financial Studies | robo-advice evidence | have |
 | `hean2024personalfinance` | Can AI Help with Your Personal Finances? | 2024 | arXiv | personal-finance advice comparator | have |
-| `ko2024chatgpt` | Can ChatGPT Improve Investment Decisions? From a Portfolio Management Perspective | 2024 | Finance Research Letters | LLM portfolio-management comparator | manual |
+| `ko2024chatgpt` | Can ChatGPT Improve Investment Decisions? From a Portfolio Management Perspective | 2024 | Finance Research Letters | LLM portfolio-management comparator | have |
 | `lee2024stockrec` | Stock Recommendations for Individual Investors | 2024 | AI-in-Finance proceedings | individual-stock recommendation comparator | have |
-| `oehler2024chatgpt` | Does ChatGPT Provide Better Advice than Robo-Advisors? | 2024 | Finance Research Letters | robo-advice LLM comparator | manual |
+| `oehler2024chatgpt` | Does ChatGPT Provide Better Advice than Robo-Advisors? | 2024 | Finance Research Letters | robo-advice LLM comparator | have |
 | `chawla2025riskadvice` | Evaluating AI for Finance: Is AI Credible at Assessing Investment Risk? | 2025 | arXiv | risk-profile audit comparator | have |
 | `lee2025bias` | Your AI, Not Your View: The Bias of LLMs in Investment Analysis | 2025 | AI-in-Finance proceedings | LLM investment-bias comparator | have |
 | `oh2025alpha` | Democratizing Alpha: LLM-Driven Portfolio Construction for Retail Investors Using Public Financial Media | 2025 | AI-in-Finance proceedings | LLM portfolio-construction comparator | have |
@@ -30,7 +30,7 @@ ignored by Git; `_order.txt` lists missing or manually downloadable papers.
 
 | BibKey | Work | Year | Publication | Role | Status |
 | --- | --- | --- | --- | --- | --- |
-| `demiguel2009naive` | Optimal Versus Naive Diversification: How Inefficient Is the 1/N Portfolio Strategy? | 2009 | Review of Financial Studies | naive diversification baseline | manual |
+| `demiguel2009naive` | Optimal Versus Naive Diversification: How Inefficient Is the 1/N Portfolio Strategy? | 2009 | Review of Financial Studies | naive diversification baseline | have |
 | `bailey2014pseudo` | Pseudo-Mathematics and Financial Charlatanism: The Effects of Backtest Overfitting on Out-of-Sample Performance | 2014 | Notices of the AMS | backtest-overfitting warning | have |
 
 ## Financial AI Systems
@@ -42,7 +42,7 @@ ignored by Git; `_order.txt` lists missing or manually downloadable papers.
 | `yang2024finrobot` | FinRobot: An Open-Source AI Agent Platform for Financial Applications using Large Language Models | 2024 | arXiv | financial agent-system comparator | have |
 | `chen2025stockbench` | StockBench: Can LLM Agents Trade Stocks Profitably in Real-world Markets? | 2025 | arXiv | LLM trading-agent benchmark comparator | have |
 | `elalami2025mlfinance` | Machine Learning and Deep Learning in Computational Finance: A Systematic Review | 2025 | arXiv | computational-finance survey | have |
-| `saha2025agents` | Large Language Model Agents for Investment Management | 2025 | SSRN | investment-management agent survey | manual |
+| `saha2025agents` | Large Language Model Agents for Investment Management | 2025 | SSRN | investment-management agent survey | have |
 
 ## Market Simulation and Audit
 
@@ -54,21 +54,21 @@ ignored by Git; `_order.txt` lists missing or manually downloadable papers.
 
 | BibKey | Work | Year | Publication | Role | Status |
 | --- | --- | --- | --- | --- | --- |
-| `novyMarx2013` | The Other Side of Value: The Gross Profitability Premium | 2013 | Journal of Financial Economics | quality factor baseline | manual |
+| `novyMarx2013` | The Other Side of Value: The Gross Profitability Premium | 2013 | Journal of Financial Economics | quality factor baseline | have |
 | `kanuri2016moat` | Sustainable Competitive Advantage and Stock Performance: The Case for Wide Moat Stocks | 2016 | Applied Economics | moat-investing comparator | manual |
-| `asness2019qmj` | Quality Minus Junk | 2019 | Review of Accounting Studies | quality factor baseline | manual |
-| `gu2020machine` | Empirical Asset Pricing via Machine Learning | 2020 | Review of Financial Studies | machine-learning asset-pricing baseline | manual |
-| `otero2025quality` | How to Improve Quality Investing | 2025 | BRQ Business Research Quarterly | quality-investing comparator | manual |
+| `asness2019qmj` | Quality Minus Junk | 2019 | Review of Accounting Studies | quality factor baseline | have |
+| `gu2020machine` | Empirical Asset Pricing via Machine Learning | 2020 | Review of Financial Studies | machine-learning asset-pricing baseline | have |
+| `otero2025quality` | How to Improve Quality Investing | 2025 | BRQ Business Research Quarterly | quality-investing comparator | have |
 
 ## Transaction Costs
 
 | BibKey | Work | Year | Publication | Role | Status |
 | --- | --- | --- | --- | --- | --- |
-| `constantinides1986capital` | Capital Market Equilibrium with Transaction Costs | 1986 | Journal of Political Economy | transaction-cost theory | manual |
-| `davis1990portfolio` | Portfolio Selection with Transaction Costs | 1990 | Mathematics of Operations Research | transaction-cost theory | manual |
-| `liu2004transaction` | Optimal Consumption and Investment with Transaction Costs and Multiple Risky Assets | 2004 | Journal of Finance | multi-asset transaction-cost theory | manual |
+| `constantinides1986capital` | Capital Market Equilibrium with Transaction Costs | 1986 | Journal of Political Economy | transaction-cost theory | have |
+| `davis1990portfolio` | Portfolio Selection with Transaction Costs | 1990 | Mathematics of Operations Research | transaction-cost theory | have |
+| `liu2004transaction` | Optimal Consumption and Investment with Transaction Costs and Multiple Risky Assets | 2004 | Journal of Finance | multi-asset transaction-cost theory | have |
 | `lobo2007portfolio` | Portfolio Optimization with Linear and Fixed Transaction Costs | 2007 | Annals of Operations Research | fixed-cost optimization precedent | have |
-| `garleanu2013dynamic` | Dynamic Trading with Predictable Returns and Transaction Costs | 2013 | Journal of Finance | dynamic trading with costs | manual |
+| `garleanu2013dynamic` | Dynamic Trading with Predictable Returns and Transaction Costs | 2013 | Journal of Finance | dynamic trading with costs | have |
 | `zhang2019dynamic` | Dynamic Portfolio Optimization with Liquidity Cost and Market Impact | 2019 | Quantitative Finance | liquidity and market-impact precedent | have |
 | `delarosa2023planning` | Planning for the Efficient Updating of Mutual Fund Portfolios | 2023 | arXiv | portfolio-update planning precedent | have |
 
