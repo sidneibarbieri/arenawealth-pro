@@ -441,35 +441,16 @@ tranche boundary.
 \end{figure}
 
 \paragraph{Sensitivity and generality.}
-The \$250 number is specific to our $(c,\tau)$; the \emph{formula} is not. Since
-$\mathrm{MIN}=c/\tau$, the floor is linear in the fixed cost and inverse in the
-tolerance, and it is \emph{independent of the tranche size} $T$: any positive
-order starts exactly one tranche, so the binding fee at the floor is one unit of
-$c$ regardless of $T$ (which only rescales the premium bands of
-Section~\ref{sec:fees}). Figure~\ref{fig:sensitivity} sweeps the floor over a
-plausible range of costs and three tolerances. The guardrail thus
-transfers to any schedule with a fixed per-order component---common for
-international or non-US-equity access---and degenerates to ``always trade'' under
-zero-commission ($c=0$).
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\columnwidth]{figures/sensitivity.png}
-  \caption{The guardrail generalizes. The economic order floor $\mathrm{MIN}=c/\tau$
-  is a smooth family of lines in the fixed cost $c$; our operating point
-  $(\$2.50,1\%)\!\to\!\$250$ is one point on it.}
-  \Description{Three straight lines of economic order floor versus fixed cost per
-  order, one per tolerance level, with the operating point at 2.50 dollars and
-  one percent marked at 250 dollars.}
-  \label{fig:sensitivity}
-\end{figure}
-
-\paragraph{Fee floor under other schedules.}
-Proposition~\ref{prop:floor} characterizes the floor for any schedule with additive fixed cost $c$.
-At $\tau=1\%$, a flat \$1 fee yields floor \$100; a flat \$5 yields \$500; a flat \$9.99 yields \$999.
-The floor scales linearly with $c$, independent of tranche size. All results port to alternative
-schedules at their respective fixed costs; the studied \$2.50 tranche (floor \$250) is typical
-for brokered accounts.
+The \$250 number is specific to our $(c,\tau)$; the formula is not. Since
+$\mathrm{MIN}=c/\tau$, the floor is linear in the fixed cost, inverse in the
+tolerance, and \emph{independent of the tranche size} $T$: any positive order
+starts exactly one tranche, so the binding fee at the floor is one unit of $c$
+regardless of $T$ (which only rescales the premium bands of
+Section~\ref{sec:fees}). Proposition~\ref{prop:floor} gives the floor for any
+schedule with an additive fixed cost. At $\tau=1\%$ a flat \$1 fee yields a \$100
+floor, \$5 yields \$500, and \$9.99 yields \$999; the guardrail degenerates to
+``always trade'' under zero commission ($c=0$). The studied \$2.50 tranche (floor
+\$250) is typical for brokered international or non-US-equity access.
 
 \section{What Actually Drives the Decision}
 \label{sec:weighting}
@@ -502,7 +483,7 @@ claim about specific securities.)
 \paragraph{Backtest against allocator baselines (real data).}
 We backtested the 17-name basket against four baselines over 2021-01-05 to
 2026-05-28 (1355 trading days) using free adjusted closes
-(Table~\ref{tab:backtest}, Figure~\ref{fig:backtest}). Two are naive
+(Table~\ref{tab:backtest}). Two are naive
 (market-value ``current'' weighting and equal weighting); two are allocator
 baselines computable from the return matrix alone---long-only minimum variance
 and equal-risk-contribution (risk parity)---so no baseline uses information the
@@ -544,18 +525,6 @@ fundamentals-weighted strategy on risk-adjusted return.
   \end{tabular}
 \end{table}
 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\columnwidth]{figures/backtest.png}
-  \caption{Basket versus four baselines. Equal weighting and risk parity, which
-  use no fundamental data, match or beat the fundamentals-weighted basket on both
-  return and risk-adjusted return; minimum variance trades return for the
-  shallowest drawdown.}
-  \Description{Grouped bar chart of CAGR and Sharpe ratio for five strategies:
-  current weight, equal weight, benchmark, minimum variance, and risk parity.
-  Equal weight and risk parity have the highest Sharpe ratios.}
-  \label{fig:backtest}
-\end{figure}
 
 \paragraph{Is the result robust?}
 A single full-sample comparison cannot separate structure from luck, so we probe

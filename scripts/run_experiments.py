@@ -42,7 +42,6 @@ from arenawealth.experiments.fee_landscape import (
     worst_case_premium,
 )
 from arenawealth.experiments.fee_sensitivity import (
-    guardrail_floor,
     reference_schedules,
     schedule_floors,
 )
@@ -178,38 +177,6 @@ def figure_guardrail(landscape, fixed_point: float, path: Path) -> None:
     plt.close(fig)
 
 
-def figure_sensitivity(path: Path) -> None:
-    """The guardrail floor as a family of curves: MIN = c / tau over cost."""
-    costs = [round(0.5 * step, 2) for step in range(1, 25)]  # $0.50 .. $12.00
-    tolerance_lines = [
-        (0.005, BLUE, "tau = 0.5%"),
-        (0.01, GOLD, "tau = 1%"),
-        (0.02, SUCCESS, "tau = 2%"),
-    ]
-    fig, ax = plt.subplots(figsize=(7, 3.6), dpi=150)
-    fig.patch.set_facecolor("white")
-    for tolerance, color, label in tolerance_lines:
-        floors = [guardrail_floor(cost, tolerance) for cost in costs]
-        ax.plot(costs, floors, color=color, linewidth=2, label=label)
-    ax.scatter([2.50], [guardrail_floor(2.50, 0.01)], color=CARBON, zorder=5)
-    ax.annotate(
-        "operating point\n(c=2.50, tau=1%) = 250 USD",
-        xy=(2.50, 250),
-        xytext=(4.2, 320),
-        fontsize=9,
-        color=CARBON,
-        arrowprops={"arrowstyle": "->", "color": CARBON},
-    )
-    ax.set_xlabel("Fixed cost per order c (USD)")
-    ax.set_ylabel("Economic order floor MIN (USD)")
-    ax.set_title("The guardrail generalizes: MIN = c / tau", color=CARBON, fontweight="bold")
-    ax.legend(frameon=False)
-    _style_axes(ax)
-    fig.tight_layout()
-    fig.savefig(path, facecolor="white")
-    plt.close(fig)
-
-
 def figure_robustness(
     asset_returns: dict[str, tuple[float, ...]],
     weights_equal: dict[str, float],
@@ -275,49 +242,6 @@ def figure_ablation(ablation_rows, path: Path) -> None:
     plt.close(fig)
 
 
-STRATEGY_PALETTE = {
-    "current_weight": GOLD,
-    "equal_weight": BLUE,
-    "benchmark": MUTED,
-    "min_variance": SUCCESS,
-    "risk_parity": "#7c3aed",  # arena-violet, defined inline to avoid token sprawl
-}
-
-
-def _collect_strategies(export: dict) -> dict[str, dict]:
-    """Merge baselines and SOTA baselines into a single ordered dict for plotting."""
-    strategies = dict(export["baselines"])
-    for name, stats in export.get("sota_baselines", {}).items():
-        strategies[name] = stats
-    return strategies
-
-
-def figure_backtest(export: dict, path: Path) -> None:
-    strategies = _collect_strategies(export)
-    names = list(strategies.keys())
-    cagr = [strategies[name]["cagr"] * 100 for name in names]
-    sharpe = [strategies[name]["sharpe_ratio"] for name in names]
-    colors = [STRATEGY_PALETTE.get(name, CARBON) for name in names]
-    fig, (ax_cagr, ax_sharpe) = plt.subplots(1, 2, figsize=(9.5, 3.6), dpi=150)
-    fig.patch.set_facecolor("white")
-    ax_cagr.bar(names, cagr, color=colors)
-    ax_cagr.set_title("CAGR (%)", color=CARBON, fontweight="bold")
-    ax_sharpe.bar(names, sharpe, color=colors)
-    ax_sharpe.set_title("Sharpe ratio", color=CARBON, fontweight="bold")
-    for axis in (ax_cagr, ax_sharpe):
-        axis.set_xticks(range(len(names)))
-        axis.set_xticklabels([name.replace("_", "\n") for name in names], fontsize=8)
-        _style_axes(axis)
-    fig.suptitle(
-        f"Basket versus baselines, {export['start_date']}..{export['end_date']}",
-        color=CARBON,
-        fontweight="bold",
-    )
-    fig.tight_layout()
-    fig.savefig(path, facecolor="white")
-    plt.close(fig)
-
-
 def main() -> None:
     FIG_DIR.mkdir(parents=True, exist_ok=True)
     EXPORT_DIR.mkdir(parents=True, exist_ok=True)
@@ -359,13 +283,12 @@ def main() -> None:
             ),
         }
 
-    # Figures
+    # Figures. The sensitivity sweep and the backtest are reported in prose and
+    # the backtest table; their data still feeds the JSON below, but a figure
+    # would only restate the closed form and the table, so none is rendered.
     figure_fee_premium(landscape, FIG_DIR / "fee_premium.png")
     figure_guardrail(landscape, guardrail.one_percent_fixed_point, FIG_DIR / "guardrail.png")
-    figure_sensitivity(FIG_DIR / "sensitivity.png")
     figure_ablation(ablation_rows, FIG_DIR / "ablation.png")
-    if backtest is not None:
-        figure_backtest(backtest, FIG_DIR / "backtest.png")
     if robustness is not None:
         figure_robustness(
             basket_returns, weights_equal, weights_current, FIG_DIR / "robustness.png"
