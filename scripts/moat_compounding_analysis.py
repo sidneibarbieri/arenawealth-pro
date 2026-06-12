@@ -106,9 +106,10 @@ def render_report(analyses: Sequence[PositionAnalysis], plan: DeploymentPlan, ca
             f"{order.shares:>9.4f} sh  fee {order.fee:.2f}"
         )
     deployed = sum(order.amount for order in plan.orders)
+    fee_pct = (plan.total_fee / deployed * 100) if deployed > 0 else 0.0
     print(
         f"  TOTAL {deployed:>9.2f}  fee {plan.total_fee:.2f} "
-        f"({plan.total_fee / deployed * 100:.2f}%)  cash left {cash - deployed:.2f}"
+        f"({fee_pct:.2f}%)  cash left {cash - deployed:.2f}"
     )
 
 
