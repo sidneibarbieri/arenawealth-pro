@@ -65,6 +65,10 @@ export function DataSourcesHealth() {
         <div>
           <p className="eyebrow">Data sources</p>
           <h2>Health status</h2>
+          <p className="heading-note">
+            Configuration is checked on load. Live checks are explicit to avoid slow startup and
+            rate-limit noise.
+          </p>
         </div>
         <button
           className="secondary-button"
@@ -112,7 +116,7 @@ function HealthSummary({ health }: { health: DataSourcesHealthResponse }) {
               <strong>{source.name}</strong>
             </div>
             <span>{source.metadata.purpose}</span>
-            <code className={`source-status ${source.status}`}>
+            <code className={`source-status status-pill ${source.status}`}>
               {source.error ?? source.status.replace('_', ' ')}
             </code>
           </div>

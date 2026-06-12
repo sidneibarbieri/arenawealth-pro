@@ -302,6 +302,61 @@ h3 {
   background: rgba(255, 255, 255, 0.58);
 }
 
+.evidence-panel {
+  min-width: 0;
+  margin-top: 28px;
+  padding: 24px;
+  border: 1px solid #cfc9b8;
+  border-top: 3px solid var(--arena-gold);
+  background:
+    linear-gradient(180deg, rgba(245, 200, 76, 0.08), transparent 54%),
+    rgba(255, 255, 255, 0.78);
+}
+
+.evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  border: 1px solid #d8d6cd;
+  background: #ffffff;
+}
+
+.evidence-card {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+  min-height: 146px;
+  padding: 17px;
+  border-right: 1px solid #d8d6cd;
+}
+
+.evidence-card:last-child {
+  border-right: 0;
+}
+
+.evidence-card strong {
+  color: var(--arena-text);
+  font-size: 1.03rem;
+  line-height: 1.25;
+}
+
+.evidence-card small {
+  color: var(--arena-muted);
+  font-size: 0.82rem;
+}
+
+.evidence-card code {
+  align-self: end;
+  width: fit-content;
+  max-width: 100%;
+  padding: 4px 8px;
+  overflow-wrap: anywhere;
+  background: #f2f1ec;
+  color: #33332f;
+  font-size: 0.76rem;
+}
+
 .metric {
   display: grid;
   align-content: start;
@@ -357,6 +412,13 @@ h3 {
   max-width: 60ch;
   color: #6b6b61;
   font-size: 0.82rem;
+}
+
+.heading-note {
+  max-width: 68ch;
+  margin: 7px 0 0;
+  color: var(--arena-muted);
+  font-size: 0.84rem;
 }
 
 .candidate-meta {
@@ -455,6 +517,13 @@ h3 {
 .source-status.error {
   background: #f8e5e5;
   color: #a33a3a;
+}
+
+.status-pill {
+  min-width: 104px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .review-grid {
@@ -888,6 +957,7 @@ tbody tr:last-child td {
   }
 
   .metric-strip,
+  .evidence-grid,
   .deployment-layout,
   .control-row,
   .trade-form,
@@ -902,6 +972,15 @@ tbody tr:last-child td {
   }
 
   .metric:last-child {
+    border-bottom: 0;
+  }
+
+  .evidence-card {
+    border-right: 0;
+    border-bottom: 1px solid #d8d6cd;
+  }
+
+  .evidence-card:last-child {
     border-bottom: 0;
   }
 

@@ -5,7 +5,6 @@ import {
   CheckCircle2,
   CircleDollarSign,
   FileText,
-  KeyRound,
   RefreshCw,
   Search,
   ShieldCheck,
@@ -18,7 +17,6 @@ import {
   fetchDecisionLogs,
   fetchPortfolio,
   fetchPortfolioSource,
-  fetchProviderStatus,
   fetchRecommendation,
   recordManualTrade,
   clearManualPortfolio,
@@ -31,7 +29,6 @@ import {
   type PortfolioResponse,
   type PortfolioSource,
   type Position,
-  type ProviderStatus,
   type RecommendationOrder,
   type RecommendationResponse,
 } from './api';
@@ -71,7 +68,6 @@ function App() {
   const [portfolio, setPortfolio] = useState<PortfolioResponse | null>(null);
   const [recommendation, setRecommendation] = useState<RecommendationResponse | null>(null);
   const [candidates, setCandidates] = useState<CandidatesResponse | null>(null);
-  const [providers, setProviders] = useState<ProviderStatus[]>([]);
   const [portfolioSource, setPortfolioSource] = useState<PortfolioSource | null>(null);
   const [decisionLogs, setDecisionLogs] = useState<DecisionLogEntry[]>([]);
   const [portfolioError, setPortfolioError] = useState<string | null>(null);
@@ -132,24 +128,6 @@ function App() {
 
     return () => controller.abort();
   }, [refreshIndex, portfolio?.analysis?.source]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    async function loadProviders() {
-      const payload = await fetchProviderStatus(controller.signal);
-      setProviders(payload);
-    }
-
-    loadProviders().catch((error: unknown) => {
-      if (isAbortError(error)) {
-        return;
-      }
-      setPortfolioError(error instanceof Error ? error.message : 'Unknown provider error');
-    });
-
-    return () => controller.abort();
-  }, [refreshIndex]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -384,6 +362,14 @@ function App() {
               <Metric label="Positions" value={String(portfolio.summary.position_count)} />
             </section>
 
+            <ReviewerEvidencePanel
+              portfolio={portfolio}
+              source={portfolioSource}
+              decisionCount={decisionLogs.length}
+              offlineDemo={offlineDemo}
+              hasRecommendation={recommendation !== null}
+            />
+
             <section className="deployment-band" id="deployment">
               <div className="section-heading">
                 <div>
@@ -484,8 +470,6 @@ function App() {
                 </div>
               )}
             </section>
-
-            <ProviderStatusPanel providers={providers} />
 
             <DataSourcesHealth />
 
@@ -678,39 +662,46 @@ function App() {
                 </span>
               </div>
               {positions.length === 0 ? (
-                <div className="loading-row">No positions found. Import a broker CSV or add a manual trade.</div>
+                <div className="loading-row">
+                  No positions found. Import a broker CSV or add a manual trade.
+                </div>
               ) : (
-              <div className="table-frame">
-                <table>
-                  <thead>
-                    <tr>
-                      <SortHeader label="Ticker" columnKey="ticker" sort={positionSort} />
-                      <SortHeader label="Name" columnKey="name" sort={positionSort} />
-                      <SortHeader label="Shares" columnKey="shares" sort={positionSort} numeric />
-                      <SortHeader
-                        label="Price"
-                        columnKey="current_price"
-                        sort={positionSort}
-                        numeric
-                      />
-                      <SortHeader label="Day" columnKey="change_pct" sort={positionSort} numeric />
-                      <SortHeader
-                        label="Value"
-                        columnKey="market_value"
-                        sort={positionSort}
-                        numeric
-                      />
-                      <SortHeader label="Weight" columnKey="weight_pct" sort={positionSort} numeric />
-                      <SortHeader label="P/L" columnKey="gain_loss" sort={positionSort} numeric />
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {positionSort.sortedRows.map((position) => (
-                      <PositionRow key={position.ticker} position={position} />
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                <div className="table-frame">
+                  <table>
+                    <thead>
+                      <tr>
+                        <SortHeader label="Ticker" columnKey="ticker" sort={positionSort} />
+                        <SortHeader label="Name" columnKey="name" sort={positionSort} />
+                        <SortHeader label="Shares" columnKey="shares" sort={positionSort} numeric />
+                        <SortHeader
+                          label="Price"
+                          columnKey="current_price"
+                          sort={positionSort}
+                          numeric
+                        />
+                        <SortHeader label="Day" columnKey="change_pct" sort={positionSort} numeric />
+                        <SortHeader
+                          label="Value"
+                          columnKey="market_value"
+                          sort={positionSort}
+                          numeric
+                        />
+                        <SortHeader
+                          label="Weight"
+                          columnKey="weight_pct"
+                          sort={positionSort}
+                          numeric
+                        />
+                        <SortHeader label="P/L" columnKey="gain_loss" sort={positionSort} numeric />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {positionSort.sortedRows.map((position) => (
+                        <PositionRow key={position.ticker} position={position} />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </section>
           </>
@@ -756,39 +747,88 @@ function StatusBlock({ tone, message }: StatusBlockProps) {
   );
 }
 
-interface ProviderStatusPanelProps {
-  providers: ProviderStatus[];
+interface ReviewerEvidencePanelProps {
+  portfolio: PortfolioResponse;
+  source: PortfolioSource | null;
+  decisionCount: number;
+  offlineDemo: boolean;
+  hasRecommendation: boolean;
 }
 
-function ProviderStatusPanel({ providers }: ProviderStatusPanelProps) {
-  if (providers.length === 0) {
-    return null;
-  }
-  const configuredCount = providers.filter((provider) => provider.configured).length;
+function ReviewerEvidencePanel({
+  portfolio,
+  source,
+  decisionCount,
+  offlineDemo,
+  hasRecommendation,
+}: ReviewerEvidencePanelProps) {
+  const activeSource = source
+    ? `${source.active_type} · ${source.position_count} positions`
+    : 'source loading';
+  const dataMode = offlineDemo ? 'Reviewer demo' : 'Live data';
+  const decisionState = hasRecommendation ? 'decision recorded' : 'waiting for analysis';
   return (
-    <section className="provider-panel" aria-label="Provider status">
+    <section className="evidence-panel" aria-label="Reviewer evidence">
       <div className="section-heading">
         <div>
-          <p className="eyebrow">Data providers</p>
-          <h2>Free source readiness</h2>
+          <p className="eyebrow">Reviewer evidence</p>
+          <h2>Reproducibility, source, audit trail</h2>
         </div>
-        <span className="freshness">
-          {configuredCount}/{providers.length} enabled
-        </span>
+        <span className="freshness">Orders are proposed, not placed</span>
       </div>
-      <div className="provider-list">
-        {providers.map((provider) => (
-          <div className="provider-row" key={provider.provider_id}>
-            <div className="provider-name">
-              {provider.configured ? <CheckCircle2 size={17} /> : <KeyRound size={17} />}
-              <strong>{provider.display_name}</strong>
-            </div>
-            <span>{provider.required_for}</span>
-            <code>{provider.env_var ?? 'no key required'}</code>
-          </div>
-        ))}
+      <div className="evidence-grid">
+        <EvidenceCard
+          label="Reproduce"
+          value="make verify"
+          detail="Runs lint, tests, frontend build, and ESLint."
+          code="make all"
+        />
+        <EvidenceCard
+          label="Active source"
+          value={activeSource}
+          detail={
+            source?.modified_at
+              ? `Modified ${formatDateTime(source.modified_at)}`
+              : 'Waiting for source metadata.'
+          }
+          code={source?.manual_override ? 'manual override' : 'immutable input'}
+        />
+        <EvidenceCard
+          label="Decision mode"
+          value={dataMode}
+          detail={
+            offlineDemo
+              ? 'Synthetic replay mode for offline review.'
+              : `Portfolio refreshed ${formatDateTime(portfolio.last_updated)}.`
+          }
+          code={decisionState}
+        />
+        <EvidenceCard
+          label="Audit trail"
+          value={`${decisionCount} recent runs`}
+          detail="Every recommendation stores policy, source, mode, cash, and queued orders."
+          code="deterministic policy"
+        />
       </div>
     </section>
+  );
+}
+
+interface EvidenceCardProps {
+  label: string;
+  value: string;
+  detail: string;
+  code: string;
+}
+
+function EvidenceCard({ label, value, detail, code }: EvidenceCardProps) {
+  return (
+    <div className="evidence-card">
+      <span className="review-label">{label}</span>
+      <strong>{value}</strong>
+      <small>{detail}</small>
+      <code>{code}</code>
+    </div>
   );
 }
 
