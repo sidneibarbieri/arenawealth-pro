@@ -335,6 +335,11 @@ def apply_manual_trade(request: ManualTradeRequest) -> Path:
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Cannot sell {shares} shares; current position has {current.shares}",
         )
+    if fees > shares * price:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Fees cannot exceed gross sale proceeds",
+        )
 
     remaining = current.shares - shares
     if remaining == 0:

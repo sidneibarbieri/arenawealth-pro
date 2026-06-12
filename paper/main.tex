@@ -227,9 +227,11 @@ therefore independent axes; an advisor benchmark must report all three.
 For an advisor that returns sets of tickers $r_1,\dots,r_n$ over $n$ repeated
 runs of a scenario with baseline top-$k$ set $b$, we report
 \[
-  V = \tfrac1n\!\sum_j \mathbf{1}[\,\mathrm{viol}(r_j)=\varnothing\,],\quad
-  S = \binom{n}{2}^{-1}\!\!\sum_{i<j}\! J(r_i,r_j),\quad
-  A = \tfrac1n\!\sum_j \tfrac{|r_j\cap b|}{k},
+  \begin{aligned}
+  V &= \tfrac1n\!\sum_j \mathbf{1}[\,\mathrm{viol}(r_j)=\varnothing\,],\\
+  S &= \binom{n}{2}^{-1}\!\!\sum_{i<j}\! J(r_i,r_j),\\
+  A &= \tfrac1n\!\sum_j \tfrac{|r_j\cap b|}{k}.
+  \end{aligned}
 \]
 where $J$ is the Jaccard overlap and $\mathrm{viol}$ the constraint set of
 Section~\ref{sec:audit}. Validity $V$ and stability $S$ are intrinsic to the
@@ -583,8 +585,8 @@ decision cheap, bounded, and auditable.
 Each finding came from instrumenting a deterministic engine rather than from a
 prior hypothesis. The fee defect was invisible in code review and obvious in a
 parameter sweep. The audit's central finding was the same kind of surprise: a
-control built only to ``agree with the policy'' scored a perfect agreement and
-stability yet was invalid, which is what convinced us that agreement-only
+control built only to ``agree with the policy'' reached agreement 1.0 and
+stability 1.0 yet was invalid, which is what convinced us that agreement-only
 evaluation---common in LLM-advice studies---hides operational failure.
 Reproducibility was not a compliance checkbox but the instrument that produced
 the science.
@@ -598,7 +600,7 @@ any specific model, and is the immediate next step. The backtest is a
 current-basket study on free adjusted closes; it is subject to survivorship and
 selection bias and is \emph{not} a point-in-time stock-selection backtest. The
 ablation uses deterministic synthetic fundamentals and demonstrates mechanism,
-not security-level claims. The cost model is the
+not performance claims. The cost model is the
 fixed per-order tranche fee only: it omits bid-ask spreads, slippage,
 integer-lot constraints, and taxes, and it applies where brokers charge such a
 fee (common for international or non-US-equity access) rather than under
@@ -626,8 +628,8 @@ around a safety threshold---e.g., $v > \tau_v$ (regulatory guardrail), $s >
 \tau_s$ (operational stability floor)---which a real advisor either crosses or does
 not. This turns evaluation from a ranking into a compliance gate.
 
-The existing baseline (deterministic policy) occupies $(1,1,1)$, the corner of
-validity, perfect agreement, and stability. The archetype controls form a
+The existing baseline (deterministic policy) occupies $(1,1,1)$, the corner with
+validity 1.0, agreement 1.0, and stability 1.0. The archetype controls form a
 polytope around it: naive diversifier at $(0,1,1)$, valid-but-disagreeing at
 $(1,0,1)$, and drifting advisor at $(1,0.4,0.07)$. Real advisors will land
 inside or outside this convex hull. A venue focused on LLM robustness should

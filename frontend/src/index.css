@@ -703,6 +703,13 @@ th.numeric .th-sort {
   border-color: #2f5f4f;
 }
 
+.field-hint {
+  color: var(--arena-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
 .toggle-field {
   grid-template-columns: auto 1fr;
   align-items: center;

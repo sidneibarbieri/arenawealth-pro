@@ -35,5 +35,7 @@ The current artifact focuses on:
 - advisor-grade data isolation and audit logs
 - liquidity and market-impact constraints
 - tax-aware deployment
+- transaction-fee capture for manual trades and broker promotions
+- option-income overlays for holders, scoped as a separate derivatives layer
 - broader provider coverage
 - external experiment integration when the external artifacts are available

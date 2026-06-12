@@ -52,8 +52,7 @@ Evidence:
 - `src/arenawealth/analytics/allocators.py` (min-variance, risk-parity)
 - `tests/unit/test_analytics_allocators.py`
 - `paper/data/price_backtest_reference.json` (`sota_baselines`, `sota_comparisons`)
-- `paper/figures/backtest.png`
-- `paper/main.tex` (Table 2)
+- `paper/main.tex` (performance table)
 
 ### F4. Factor weights may be less important than selection
 
@@ -256,6 +255,9 @@ Current honest position:
 5. AI-generated recommendations will be less stable and less replayable than the
    deterministic policy unless constrained by a logged policy-and-snapshot
    interface.
+6. Option-income overlays can add user value for long-term holders, but they
+   require a separate validity model because bid-ask spread, expiry, delta, and
+   nonlinear payoff constraints replace the current fixed-fee equity model.
 
 ## Backlog for Stronger Evidence
 
@@ -269,6 +271,10 @@ Current honest position:
 5. Ablations: moat, compounding, valuation, concentration caps, rebalance
    interval, transaction costs, and AI augmentation.
 6. Decision replay bundles: decision id -> frozen inputs -> regenerated output.
+7. Optional derivatives layer: covered-call, protective-put, and collar
+   scenarios with option-chain snapshots, spread checks, expiry constraints, and
+   payoff diagrams. This should be a separate study after the equity audit
+   benchmark is stable.
 
 ## Writing Discipline
 

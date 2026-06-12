@@ -178,13 +178,43 @@ def test_manual_trade_writes_local_inbox_portfolio(
             "name": "Apple",
             "shares": 1,
             "price": 120,
-            "fees": 0,
+            "fees": 2,
         },
     )
 
     assert response.status_code == 200
     assert manual.exists()
-    assert "AAPL,Apple,2.0,110.0,120.0" in manual.read_text()
+    assert "AAPL,Apple,2.0,111.0,120.0" in manual.read_text()
+
+
+def test_manual_sell_rejects_fee_above_gross_proceeds(
+    api_client: TestClient,
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    import arenawealth.api.routers.user_portfolio as user_portfolio
+
+    inbox = tmp_path / "inbox"
+    inbox.mkdir()
+    seed = inbox / "portfolio.csv"
+    seed.write_text("ticker,name,shares,cost_basis_per_share,current_price\nAAPL,Apple,1,100,110\n")
+    manual = inbox / "manual-portfolio.csv"
+    monkeypatch.setenv("ARENAWEALTH_PORTFOLIO_INBOX", str(inbox))
+    monkeypatch.setattr(user_portfolio, "MANUAL_PORTFOLIO", manual)
+
+    response = api_client.post(
+        "/api/v1/portfolio/user/trades",
+        json={
+            "action": "sell",
+            "ticker": "AAPL",
+            "shares": 1,
+            "price": 100,
+            "fees": 101,
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Fees cannot exceed gross sale proceeds"
 
 
 def test_portfolio_source_reports_manual_override(

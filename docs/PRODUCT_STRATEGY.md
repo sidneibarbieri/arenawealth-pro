@@ -38,6 +38,23 @@ can publish deterministic portfolios for a stated mandate, such as quality
 compounders under concentration limits, but it should not be framed as the
 single best portfolio for all users.
 
+## Fee Capture
+
+Manual trades must capture the actual operation fee. The default should be
+zero, because fee-free and promotional orders are common, while non-zero fees
+should be entered explicitly. The deterministic deployment engine may still use
+a policy fee schedule for planning, but recorded trades should reflect what the
+broker charged.
+
+## Derivatives Scope
+
+Covered calls, protective puts, and collars may be useful for long-term holders,
+but they should not be merged into the equity cash-deployment engine. Options
+change the decision model: validity depends on option-chain snapshots,
+bid-ask spread, expiry window, delta exposure, assignment risk, and nonlinear
+payoff. The right product path is a separate derivatives layer after the
+long-only equity audit benchmark is stable.
+
 ## Reviewer Stories
 
 - As a reviewer, I can run the offline demo and reproduce a recommendation
@@ -50,6 +67,8 @@ single best portfolio for all users.
   deterministic policy.
 - As a researcher, I can replay snapshots and extend the method with patent,
   macro, or factor baselines without changing the user workflow.
+- As a holder, I can record the actual fee paid for a buy or sell, including
+  fee-free promotional orders.
 
 ## Branding Direction
 

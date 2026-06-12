@@ -65,6 +65,9 @@ export function PortfolioEditor({
   if (fees < 0) {
     errors.push('Fees cannot be negative.');
   }
+  if (!isBuy && gross > 0 && fees > gross) {
+    errors.push('Fees cannot exceed gross proceeds.');
+  }
   if (!isBuy && ticker) {
     if (!owned) {
       errors.push(`You do not hold ${ticker}.`);
@@ -165,15 +168,17 @@ export function PortfolioEditor({
         </label>
 
         <label className="field">
-          <span>Fees</span>
+          <span>Transaction fee</span>
           <input
             inputMode="decimal"
             type="number"
             min="0"
             step="0.01"
+            placeholder="0.00"
             value={form.fees || ''}
             onChange={(event) => update('fees', Number(event.target.value))}
           />
+          <small className="field-hint">Use 0 for fee-free or promotional orders.</small>
         </label>
       </div>
 
