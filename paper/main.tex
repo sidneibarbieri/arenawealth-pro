@@ -120,18 +120,23 @@ A fast-growing line uses language models to recommend assets or build portfolios
 and evaluates them mainly by return or by alignment with a reference: media-driven
 LLM portfolios report strong but short-horizon gains \cite{oh2025alpha}, and
 knowledge-graph-aligned recommenders are scored on behavioral alignment
-\cite{spadea2025flarko}. Top-finance evidence on robo-advice is more cautious:
-large-scale field evidence shows that automated advice can reduce behavioral
-biases but does not eliminate them \cite{dacunto2019robo}. A complementary line
-documents failure modes a return or overlap score cannot see: LLM risk
+\cite{spadea2025flarko}. Return alone is a fragile verdict: a contamination-free
+multi-month trading benchmark finds that most LLM agents fail to beat a passive
+buy-and-hold baseline, and that strong financial question-answering does not
+translate into trading skill \cite{chen2025stockbench}. Top-finance field
+evidence on robo-advice is likewise cautious---automated advice can reduce
+behavioral biases without eliminating them \cite{dacunto2019robo}. A complementary
+line documents failure modes a return or overlap score cannot see: LLM risk
 assessments vary with irrelevant demographic attributes \cite{chawla2025riskadvice},
-and investment analyses carry latent, confirmation-seeking bias \cite{lee2025bias};
-surveys flag interpretability and generalizability as open problems
-\cite{elalami2025mlfinance}. What is missing is a single evaluation that places a
-learned advisor against a transparent, replayable baseline and measures, together,
-whether its advice is operationally \emph{valid}, \emph{stable} across runs, and
-how far it \emph{agrees} with the baseline. We supply that baseline and protocol;
-the advisor under test may be an LLM, a robo-allocator, or a heuristic.
+investment analyses carry latent, confirmation-seeking bias \cite{lee2025bias},
+and recommenders show systematic product preferences that survive debiasing
+\cite{zhi2025productbias}; surveys flag interpretability and generalizability as
+open problems \cite{elalami2025mlfinance}. What is missing is a single evaluation
+that places a learned advisor against a transparent, replayable baseline and
+measures, together, whether its advice is operationally \emph{valid},
+\emph{stable} across runs, and how far it \emph{agrees} with the baseline. We
+supply that baseline and protocol; the advisor under test may be an LLM, a
+robo-allocator, or a heuristic.
 
 \paragraph{Whether to believe it: reproducibility over overfitting.}
 A large fraction of reported strategy performance does not survive out of
