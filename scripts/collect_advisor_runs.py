@@ -243,8 +243,11 @@ def main() -> None:
             audits.append(audit)
 
     print(f"live calls used: {budget.used} / {arguments.max_calls}")
-    if not arguments.live:
-        print("dry run: no API calls made. Re-run with --live and Azure credentials to collect.")
+    if not audits:
+        print(
+            "no audits produced: nothing cached and no live calls. "
+            "Re-run with --live and credentials, or point --cache-root at cached runs."
+        )
         return
     summary_path = (
         arguments.cache_root
@@ -254,7 +257,8 @@ def main() -> None:
     )
     summary_path.parent.mkdir(parents=True, exist_ok=True)
     summary_path.write_text(json.dumps(audits, indent=2), encoding="utf-8")
-    print(f"wrote {summary_path}")
+    source = "live + cache" if arguments.live else "cache only (no API calls)"
+    print(f"wrote {summary_path} from {source}")
 
 
 if __name__ == "__main__":
