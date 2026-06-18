@@ -19,12 +19,14 @@ def test_kway_fee_neutrality_characterization():
     budget = 2500.0
     whole_tranches = math.ceil(budget / fee_params.tranche_size_usd)  # 3
     # Whole-tranche legs are fee-neutral and reach the ceil(a/T) bound.
-    legs = [fee_params.tranche_size_usd, fee_params.tranche_size_usd, budget - 2 * fee_params.tranche_size_usd]
+    tranche = fee_params.tranche_size_usd
+    legs = [tranche, tranche, budget - 2 * tranche]
     assert len(legs) == whole_tranches
-    assert sum(compute_order_fee(leg, fee_params) for leg in legs) == compute_order_fee(budget, fee_params)
+    whole_budget_fee = compute_order_fee(budget, fee_params)
+    assert sum(compute_order_fee(leg, fee_params) for leg in legs) == whole_budget_fee
     # Splitting into more legs than ceil(a/T) must overpay.
     too_many = [budget / 4] * 4
-    assert sum(compute_order_fee(leg, fee_params) for leg in too_many) > compute_order_fee(budget, fee_params)
+    assert sum(compute_order_fee(leg, fee_params) for leg in too_many) > whole_budget_fee
 
 
 def make_position(
@@ -178,11 +180,12 @@ def test_planner_never_overpays_single_order_fee_across_grid():
         make_position("B", 40.0, 10.0, "TB"),
     ]
     fee_params = FeeParameters()
-    
+
     for cash_cents in range(25_000, 500_000, 1_111):  # $250.00 .. $5000 in odd steps
         cash = cash_cents / 100
         plan = plan_deployment(positions, cash, fee_params)
-        assert plan.total_fee <= compute_order_fee(cash, fee_params) + 1e-9, f"overpaid at cash={cash}"
+        fee_ceiling = compute_order_fee(cash, fee_params) + 1e-9
+        assert plan.total_fee <= fee_ceiling, f"overpaid at cash={cash}"
 
 
 def test_fee_worsening_band_matches_closed_form():
@@ -200,12 +203,12 @@ def test_fee_worsening_band_matches_closed_form():
     lower_edge = fee_params.min_order_amount_usd / (1 - rho)
     assert lower_edge == 625.0
     tranche = fee_params.tranche_size_usd
-    
+
     for cash in (lower_edge, 800.0, tranche):
         plan = plan_deployment(positions, cash, fee_params)
         assert len(plan.orders) == 1, f"expected consolidation at cash={cash}"
         assert plan.total_fee == compute_order_fee(cash, fee_params)
-    
+
     # Above the tranche the split becomes fee-neutral and two orders are allowed.
     plan_two = plan_deployment(positions, 1100.0, fee_params)
     assert len(plan_two.orders) == 2

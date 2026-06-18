@@ -794,13 +794,13 @@ async def get_audit_results() -> dict[str, Any]:
             detail="AI advisor audit reference file not found. Run make ai-advisor-audit first."
         )
     try:
-        with open(ref_path, "r", encoding="utf-8") as f:
+        with open(ref_path, encoding="utf-8") as f:
             return json.load(f)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to read audit results: {str(e)}"
-        )
+            detail=f"Failed to read audit results: {e!s}"
+        ) from e
 
 
 @router.get("/user/health")
