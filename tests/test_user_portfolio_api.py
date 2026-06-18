@@ -346,3 +346,14 @@ def test_portfolio_candidates_offline_demo(api_client: TestClient) -> None:
     assert 1 <= len(body["candidates"]) <= 5
     scores = [candidate["composite_score"] for candidate in body["candidates"]]
     assert scores == sorted(scores, reverse=True)
+
+
+def test_portfolio_audit_results_endpoint(api_client: TestClient) -> None:
+    response = api_client.get("/api/v1/portfolio/audit-results")
+    assert response.status_code == 200
+    body = response.json()
+    assert "version" in body
+    assert "overall" in body
+    assert "by_advisor" in body
+    assert "reports" in body
+

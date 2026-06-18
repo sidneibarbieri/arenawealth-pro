@@ -241,3 +241,34 @@ export async function fetchDecisionLogs(signal: AbortSignal): Promise<DecisionLo
   const response = await fetch('/api/v1/portfolio/user/decisions?limit=8', { signal });
   return parseJsonResponse<DecisionLogEntry[]>(response, 'Decision log');
 }
+
+export interface AuditReportOverall {
+  run_sets: number;
+  mean_valid_rate: number;
+  mean_policy_jaccard: number;
+  mean_stability: number;
+  violation_counts: Record<string, number>;
+}
+
+export interface AdvisorSummary {
+  scenarios: number;
+  mean_valid_rate: number;
+  mean_policy_jaccard: number;
+  mean_stability: number;
+  violation_counts: Record<string, number>;
+}
+
+export interface AuditResultsResponse {
+  version: string;
+  description: string;
+  scenario_count: number;
+  advisor_count: number;
+  overall: AuditReportOverall;
+  by_advisor: Record<string, AdvisorSummary>;
+}
+
+export async function fetchAuditResults(signal: AbortSignal): Promise<AuditResultsResponse> {
+  const response = await fetch('/api/v1/portfolio/audit-results', { signal });
+  return parseJsonResponse<AuditResultsResponse>(response, 'Audit results');
+}
+

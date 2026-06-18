@@ -784,6 +784,25 @@ async def get_decision_logs(
     return latest_decision_logs(limit)
 
 
+@router.get("/audit-results")
+async def get_audit_results() -> dict[str, Any]:
+    """Get AI advisor audit benchmark results."""
+    ref_path = ROOT / "paper" / "data" / "ai_advisor_audit_reference.json"
+    if not ref_path.exists():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="AI advisor audit reference file not found. Run make ai-advisor-audit first."
+        )
+    try:
+        with open(ref_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to read audit results: {str(e)}"
+        )
+
+
 @router.get("/user/health")
 async def portfolio_health_check() -> dict[str, Any]:
     snapshot = build_snapshot(live=False)
@@ -795,3 +814,4 @@ async def portfolio_health_check() -> dict[str, Any]:
         "position_count": snapshot.summary.position_count,
         "last_updated": snapshot.last_updated,
     }
+

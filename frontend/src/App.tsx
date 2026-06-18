@@ -21,6 +21,7 @@ import {
   recordManualTrade,
   clearManualPortfolio,
   uploadPortfolioCsv,
+  fetchAuditResults,
   type Candidate,
   type CandidatesResponse,
   type DecisionLogEntry,
@@ -31,6 +32,7 @@ import {
   type Position,
   type RecommendationOrder,
   type RecommendationResponse,
+  type AuditResultsResponse,
 } from './api';
 import { DataSourcesHealth } from './components/DataSourcesHealth';
 import { PortfolioEditor } from './components/PortfolioEditor';

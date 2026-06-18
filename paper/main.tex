@@ -371,9 +371,11 @@ budget can be diversified without paying for it.
 A split of budget $a$ into legs $a_1,\dots,a_k$ ($\sum_i a_i=a$, $a_i>0$) is
 fee-neutral, $\sum_i f(a_i)=f(a)$, iff
 $\sum_i \lceil a_i/T\rceil = \lceil a/T\rceil$. The number of fee-neutral legs is
-therefore at most $\lceil a/T\rceil$, and this bound is achieved by giving each
-leg a full tranche. Requiring each leg also to be economic ($a_i\ge\mathrm{MIN}$)
-caps the breadth at $\min\!\big(\lceil a/T\rceil, \lfloor a/\mathrm{MIN}\rfloor\big)$.
+therefore at most $\lceil a/T\rceil$, and this bound is achieved by allocating
+cash such that each leg is at most a single tranche size (i.e., $a_i \le T$), with at
+most one leg being fractional if $a$ is not a multiple of $T$. Requiring each leg
+also to be economic ($a_i\ge\mathrm{MIN}$) caps the breadth at
+$\min\!\big(\lceil a/T\rceil, \lfloor a/\mathrm{MIN}\rfloor\big)$.
 \end{proposition}
 \begin{proof}
 $f(a_i)=\lceil a_i/T\rceil c$ and $f(a)=\lceil a/T\rceil c$, so neutrality is
@@ -415,9 +417,10 @@ outside it.
 \begin{proposition}[Feasibility of the floor]
 \label{prop:floor}
 Let $g(a)=f(a)/a=\lceil a/T\rceil c/a$ be the fee impact of a single order of
-size $a$. Within tranche $k$ (for $a\in((k-1)T, kT]$) $g$ decreases from near
-$kc/((k-1)T)$ to its tranche minimum $g(kT)=c/T$; hence $\min_{a>0} g(a)=c/T$,
-attained at every boundary $a=kT$. Consequently, for a tolerance $\tau$:
+size $a$. Within tranche $k$ (for $a\in((k-1)T, kT]$) $g$ decreases from its supremum
+(which is $\infty$ for $k=1$, and $kc/((k-1)T)$ for $k>1$) to its tranche minimum
+$g(kT)=c/T$; hence $\min_{a>0} g(a)=c/T$, attained at every boundary $a=kT$.
+Consequently, for a tolerance $\tau$:
 \begin{itemize}
   \item if $\tau \ge c/T$, the smallest order meeting the tolerance is
   $\mathrm{MIN}=c/\tau\le T$ (first tranche), the fixed point of
