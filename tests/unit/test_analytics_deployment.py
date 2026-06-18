@@ -3,9 +3,8 @@
 import math
 
 from arenawealth.analytics.deployment import (
-    MIN_ORDER_AMOUNT,
-    TRANCHE_SIZE,
-    order_fee,
+    FeeParameters,
+    compute_order_fee,
     plan_deployment,
 )
 from arenawealth.analytics.models import Holding, PositionAnalysis
@@ -16,15 +15,16 @@ def test_kway_fee_neutrality_characterization():
     tranche counts sum to the whole-budget tranche count, and the maximum number
     of fee-neutral legs equals ceil(budget / T).
     """
+    fee_params = FeeParameters()
     budget = 2500.0
-    whole_tranches = math.ceil(budget / TRANCHE_SIZE)  # 3
+    whole_tranches = math.ceil(budget / fee_params.tranche_size_usd)  # 3
     # Whole-tranche legs are fee-neutral and reach the ceil(a/T) bound.
-    legs = [TRANCHE_SIZE, TRANCHE_SIZE, budget - 2 * TRANCHE_SIZE]
+    legs = [fee_params.tranche_size_usd, fee_params.tranche_size_usd, budget - 2 * fee_params.tranche_size_usd]
     assert len(legs) == whole_tranches
-    assert sum(order_fee(leg) for leg in legs) == order_fee(budget)
+    assert sum(compute_order_fee(leg, fee_params) for leg in legs) == compute_order_fee(budget, fee_params)
     # Splitting into more legs than ceil(a/T) must overpay.
     too_many = [budget / 4] * 4
-    assert sum(order_fee(leg) for leg in too_many) > order_fee(budget)
+    assert sum(compute_order_fee(leg, fee_params) for leg in too_many) > compute_order_fee(budget, fee_params)
 
 
 def make_position(
@@ -58,13 +58,14 @@ def make_position(
 
 
 def test_order_fee_tiers():
-    assert order_fee(0.0) == 0.0
-    assert order_fee(500.0) == 2.50
-    assert order_fee(1000.0) == 2.50
-    assert order_fee(1000.01) == 5.00
-    assert order_fee(1500.0) == 5.00
-    assert order_fee(2000.0) == 5.00
-    assert order_fee(2001.0) == 7.50
+    fee_params = FeeParameters()
+    assert compute_order_fee(0.0, fee_params) == 0.0
+    assert compute_order_fee(500.0, fee_params) == 2.50
+    assert compute_order_fee(1000.0, fee_params) == 2.50
+    assert compute_order_fee(1000.01, fee_params) == 5.00
+    assert compute_order_fee(1500.0, fee_params) == 5.00
+    assert compute_order_fee(2000.0, fee_params) == 5.00
+    assert compute_order_fee(2001.0, fee_params) == 7.50
 
 
 def test_excludes_overweight_and_picks_top_two_distinct_themes():
@@ -119,10 +120,11 @@ def test_two_orders_cost_same_as_one():
         make_position("A", 80.0, 10.0, "TA"),
         make_position("B", 70.0, 10.0, "TB"),
     ]
+    fee_params = FeeParameters()
 
-    plan = plan_deployment(positions, 1511.18)
+    plan = plan_deployment(positions, 1511.18, fee_params)
 
-    assert plan.total_fee == order_fee(1511.18)
+    assert plan.total_fee == compute_order_fee(1511.18, fee_params)
 
 
 def test_does_not_deploy_cash_below_economic_minimum():
@@ -130,8 +132,9 @@ def test_does_not_deploy_cash_below_economic_minimum():
         make_position("A", 80.0, 10.0, "TA"),
         make_position("B", 70.0, 10.0, "TB"),
     ]
+    fee_params = FeeParameters()
 
-    plan = plan_deployment(positions, MIN_ORDER_AMOUNT - 0.01)
+    plan = plan_deployment(positions, fee_params.min_order_amount_usd - 0.01, fee_params)
 
     assert plan.orders == ()
     assert plan.total_fee == 0.0
@@ -142,11 +145,12 @@ def test_uses_one_order_when_cash_cannot_fund_two_economic_orders():
         make_position("A", 80.0, 10.0, "TA"),
         make_position("B", 70.0, 10.0, "TB"),
     ]
+    fee_params = FeeParameters()
 
-    plan = plan_deployment(positions, MIN_ORDER_AMOUNT * 1.5)
+    plan = plan_deployment(positions, fee_params.min_order_amount_usd * 1.5, fee_params)
 
     assert tuple(order.ticker for order in plan.orders) == ("A",)
-    assert plan.orders[0].amount == MIN_ORDER_AMOUNT * 1.5
+    assert plan.orders[0].amount == fee_params.min_order_amount_usd * 1.5
 
 
 def test_consolidates_in_subtranche_overpay_band():
@@ -159,11 +163,12 @@ def test_consolidates_in_subtranche_overpay_band():
         make_position("A", 60.0, 10.0, "TA"),
         make_position("B", 40.0, 10.0, "TB"),
     ]
+    fee_params = FeeParameters()
 
-    plan = plan_deployment(positions, 800.0)
+    plan = plan_deployment(positions, 800.0, fee_params)
 
     assert len(plan.orders) == 1
-    assert plan.total_fee == order_fee(800.0) == 2.50
+    assert plan.total_fee == compute_order_fee(800.0, fee_params) == 2.50
 
 
 def test_planner_never_overpays_single_order_fee_across_grid():
@@ -172,10 +177,12 @@ def test_planner_never_overpays_single_order_fee_across_grid():
         make_position("A", 60.0, 10.0, "TA"),
         make_position("B", 40.0, 10.0, "TB"),
     ]
+    fee_params = FeeParameters()
+    
     for cash_cents in range(25_000, 500_000, 1_111):  # $250.00 .. $5000 in odd steps
         cash = cash_cents / 100
-        plan = plan_deployment(positions, cash)
-        assert plan.total_fee <= order_fee(cash) + 1e-9, f"overpaid at cash={cash}"
+        plan = plan_deployment(positions, cash, fee_params)
+        assert plan.total_fee <= compute_order_fee(cash, fee_params) + 1e-9, f"overpaid at cash={cash}"
 
 
 def test_fee_worsening_band_matches_closed_form():
@@ -188,15 +195,18 @@ def test_fee_worsening_band_matches_closed_form():
         make_position("A", 60.0, 10.0, "TA"),
         make_position("B", 40.0, 10.0, "TB"),
     ]
+    fee_params = FeeParameters()
     rho = 60.0 / (60.0 + 40.0)
-    lower_edge = MIN_ORDER_AMOUNT / (1 - rho)
+    lower_edge = fee_params.min_order_amount_usd / (1 - rho)
     assert lower_edge == 625.0
-    tranche = 1000.0
+    tranche = fee_params.tranche_size_usd
+    
     for cash in (lower_edge, 800.0, tranche):
-        plan = plan_deployment(positions, cash)
+        plan = plan_deployment(positions, cash, fee_params)
         assert len(plan.orders) == 1, f"expected consolidation at cash={cash}"
-        assert plan.total_fee == order_fee(cash)
+        assert plan.total_fee == compute_order_fee(cash, fee_params)
+    
     # Above the tranche the split becomes fee-neutral and two orders are allowed.
-    plan_two = plan_deployment(positions, 1100.0)
+    plan_two = plan_deployment(positions, 1100.0, fee_params)
     assert len(plan_two.orders) == 2
-    assert plan_two.total_fee == order_fee(1100.0)
+    assert plan_two.total_fee == compute_order_fee(1100.0, fee_params)
