@@ -23,11 +23,15 @@ wheels/
 # Development
 venv/
 .venv/
+.uv-cache/
 env/
 .vscode/
 .idea/
 *.swp
 *.swo
+.private/
+.claude/
+arenawealth-pro.worktrees/
 
 # System
 .DS_Store
@@ -64,10 +68,6 @@ data/snapshots/
 .env.*
 !.env.example
 
-# Submission packets carry venue-specific narratives — keep local only
-submissions/product-pitch/demo_shots/*.png
-submissions/product-pitch/*.pdf
-notes/PAPER_TARGET.md
 _qa_*.pdf
 
 # Local environments and generated output
@@ -85,9 +85,6 @@ htmlcov/
 *_excellence_report_*.md
 archive/
 old_arenawealth-pro/
-brandArena/
-project-framework/
-notes/brand-assets/
 /.playwright-mcp/
 portfolio-editor-*.png
 

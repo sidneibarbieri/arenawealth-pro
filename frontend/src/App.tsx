@@ -21,7 +21,6 @@ import {
   recordManualTrade,
   clearManualPortfolio,
   uploadPortfolioCsv,
-  fetchAuditResults,
   type Candidate,
   type CandidatesResponse,
   type DecisionLogEntry,
@@ -32,7 +31,6 @@ import {
   type Position,
   type RecommendationOrder,
   type RecommendationResponse,
-  type AuditResultsResponse,
 } from './api';
 import { DataSourcesHealth } from './components/DataSourcesHealth';
 import { PortfolioEditor } from './components/PortfolioEditor';
@@ -296,7 +294,7 @@ function App() {
       </a>
       <aside className="side-rail" aria-label="Workspace navigation">
         <div className="brand-lockup">
-          <div className="brand-mark">A</div>
+          <img className="brand-mark" src="/favicon.svg" alt="" aria-hidden="true" />
           <div>
             <p className="eyebrow">ArenaWealth</p>
             <p className="brand-subtitle">Research desk</p>
@@ -897,7 +895,7 @@ function PortfolioSourcePanel({ source, onResetManual, onUpload }: PortfolioSour
         </div>
       </div>
       <p className="mode-hint">
-        Upload a broker CSV (for example, an Avenue export) to update the portfolio. Manual edits
+        Upload a broker CSV export to update the portfolio. Manual edits
         become the active source until cleared.
       </p>
     </section>

@@ -15,16 +15,15 @@ workbench, and reviewer-facing validation scripts.
 ## Setup
 
 ```bash
-python3.11 -m venv .venv
-source .venv/bin/activate
-pip install -e ".[dev]"
-cd frontend && npm install && cd ..
+make setup
 ```
 
-Equivalent shortcut:
+Manual equivalent:
 
 ```bash
-make setup
+python3.11 -m venv .venv
+.venv/bin/python -m pip install -e ".[dev]"
+cd frontend && npm install && cd ..
 ```
 
 To create a local `.env` template for free data-provider configuration:
@@ -72,7 +71,7 @@ Reviewer-safe offline run:
 ```bash
 python scripts/moat_compounding_analysis.py \
   --cash 1511.18 \
-  --holdings tests/fixtures/seed_portfolio_avenue.csv \
+  --holdings tests/fixtures/seed_portfolio_broker.csv \
   --offline-demo
 ```
 
@@ -189,8 +188,8 @@ The Playwright config starts the API and frontend when needed.
 ## Paper Scaffold
 
 The LaTeX paper scaffold is under `paper/`. It is anonymous and names no
-submission target, author, or institution. Submission packets live under
-`submissions/` and are not required to run the artifact.
+submission target, author, or institution. Submission-specific packets and
+private strategy notes are not part of the publishable artifact.
 
 ## Scope Notes
 

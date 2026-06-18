@@ -1,4 +1,0 @@
-display_name: Free Data Source Readiness
-short_description: Configure and monitor free APIs without leaking secrets or slowing the app.
-default_prompt: Add provider readiness checks for this free-data project, with config and live modes.
-

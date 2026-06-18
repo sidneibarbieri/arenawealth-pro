@@ -1,1 +1,1 @@
-"""Portfolio importers — CSV, Avenue, Interactive Brokers, manual entry."""
+"""Portfolio importers: CSV broker exports and manual entry."""

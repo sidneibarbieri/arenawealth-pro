@@ -76,6 +76,14 @@ def test_model_label_defaults_from_provider_env(monkeypatch):
     assert safe_slug("model / x") == "model_x"
 
 
+def test_model_label_uses_current_final_defaults(monkeypatch):
+    monkeypatch.delenv("OPENAI_MODEL", raising=False)
+    monkeypatch.delenv("ANTHROPIC_MODEL", raising=False)
+
+    assert model_label("openai", None) == "gpt-5.5"
+    assert model_label("anthropic", None) == "claude-opus-4-8"
+
+
 def test_prompt_hash_changes_when_prompt_changes():
     assert prompt_hash("prompt v1") != prompt_hash("prompt v2")
     assert prompt_hash("prompt v1") == prompt_hash("prompt v1")

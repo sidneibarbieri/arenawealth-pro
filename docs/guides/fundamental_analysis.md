@@ -11,7 +11,7 @@ For reviewer runs without network access:
 ```bash
 python scripts/moat_compounding_analysis.py \
   --cash 1511.18 \
-  --holdings tests/fixtures/seed_portfolio_avenue.csv \
+  --holdings tests/fixtures/seed_portfolio_broker.csv \
   --offline-demo
 ```
 

@@ -53,7 +53,7 @@ from arenawealth.experiments.robustness import (
 )
 
 ROOT = Path(__file__).resolve().parent.parent
-SEED_CSV = ROOT / "tests" / "fixtures" / "seed_portfolio_avenue.csv"
+SEED_CSV = ROOT / "tests" / "fixtures" / "seed_portfolio_broker.csv"
 RETURN_MATRIX_CSV = ROOT / "paper" / "data" / "returns_matrix.csv"
 FIG_DIR = ROOT / "paper" / "figures"
 EXPORT_DIR = ROOT / "exports"

@@ -14,9 +14,6 @@ Recommended reading order:
 8. `guides/architecture.md` for system structure.
 9. `guides/fundamental_analysis.md` and `guides/compounding.md` for scoring logic.
 
-Strategic notes that are not part of the reviewer artifact live under `notes/`.
-Submission-specific packets live under `submissions/` and are not runtime
-dependencies.
-
-Files archived under `archive/` are historical work products and are not part of
-the supported artifact.
+Private strategy notes, pitch packets, and reusable local assistant skills are
+kept outside the publishable artifact. Files archived under `archive/` are
+historical work products and are not part of the supported artifact.

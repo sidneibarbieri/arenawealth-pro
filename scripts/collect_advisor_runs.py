@@ -36,7 +36,12 @@ from arenawealth.experiments.ai_advisor import (
     AdvisorScenario,
     evaluate_run_set,
 )
-from arenawealth.experiments.llm_clients import AdvisorLLMClient, build_llm_client
+from arenawealth.experiments.llm_clients import (
+    DEFAULT_ANTHROPIC_MODEL,
+    DEFAULT_OPENAI_MODEL,
+    AdvisorLLMClient,
+    build_llm_client,
+)
 
 ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(ROOT / ".env")
@@ -97,9 +102,9 @@ def model_label(provider: str, model: str | None) -> str:
             or "azure-model"
         )
     if normalized == "openai":
-        return os.getenv("OPENAI_MODEL", "gpt-4o")
+        return os.getenv("OPENAI_MODEL", DEFAULT_OPENAI_MODEL)
     if normalized == "anthropic":
-        return os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-5")
+        return os.getenv("ANTHROPIC_MODEL", DEFAULT_ANTHROPIC_MODEL)
     return "unknown-model"
 
 

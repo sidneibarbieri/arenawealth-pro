@@ -53,7 +53,7 @@ The output is written to `exports/reviewer_metrics_<timestamp>.json`.
 ```bash
 python scripts/moat_compounding_analysis.py \
   --cash 1511.18 \
-  --holdings tests/fixtures/seed_portfolio_avenue.csv \
+  --holdings tests/fixtures/seed_portfolio_broker.csv \
   --offline-demo
 ```
 

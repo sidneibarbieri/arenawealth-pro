@@ -20,5 +20,5 @@ feel like a financial workbench, not a marketing page.
 
 ## Current Application
 
-The workbench uses the Arena palette through CSS tokens. The ignored
-`brandArena/` studies remain reference material only.
+The workbench uses the Arena palette through CSS tokens. Private brand studies
+are outside the publishable artifact.

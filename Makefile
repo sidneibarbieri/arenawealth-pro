@@ -1,12 +1,18 @@
 PYTHON ?= .venv/bin/python
 PIP ?= .venv/bin/pip
 UVICORN ?= .venv/bin/uvicorn
+UV_CACHE_DIR ?= .uv-cache
 
-.PHONY: setup verify verify-e2e metrics recommendation price-backtest experiments ai-advisor-audit bibliography collect-advisor-runs verify-data repro-docker configure-env api ui app run paper all package clean
+.PHONY: setup verify verify-e2e metrics recommendation price-backtest experiments ai-advisor-audit bibliography advisor-budget collect-advisor-runs verify-data repro-docker configure-env api ui app run paper all package clean
 
 setup:
 	python3.11 -m venv .venv
-	$(PIP) install -e ".[dev]"
+	if command -v uv >/dev/null 2>&1; then \
+		UV_CACHE_DIR=$(UV_CACHE_DIR) uv pip install --python .venv/bin/python -e ".[dev]"; \
+	else \
+		.venv/bin/python -m ensurepip --upgrade; \
+		.venv/bin/python -m pip install -e ".[dev]"; \
+	fi
 	cd frontend && npm install
 
 verify:
@@ -32,6 +38,9 @@ ai-advisor-audit:
 
 bibliography:
 	$(PYTHON) scripts/manage_bibliography.py
+
+advisor-budget:
+	$(PYTHON) scripts/estimate_advisor_budget.py --runs 3
 
 collect-advisor-runs:
 	$(PYTHON) scripts/collect_advisor_runs.py --runs 3

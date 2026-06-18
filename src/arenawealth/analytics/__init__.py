@@ -8,11 +8,11 @@ from arenawealth.analytics.backtest import (
     run_backtest,
 )
 from arenawealth.analytics.deployment import (
-    ConcentrationLimits,
     FEE_PER_TRANCHE,
-    FeeParameters,
     MIN_ORDER_AMOUNT,
     TRANCHE_SIZE,
+    ConcentrationLimits,
+    FeeParameters,
     compute_order_fee,
     order_fee,
     plan_deployment,
@@ -62,6 +62,9 @@ from arenawealth.analytics.snapshots import SnapshotProvider, load_snapshot, rec
 from arenawealth.analytics.workflow import analyze_holdings, fetch_fundamentals
 
 __all__ = [
+    "FEE_PER_TRANCHE",
+    "MIN_ORDER_AMOUNT",
+    "TRANCHE_SIZE",
     "AdditionReview",
     "AlignedReturnSeries",
     "BacktestComparison",
@@ -70,7 +73,6 @@ __all__ = [
     "ConcentrationLimits",
     "DemoFundamentalsProvider",
     "DeploymentPlan",
-    "FEE_PER_TRANCHE",
     "FMPFundamentalsProvider",
     "FeeParameters",
     "FinnhubFundamentalsProvider",
@@ -78,7 +80,6 @@ __all__ = [
     "Fundamentals",
     "FundamentalsProvider",
     "Holding",
-    "MIN_ORDER_AMOUNT",
     "Order",
     "PointInTimeFact",
     "PortfolioReview",
@@ -87,7 +88,6 @@ __all__ = [
     "PriceBacktestStudy",
     "ReplacementReview",
     "SnapshotProvider",
-    "TRANCHE_SIZE",
     "TrimReview",
     "YahooFundamentalsProvider",
     "align_price_history",

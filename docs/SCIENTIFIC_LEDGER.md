@@ -293,7 +293,7 @@ Current honest position:
    inside a fixed portfolio.
 4. Provider-health visibility improves reproducibility by making missing data
    states explicit.
-5. AI-generated recommendations will be less stable and less replayable than the
+5. Model-generated recommendations will be less stable and less replayable than the
    deterministic policy unless constrained by a logged policy-and-snapshot
    interface.
 6. Option-income overlays can add user value for long-term holders, but they

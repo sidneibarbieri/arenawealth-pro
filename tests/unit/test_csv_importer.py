@@ -1,4 +1,4 @@
-"""Tests for CSV importer — validates it reads the real Avenue seed fixture correctly."""
+"""Tests for CSV importer using a brokerage-style seed fixture."""
 
 from decimal import Decimal
 from pathlib import Path
@@ -8,35 +8,50 @@ import pytest
 from arenawealth.importers.csv_importer import import_csv
 
 FIXTURES_DIR = Path(__file__).parent.parent / "fixtures"
-AVENUE_CSV = FIXTURES_DIR / "seed_portfolio_avenue.csv"
+BROKER_CSV = FIXTURES_DIR / "seed_portfolio_broker.csv"
+
 
 class TestCsvImporter:
-    def test_reads_avenue_fixture(self) -> None:
-        positions = import_csv(AVENUE_CSV)
+    def test_reads_broker_fixture(self) -> None:
+        positions = import_csv(BROKER_CSV)
         assert len(positions) == 17
 
     def test_first_position_is_lin(self) -> None:
-        positions = import_csv(AVENUE_CSV)
+        positions = import_csv(BROKER_CSV)
         assert positions[0].ticker == "LIN"
         assert positions[0].name == "Linde plc"
 
     def test_shares_precision_preserved(self) -> None:
-        positions = import_csv(AVENUE_CSV)
+        positions = import_csv(BROKER_CSV)
         lin = positions[0]
         assert lin.shares == Decimal("34.47335")
 
     def test_cost_basis_correct(self) -> None:
-        positions = import_csv(AVENUE_CSV)
+        positions = import_csv(BROKER_CSV)
         lin = positions[0]
         assert lin.cost_basis_per_share == Decimal("431.36")
 
     def test_all_tickers_present(self) -> None:
-        positions = import_csv(AVENUE_CSV)
+        positions = import_csv(BROKER_CSV)
         tickers = {pos.ticker for pos in positions}
         expected = {
-            "LIN", "RELX", "SPGI", "EQIX", "ASML", "ROP", "MSFT",
-            "GOOGL", "TSM", "AVGO", "PLD", "TDG", "NVO", "ISRG",
-            "UNH", "JPM", "LLY",
+            "LIN",
+            "RELX",
+            "SPGI",
+            "EQIX",
+            "ASML",
+            "ROP",
+            "MSFT",
+            "GOOGL",
+            "TSM",
+            "AVGO",
+            "PLD",
+            "TDG",
+            "NVO",
+            "ISRG",
+            "UNH",
+            "JPM",
+            "LLY",
         }
         assert tickers == expected
 
@@ -52,7 +67,7 @@ class TestCsvImporter:
         positions = import_csv(csv)
         assert positions[0].current_price == Decimal("150")
 
-    def test_reads_avenue_download_columns(self, tmp_path: Path) -> None:
+    def test_reads_broker_download_columns(self, tmp_path: Path) -> None:
         csv = tmp_path / "portfolio.csv"
         csv.write_text(
             "Symbol,Name,Asset Class,Category,Total Quantity,Available Quantity,"

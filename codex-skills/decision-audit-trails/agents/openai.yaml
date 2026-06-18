@@ -1,4 +1,0 @@
-display_name: Decision Audit Trails
-short_description: Add append-only decision logs, provenance, snapshots, and replay paths.
-default_prompt: Add an audit trail for this recommendation or ranking workflow and test that it persists real decisions.
-

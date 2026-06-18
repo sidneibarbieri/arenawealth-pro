@@ -30,11 +30,10 @@ This runs, in order:
    JSON report under `exports/` from the engine and the tracked return matrix.
 4. `paper` — compile `paper/main.pdf` with `latexmk` (requires a TeX install).
 
-Science only (no TeX, no frontend):
+Host reproduction:
 
 ```bash
-python3.11 -m venv .venv && . .venv/bin/activate
-pip install -e ".[dev]"
+make setup      # installs Python and frontend dependencies
 make verify-data   # SHA-256 of tracked inputs vs paper/data/DATA_HASHES.txt
 make verify        # tests + lint
 make experiments   # regenerate figures and the JSON report
@@ -44,15 +43,15 @@ make experiments   # regenerate figures and the JSON report
 
 | Paper element | Produced by |
 | --- | --- |
-| Subadditivity, fee-worsening propositions | `src/arenawealth/analytics/deployment.py`, tests in `tests/unit/test_analytics_deployment.py` |
+| Fee propositions | `src/arenawealth/analytics/deployment.py` and deployment tests |
 | Fee premium + guardrail figures | `src/arenawealth/experiments/fee_landscape.py` |
-| Sensitivity figure + schedule table | `src/arenawealth/experiments/fee_sensitivity.py` |
-| Ablation figure/table | `src/arenawealth/experiments/ablation.py` |
-| Backtest table/figure | `paper/data/price_backtest_reference.json` (tracked) |
-| Robustness figure + bootstrap CI | `src/arenawealth/experiments/robustness.py`, `paper/data/returns_matrix.csv` |
-| Audit protocol metrics + archetype table/figure | `src/arenawealth/experiments/ai_advisor.py`, `scripts/run_ai_advisor_audit.py`, `paper/data/ai_advisor_audit_reference.json` |
+| Schedule table | `src/arenawealth/experiments/fee_sensitivity.py` |
+| Ablation evidence | `src/arenawealth/experiments/ablation.py` |
+| Backtest table | `paper/data/price_backtest_reference.json` |
+| Robustness figure | `src/arenawealth/experiments/robustness.py` and tracked returns |
+| Advisor audit | `src/arenawealth/experiments/ai_advisor.py` and frozen scenarios |
 | Audit scenarios (frozen) | `paper/data/ai_advisor_scenarios.json` |
-| Replay-determinism guarantee | `tests/test_user_portfolio_api.py::test_recommendation_is_replayable_from_same_inputs` |
+| Replay determinism | `tests/test_user_portfolio_api.py` |
 
 ## Determinism
 

@@ -1,3 +1,0 @@
-display_name: FinTech Competition Prep
-short_description: Package a fintech product for a startup or pitch competition with demo script, market sizing, and compliance slide.
-default_prompt: Prepare this fintech project for a product competition. Produce a demo narrative, a claim-evidence matrix, a compliance framing, and a demo script with offline fallback.

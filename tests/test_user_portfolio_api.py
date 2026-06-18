@@ -264,7 +264,7 @@ def test_clear_manual_portfolio_restores_broker_export(
     assert body["positions"][0]["ticker"] == "MSFT"
 
 
-def test_upload_avenue_csv_becomes_active_source(
+def test_upload_broker_csv_becomes_active_source(
     api_client: TestClient,
     tmp_path: Path,
     monkeypatch,
@@ -276,13 +276,13 @@ def test_upload_avenue_csv_becomes_active_source(
     monkeypatch.setenv("ARENAWEALTH_PORTFOLIO_INBOX", str(inbox))
     monkeypatch.setattr(user_portfolio, "MANUAL_PORTFOLIO", inbox / "manual-portfolio.csv")
 
-    avenue_csv = (
+    broker_csv = (
         "Symbol,Description,Total Quantity,Average Price,Current Price\n"
         "NVDA,NVIDIA Corp,10,100.00,150.00\n"
     )
     response = api_client.post(
         "/api/v1/portfolio/user/source/upload",
-        files={"file": ("portfolio-25-05-2026.csv", avenue_csv, "text/csv")},
+        files={"file": ("portfolio-25-05-2026.csv", broker_csv, "text/csv")},
     )
 
     assert response.status_code == 200

@@ -1,4 +1,0 @@
-display_name: Repo Artifact Sanitization
-short_description: Clean repositories for external review while preserving valuable legacy insights.
-default_prompt: Sanitize this repository for external review and salvage only valuable legacy ideas.
-

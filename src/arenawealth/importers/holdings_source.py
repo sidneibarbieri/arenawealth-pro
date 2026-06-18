@@ -8,7 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_INBOX = ROOT / "data" / "inbox"
 PRIVATE_HOLDINGS = ROOT / "data" / "carteira_atual.csv"
-FIXTURE_HOLDINGS = ROOT / "tests" / "fixtures" / "seed_portfolio_avenue.csv"
+FIXTURE_HOLDINGS = ROOT / "tests" / "fixtures" / "seed_portfolio_broker.csv"
 
 
 def holdings_inbox() -> Path:

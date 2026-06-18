@@ -107,17 +107,11 @@ a {
 }
 
 .brand-mark {
-  display: grid;
   width: 42px;
   height: 42px;
-  place-items: center;
-  border-top: 2px solid var(--arena-gold);
-  border-right: 2px solid var(--arena-blue);
-  border-bottom: 1px solid rgba(247, 246, 242, 0.28);
-  border-left: 1px solid rgba(247, 246, 242, 0.28);
-  background: var(--arena-paper);
-  color: var(--arena-space);
-  font-weight: 800;
+  flex: 0 0 auto;
+  display: block;
+  border-radius: 10px;
 }
 
 .brand-subtitle,

@@ -20,7 +20,7 @@ from arenawealth.analytics import (
 )
 
 DEFAULT_HOLDINGS = Path("data/carteira_atual.csv")
-DEFAULT_FIXTURE = Path("tests/fixtures/seed_portfolio_avenue.csv")
+DEFAULT_FIXTURE = Path("tests/fixtures/seed_portfolio_broker.csv")
 DEFAULT_OUTPUT_DIR = Path("exports")
 RETURN_MATRIX_PATH = Path("paper/data/returns_matrix.csv")
 

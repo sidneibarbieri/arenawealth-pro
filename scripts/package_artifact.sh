@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 # Build an anonymized, self-contained reviewer artifact from tracked files.
 #
-# Exports the git-tracked snapshot (no history, respects .gitignore), drops the
-# submission-specific and build-tooling material, anonymizes the author identity read
-# from pyproject (no hardcoded name), and zips the result under dist/.
+# Exports the committed git snapshot (no history), anonymizes the author
+# identity read from pyproject, and zips the result under dist/.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
+if [ -n "$(git status --porcelain)" ]; then
+    echo "ERROR: commit or discard local changes before packaging the artifact." >&2
+    exit 1
+fi
+
 stamp=$(date +%Y%m%d)
 name="arenawealth-artifact-${stamp}"
 work="dist/${name}"
@@ -28,9 +32,7 @@ mkdir -p "${work}"
 # Tracked files only: no .git, no ignored private data.
 git archive --format=tar HEAD | tar -x -C "${work}"
 
-# Remove material that is not part of the research artifact, including this
-# packager (build tooling reviewers do not need).
-rm -rf "${work}/submissions" "${work}/notes" "${work}/codex-skills"
+# Remove this packager; reviewers receive the frozen artifact, not release tooling.
 rm -f "${work}/scripts/package_artifact.sh"
 
 # Anonymize the author identity wherever it appears.

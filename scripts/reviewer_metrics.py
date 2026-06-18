@@ -97,7 +97,7 @@ def build_payload(timeout_seconds: int) -> dict[str, object]:
                 "--cash",
                 "1511.18",
                 "--holdings",
-                "tests/fixtures/seed_portfolio_avenue.csv",
+                "tests/fixtures/seed_portfolio_broker.csv",
                 "--offline-demo",
             ],
             timeout_seconds,

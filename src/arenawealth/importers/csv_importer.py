@@ -1,8 +1,7 @@
 """CSV portfolio importer — flexible column mapping for any broker export.
 
-Handles the common case: user exports positions from Avenue, Interactive Brokers,
-or any broker as CSV. Column names are mapped via aliases so the user doesn't need
-to rename anything.
+Handles the common case: a user exports positions from a broker as CSV. Column
+names are mapped via aliases so the user does not need to rename anything.
 """
 
 from __future__ import annotations
@@ -46,12 +45,14 @@ CURRENT_PRICE_ALIASES = {
     "cotação",
 }
 
+
 def _find_column(columns: list[str], aliases: set[str]) -> str | None:
     normalized = {col.lower().strip().replace(" ", "_"): col for col in columns}
     for alias in aliases:
         if alias in normalized:
             return normalized[alias]
     return None
+
 
 def import_csv(
     path: Path | str,

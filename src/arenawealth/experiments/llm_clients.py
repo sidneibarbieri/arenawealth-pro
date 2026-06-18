@@ -13,6 +13,10 @@ from typing import Any, Protocol
 
 import httpx
 
+ADVISOR_MAX_OUTPUT_TOKENS = 500
+DEFAULT_OPENAI_MODEL = "gpt-5.5"
+DEFAULT_ANTHROPIC_MODEL = "claude-opus-4-8"
+
 
 @dataclass(frozen=True)
 class LLMCompletion:
@@ -77,7 +81,7 @@ class AzureOpenAIClient:
             json={
                 "messages": [{"role": "user", "content": prompt}],
                 "temperature": temperature,
-                "max_tokens": 500,
+                "max_tokens": ADVISOR_MAX_OUTPUT_TOKENS,
             },
             timeout=60.0,
         )
@@ -100,7 +104,7 @@ class OpenAIChatClient:
     def from_env(cls, model: str | None = None) -> OpenAIChatClient:
         return cls(
             api_key=_require_env("OPENAI_API_KEY"),
-            model=_optional_model(model, "OPENAI_MODEL", "gpt-4o"),
+            model=_optional_model(model, "OPENAI_MODEL", DEFAULT_OPENAI_MODEL),
             base_url=os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1").rstrip("/"),
         )
 
@@ -115,7 +119,7 @@ class OpenAIChatClient:
                 "model": self.model,
                 "messages": [{"role": "user", "content": prompt}],
                 "temperature": temperature,
-                "max_tokens": 500,
+                "max_tokens": ADVISOR_MAX_OUTPUT_TOKENS,
             },
             timeout=60.0,
         )
@@ -139,7 +143,7 @@ class AnthropicMessagesClient:
     def from_env(cls, model: str | None = None) -> AnthropicMessagesClient:
         return cls(
             api_key=_require_env("ANTHROPIC_API_KEY"),
-            model=_optional_model(model, "ANTHROPIC_MODEL", "claude-sonnet-4-5"),
+            model=_optional_model(model, "ANTHROPIC_MODEL", DEFAULT_ANTHROPIC_MODEL),
             api_version=os.getenv("ANTHROPIC_VERSION", "2023-06-01"),
             base_url=os.getenv("ANTHROPIC_BASE_URL", "https://api.anthropic.com").rstrip("/"),
         )
@@ -154,7 +158,7 @@ class AnthropicMessagesClient:
             },
             json={
                 "model": self.model,
-                "max_tokens": 500,
+                "max_tokens": ADVISOR_MAX_OUTPUT_TOKENS,
                 "temperature": temperature,
                 "messages": [{"role": "user", "content": prompt}],
             },
