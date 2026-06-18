@@ -107,8 +107,19 @@ def overall_summary(reports: tuple[AdvisorRunSetReport, ...]) -> dict[str, Any]:
         "mean_valid_rate": mean(report.valid_rate for report in reports),
         "mean_policy_jaccard": mean(report.mean_policy_jaccard for report in reports),
         "mean_stability": mean(report.stability.mean_pairwise_jaccard for report in reports),
+        "mean_amount_stability": mean_amount_stability(reports),
         "violation_counts": flatten_violation_counts(reports),
     }
+
+
+def mean_amount_stability(reports: tuple[AdvisorRunSetReport, ...]) -> float | None:
+    """Average sizing stability over the run sets that actually carry amounts."""
+    values = [
+        report.stability.amount_stability
+        for report in reports
+        if report.stability.amount_stability is not None
+    ]
+    return mean(values) if values else None
 
 
 def summarize_by_advisor(
@@ -125,6 +136,7 @@ def summarize_by_advisor(
             "mean_stability": mean(
                 item.stability.mean_pairwise_jaccard for item in items
             ),
+            "mean_amount_stability": mean_amount_stability(tuple(items)),
             "violation_counts": flatten_violation_counts(tuple(items)),
         }
         for advisor_label, items in sorted(grouped.items())

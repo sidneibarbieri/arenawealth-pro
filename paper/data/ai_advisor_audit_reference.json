@@ -8,6 +8,7 @@
     "mean_valid_rate": 0.5555555555555556,
     "mean_policy_jaccard": 0.5592592592592592,
     "mean_stability": 0.662962962962963,
+    "mean_amount_stability": 0.7555555555555555,
     "violation_counts": {
       "already_owned:MSFT": 2,
       "already_owned:NVO": 1,
@@ -29,6 +30,7 @@
       "mean_valid_rate": 0.0,
       "mean_policy_jaccard": 0.0,
       "mean_stability": 0.0,
+      "mean_amount_stability": null,
       "violation_counts": {
         "already_owned:MSFT": 1,
         "already_owned:NVO": 1,
@@ -45,6 +47,7 @@
       "mean_valid_rate": 1.0,
       "mean_policy_jaccard": 1.0,
       "mean_stability": 1.0,
+      "mean_amount_stability": 1.0,
       "violation_counts": {}
     },
     "drifting_advisor": {
@@ -52,6 +55,7 @@
       "mean_valid_rate": 1.0,
       "mean_policy_jaccard": 0.4,
       "mean_stability": 0.06666666666666667,
+      "mean_amount_stability": null,
       "violation_counts": {}
     },
     "naive_diversifier": {
@@ -59,6 +63,7 @@
       "mean_valid_rate": 0.0,
       "mean_policy_jaccard": 1.0,
       "mean_stability": 1.0,
+      "mean_amount_stability": 0.9333333333333333,
       "violation_counts": {
         "unnecessary_split_fee": 2
       }
@@ -68,6 +73,7 @@
       "mean_valid_rate": 0.0,
       "mean_policy_jaccard": 0.13333333333333333,
       "mean_stability": 0.4,
+      "mean_amount_stability": null,
       "violation_counts": {
         "already_owned:MSFT": 1,
         "ticker_not_allowed:MSFT": 1,
@@ -79,6 +85,7 @@
       "mean_valid_rate": 0.0,
       "mean_policy_jaccard": 0.5,
       "mean_stability": 0.5,
+      "mean_amount_stability": 0.33333333333333326,
       "violation_counts": {
         "below_min_order:NVO": 2,
         "below_min_order:TSM": 1,
@@ -90,6 +97,7 @@
       "mean_valid_rate": 1.0,
       "mean_policy_jaccard": 0.0,
       "mean_stability": 1.0,
+      "mean_amount_stability": null,
       "violation_counts": {}
     }
   },
@@ -107,7 +115,8 @@
           "ADBE",
           "ANET",
           "MA"
-        ]
+        ],
+        "amount_stability": null
       },
       "mean_overlap_at_k": 3.0,
       "mean_policy_jaccard": 1.0,
@@ -143,7 +152,8 @@
           "MSFT",
           "NVDA",
           "V"
-        ]
+        ],
+        "amount_stability": null
       },
       "mean_overlap_at_k": 0.6666666666666666,
       "mean_policy_jaccard": 0.13333333333333333,
@@ -169,7 +179,8 @@
           "NVDA",
           "RACE",
           "V"
-        ]
+        ],
+        "amount_stability": null
       },
       "mean_overlap_at_k": 1.3333333333333333,
       "mean_policy_jaccard": 0.4,
@@ -188,7 +199,8 @@
         "mean_pairwise_jaccard": 1.0,
         "unique_tickers": [
           "TSM"
-        ]
+        ],
+        "amount_stability": 1.0
       },
       "mean_overlap_at_k": 1.0,
       "mean_policy_jaccard": 1.0,
@@ -213,7 +225,8 @@
         "unique_tickers": [
           "NVO",
           "TSM"
-        ]
+        ],
+        "amount_stability": 0.9333333333333333
       },
       "mean_overlap_at_k": 1.0,
       "mean_policy_jaccard": 1.0,
@@ -246,7 +259,8 @@
         "unique_tickers": [
           "NVO",
           "TSM"
-        ]
+        ],
+        "amount_stability": 0.33333333333333326
       },
       "mean_overlap_at_k": 0.5,
       "mean_policy_jaccard": 0.5,
@@ -266,7 +280,8 @@
         "unique_tickers": [
           "ADBE",
           "MA"
-        ]
+        ],
+        "amount_stability": null
       },
       "mean_overlap_at_k": 2.0,
       "mean_policy_jaccard": 1.0,
@@ -323,7 +338,8 @@
           "NVO",
           "TSM",
           "V"
-        ]
+        ],
+        "amount_stability": null
       },
       "mean_overlap_at_k": 0.0,
       "mean_policy_jaccard": 0.0,
@@ -343,7 +359,8 @@
         "unique_tickers": [
           "MSCI",
           "V"
-        ]
+        ],
+        "amount_stability": null
       },
       "mean_overlap_at_k": 0.0,
       "mean_policy_jaccard": 0.0,

@@ -12,7 +12,8 @@
         "ADBE",
         "ANET",
         "MA"
-      ]
+      ],
+      "amount_stability": null
     },
     "mean_overlap_at_k": 3.0,
     "mean_policy_jaccard": 1.0,
@@ -36,7 +37,8 @@
       "unique_tickers": [
         "NVO",
         "TSM"
-      ]
+      ],
+      "amount_stability": 0.6666666666666667
     },
     "mean_overlap_at_k": 1.0,
     "mean_policy_jaccard": 1.0,
@@ -55,7 +57,8 @@
       "unique_tickers": [
         "ADBE",
         "MA"
-      ]
+      ],
+      "amount_stability": null
     },
     "mean_overlap_at_k": 2.0,
     "mean_policy_jaccard": 1.0,

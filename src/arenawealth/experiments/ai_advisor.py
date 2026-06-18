@@ -59,6 +59,7 @@ class StabilityReport:
     runs: int
     mean_pairwise_jaccard: float
     unique_tickers: tuple[str, ...]
+    amount_stability: float | None = None
 
 
 @dataclass(frozen=True)
@@ -101,6 +102,50 @@ def jaccard(left: tuple[str, ...], right: tuple[str, ...]) -> float:
     if not union:
         return 1.0
     return len(left_set & right_set) / len(union)
+
+
+def allocation_weights(recommendation: AdvisorRecommendation) -> dict[str, float]:
+    """Fraction of deployed cash per ticker.
+
+    Set-based agreement and stability ignore sizing: two runs can pick the same
+    tickers yet allocate the cash very differently. This reduces a recommendation
+    to a weight distribution over tickers so sizing can be compared directly.
+    Returns an empty mapping when amounts are absent or do not align with tickers.
+    """
+    tickers = tuple(ticker.strip().upper() for ticker in recommendation.tickers)
+    amounts = recommendation.amounts
+    if not amounts or len(amounts) != len(tickers):
+        return {}
+    total = sum(amounts)
+    if total <= 0:
+        return {}
+    weights: dict[str, float] = {}
+    for ticker, amount in zip(tickers, amounts, strict=True):
+        weights[ticker] = weights.get(ticker, 0.0) + amount / total
+    return weights
+
+
+def _total_variation(left: dict[str, float], right: dict[str, float]) -> float:
+    """Total-variation distance between two weight distributions, in [0, 1]."""
+    keys = set(left) | set(right)
+    return 0.5 * sum(abs(left.get(key, 0.0) - right.get(key, 0.0)) for key in keys)
+
+
+def amount_stability(
+    recommendations: tuple[AdvisorRecommendation, ...],
+) -> float | None:
+    """Sizing consistency across runs, in [0, 1] (1 = identical allocation).
+
+    Defined as 1 minus the mean pairwise total-variation distance over allocation
+    weight vectors. Returns None when fewer than two runs carry usable amounts,
+    so it is reported only where sizing is actually observed.
+    """
+    vectors = [allocation_weights(recommendation) for recommendation in recommendations]
+    vectors = [vector for vector in vectors if vector]
+    if len(vectors) < 2:
+        return None
+    distances = [_total_variation(left, right) for left, right in combinations(vectors, 2)]
+    return 1.0 - mean(distances)
 
 
 def check_constraints(
@@ -176,17 +221,20 @@ def compare_to_policy(
 def stability(recommendations: tuple[AdvisorRecommendation, ...]) -> StabilityReport:
     normalized = [normalize_tickers(recommendation.tickers) for recommendation in recommendations]
     unique = tuple(sorted({ticker for tickers in normalized for ticker in tickers}))
+    sizing = amount_stability(recommendations)
     if len(normalized) < 2:
         return StabilityReport(
             runs=len(normalized),
             mean_pairwise_jaccard=1.0,
             unique_tickers=unique,
+            amount_stability=sizing,
         )
     scores = [jaccard(left, right) for left, right in combinations(normalized, 2)]
     return StabilityReport(
         runs=len(normalized),
         mean_pairwise_jaccard=mean(scores),
         unique_tickers=unique,
+        amount_stability=sizing,
     )
 
 
