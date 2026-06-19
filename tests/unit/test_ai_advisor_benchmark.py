@@ -9,6 +9,15 @@ from arenawealth.experiments.ai_advisor import (
     normalize_tickers,
     stability,
 )
+from arenawealth.experiments.scenario_bank import (
+    ADVISOR_LABELS,
+    RUNS_PER_SCENARIO,
+    advisor_recommendations,
+    manifest_sha256,
+    run_scenario_bank,
+    scenario_bank,
+    taxonomy_label,
+)
 
 
 def test_normalize_tickers_preserves_order_and_removes_duplicates() -> None:
@@ -197,6 +206,23 @@ def test_constraint_report_flags_unsupported_fact_ids() -> None:
     assert report.violations == ("unsupported_fact:unsupported_dividend_fact",)
 
 
+def test_below_floor_hold_is_valid_when_amounts_are_required() -> None:
+    scenario = AdvisorScenario(
+        name="below_floor_hold",
+        cash=100.0,
+        allowed_tickers=("MA",),
+        owned_tickers=(),
+        policy_tickers=(),
+        max_recommendations=1,
+        amounts_required=True,
+    )
+    recommendation = AdvisorRecommendation(run_id="hold", tickers=(), amounts=())
+
+    report = check_constraints(scenario, recommendation)
+
+    assert report.is_valid
+
+
 def test_evaluate_run_set_reports_validity_agreement_and_stability() -> None:
     scenario = AdvisorScenario(
         name="addition",
@@ -220,3 +246,46 @@ def test_evaluate_run_set_reports_validity_agreement_and_stability() -> None:
     assert report.mean_overlap_at_k == 2.5
     assert report.mean_policy_jaccard == 0.75
     assert report.stability.mean_pairwise_jaccard == 0.5
+
+
+def test_scenario_bank_has_stable_size_categories_and_manifest() -> None:
+    records = scenario_bank()
+
+    assert len(records) == 120
+    assert len({record.scenario_id for record in records}) == 120
+    assert manifest_sha256(records) == manifest_sha256(scenario_bank())
+    assert {record.category for record in records} >= {
+        "new_cash_deployment",
+        "subtranche_cash",
+        "hallucinated_fact",
+        "rebalance_versus_hold",
+    }
+
+
+def test_scenario_bank_advisors_emit_fixed_run_count() -> None:
+    record = scenario_bank()[0]
+
+    for advisor_label in ADVISOR_LABELS:
+        recommendations = advisor_recommendations(
+            record.scenario, advisor_label, RUNS_PER_SCENARIO
+        )
+        assert len(recommendations) == RUNS_PER_SCENARIO
+
+
+def test_scenario_bank_report_surfaces_agreement_false_positives() -> None:
+    report = run_scenario_bank()
+    aggregates = {row.advisor_label: row for row in report.advisor_aggregates}
+
+    assert report.scenario_count == 120
+    assert report.total_runs == 120 * RUNS_PER_SCENARIO * len(ADVISOR_LABELS)
+    assert aggregates["deterministic_contract"].validity_rate > 0.9
+    assert aggregates["agreement_only_splitter"].mean_agreement > 0.8
+    assert aggregates["agreement_only_splitter"].agreement_only_false_positive_rate > 0.0
+    taxonomy = dict(report.failure_taxonomy)
+    assert taxonomy["fee_worsening_split"] >= 100
+
+
+def test_taxonomy_label_normalizes_low_level_violations() -> None:
+    assert taxonomy_label("ticker_not_allowed:XYZ") == "out_of_universe"
+    assert taxonomy_label("unsupported_fact:macro_claim") == "ungrounded_fact"
+    assert taxonomy_label("unnecessary_split_fee") == "fee_worsening_split"

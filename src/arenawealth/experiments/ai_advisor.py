@@ -23,6 +23,7 @@ class AdvisorScenario:
     add_only: bool = True
     amounts_required: bool = False
     min_order_amount: float = MIN_ORDER_AMOUNT
+    min_cash_deployment_fraction: float | None = None
 
 
 @dataclass(frozen=True)
@@ -173,6 +174,8 @@ def _amount_violations(
     amounts: tuple[float, ...],
 ) -> list[str]:
     if not amounts:
+        if scenario.amounts_required and scenario.cash < scenario.min_order_amount:
+            return []
         return ["amounts_required"] if scenario.amounts_required else []
     violations: list[str] = []
     if len(amounts) != len(tickers):
@@ -181,6 +184,12 @@ def _amount_violations(
     cash_used = sum(amounts)
     if cash_used > scenario.cash + 0.01:
         violations.append("cash_exceeded")
+    if (
+        scenario.min_cash_deployment_fraction is not None
+        and scenario.cash >= scenario.min_order_amount
+        and cash_used + 0.01 < scenario.cash * scenario.min_cash_deployment_fraction
+    ):
+        violations.append("cash_underdeployed")
     for ticker, amount in zip(tickers, amounts, strict=True):
         if amount <= 0:
             violations.append(f"non_positive_order:{ticker}")
@@ -191,9 +200,7 @@ def _amount_violations(
     return violations
 
 
-def _fact_violations(
-    scenario: AdvisorScenario, cited_fact_ids: tuple[str, ...]
-) -> list[str]:
+def _fact_violations(scenario: AdvisorScenario, cited_fact_ids: tuple[str, ...]) -> list[str]:
     if not cited_fact_ids or not scenario.available_fact_ids:
         return []
     available = set(scenario.available_fact_ids)
@@ -256,9 +263,7 @@ def evaluate_run_set(
         for recommendation in recommendations
     ]
     cash_values = [
-        sum(recommendation.amounts)
-        for recommendation in recommendations
-        if recommendation.amounts
+        sum(recommendation.amounts) for recommendation in recommendations if recommendation.amounts
     ]
     fee_values = [
         sum(order_fee(amount) for amount in recommendation.amounts)

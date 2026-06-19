@@ -50,6 +50,7 @@ from arenawealth.experiments.robustness import (
     fixed_weight_returns,
     rolling_comparison,
 )
+from arenawealth.experiments.scenario_bank import run_scenario_bank
 
 ROOT = Path(__file__).resolve().parent.parent
 SEED_CSV = ROOT / "tests" / "fixtures" / "seed_portfolio_broker.csv"
@@ -79,6 +80,7 @@ def current_weights_from_seed(path: Path) -> dict[str, float]:
             ticker = row["ticker"].strip().upper()
             weights[ticker] = float(row["shares"]) * float(row["current_price"])
     return weights
+
 
 def load_holdings(path: Path) -> tuple[Holding, ...]:
     with path.open(encoding="utf-8") as handle:
@@ -223,8 +225,7 @@ def figure_robustness_tikz(
 
 def figure_ablation_tikz(ablation_rows, path: Path) -> None:
     coordinates = [
-        (index, row.spearman_vs_baseline)
-        for index, row in enumerate(ablation_rows, start=1)
+        (index, row.spearman_vs_baseline) for index, row in enumerate(ablation_rows, start=1)
     ]
     labels = ",".join(
         {
@@ -306,6 +307,9 @@ def main() -> None:
     # Experiment H: planner suboptimality against the MIP deployment optimum
     optimality = planner_optimality_report()
 
+    # Experiment I: offline frozen-scenario advisor benchmark
+    advisor_benchmark = run_scenario_bank()
+
     # Figures. The sensitivity sweep and the backtest are reported in prose and
     # the backtest table; their data still feeds the JSON below, but a figure
     # would only restate the closed form and the table, so none is rendered.
@@ -353,6 +357,7 @@ def main() -> None:
             "max_fee_premium": optimality.max_fee_premium,
             "points": [asdict(point) for point in optimality.points],
         },
+        "advisor_scenario_bank": asdict(advisor_benchmark),
         "backtest": _summarize_backtest(backtest),
     }
     out = EXPORT_DIR / f"experiments_{stamp}.json"
@@ -364,6 +369,7 @@ def main() -> None:
 def _summarize_backtest(export: dict | None) -> dict | None:
     if export is None:
         return None
+
     def metrics(values: dict) -> dict:
         return {
             "cagr": values["cagr"],
@@ -426,6 +432,22 @@ def _print_summary(findings: dict, out: Path) -> None:
                 f"Sharpe={stats['sharpe_ratio']:.3f} "
                 f"MaxDD={stats['max_drawdown'] * 100:6.1f}%"
             )
+    advisor_bank = findings["advisor_scenario_bank"]
+    print("== Advisor scenario bank ==")
+    print(
+        f"  scenarios={advisor_bank['scenario_count']} "
+        f"advisors={advisor_bank['advisor_count']} "
+        f"runs={advisor_bank['total_runs']} "
+        f"manifest={advisor_bank['manifest_sha256'][:12]}"
+    )
+    for row in advisor_bank["advisor_aggregates"]:
+        print(
+            f"  {row['advisor_label']:>25}: "
+            f"valid={row['validity_rate']:.3f} "
+            f"agree={row['mean_agreement']:.3f} "
+            f"setS={row['mean_set_stability']:.3f} "
+            f"agreement-fp={row['agreement_only_false_positive_rate']:.3f}"
+        )
     print(f"\nWrote {out}")
 
 
