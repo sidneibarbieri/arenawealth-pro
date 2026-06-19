@@ -36,7 +36,7 @@ git archive --format=tar HEAD | tar -x -C "${work}"
 rm -f "${work}/scripts/package_artifact.sh"
 
 # Anonymize the author identity wherever it appears.
-if [ -n "${author}" ]; then
+if [ -n "${author}" ] && [ "${author}" != "Anonymous" ] && [ "${author}" != "Anonymous Authors" ]; then
     python3 - "${work}" "${author}" <<'PY'
 import sys
 from pathlib import Path
