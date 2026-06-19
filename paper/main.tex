@@ -136,36 +136,48 @@ narrower and more auditable: recurring small-cash deployment under a quantized
 step fee. The fixed-cost guardrail is the small-cash analogue of the no-trade
 region: below the floor, the optimal action is to hold.
 
-A fast-growing line uses language models to recommend assets or build portfolios
-and evaluates them mainly by return or by alignment with a reference:
-media-driven LLM portfolios report strong but short-horizon gains
-\cite{oh2025alpha}, and knowledge-graph-aligned recommenders are scored on
-behavioral alignment \cite{spadea2025flarko}. Return alone is a fragile verdict.
-A contamination-free multi-month trading benchmark finds that most LLM agents
-fail to beat a passive buy-and-hold baseline, and that strong financial
-question-answering does not translate into trading skill
-\cite{chen2025stockbench}; a longer and broader investing benchmark reaches the
-same warning, showing that apparent LLM advantages deteriorate under larger
-universes and market regimes \cite{li2026finsaber}. Live multi-market arenas
-move evaluation closer to deployment by comparing agents over verified market
-streams \cite{qian2026ama}. Top-finance field evidence on robo-advice is
-likewise cautious: automated advice can reduce behavioral biases without
-eliminating them \cite{dacunto2019robo}.
+A fast-growing line uses language models to recommend assets or build
+portfolios, and evaluates them almost entirely by realized return or by
+alignment with a reference: media-driven LLM portfolios report strong but
+short-horizon gains \cite{oh2025alpha}, and knowledge-graph-aligned recommenders
+are scored on behavioral alignment \cite{spadea2025flarko}. Such verdicts are
+fragile. A contamination-free, multi-month benchmark finds that most LLM agents
+fail to beat passive buy-and-hold, and that strong financial question-answering
+does not transfer into trading skill \cite{chen2025stockbench}. The warning
+sharpens at longer horizons: evaluated over two decades and more than a hundred
+symbols, previously reported LLM advantages largely vanish once survivorship,
+look-ahead, and data-snooping biases are removed, leaving strategies that are
+overly conservative in bull markets and overly aggressive in bear markets
+\cite{li2026finsaber}. Live arenas push the other way, toward realism, yet find
+that the agent framework, not the model backbone, dominates trading behavior
+\cite{qian2026ama}. Two lessons follow. Because return is regime-dependent and
+the wrapper around a model changes its decisions, the object under test must be
+the advice an agent actually emits, not the backbone alone; and because
+bias-free return evaluation needs long horizons and clean point-in-time data, no
+single submission can settle it on return. We therefore evaluate advice where it
+is cheap, exact, and replayable: on frozen scenarios, against a deterministic
+baseline, before any return is computed. The backtest inherits the same
+discipline, estimating its allocator baselines walk-forward from past-only
+windows so that no future information leaks into the comparison
+\cite{bailey2014pseudo}. Field evidence on robo-advice is likewise cautious:
+automated advice can dampen behavioral biases without eliminating them
+\cite{dacunto2019robo}.
 
 A complementary line documents failure modes a return or overlap score cannot
-see. Finance trustworthiness benchmarks now test truthfulness, safety,
-fairness, privacy, transparency, and discovery rather than a single task score
-\cite{hu2025fintrust}. LLM risk assessments vary with irrelevant demographic
-attributes \cite{chawla2025riskadvice}, investment analyses carry latent,
-confirmation-seeking bias \cite{lee2025bias}, and recommenders show systematic
-product preferences that survive debiasing \cite{zhi2025productbias}; surveys
-flag interpretability and generalizability as open problems
-\cite{elalami2025mlfinance}. What is missing is a compact evaluation that places
-a learned advisor against a transparent, replayable baseline and measures,
-together, whether its advice is operationally \emph{valid}, \emph{stable}
-across runs, and how far it \emph{agrees} with the baseline. We supply that
-baseline and protocol; the advisor under test may be an LLM, a robo-allocator,
-or a heuristic.
+see. Finance trustworthiness benchmarks now probe truthfulness, safety,
+fairness, privacy, and transparency rather than a single task score
+\cite{hu2025fintrust}; yet they grade what a model says, not whether the
+resulting trade is admissible. The gap is operational. LLM risk assessments
+shift with irrelevant demographic attributes \cite{chawla2025riskadvice},
+investment analyses carry latent, confirmation-seeking bias \cite{lee2025bias},
+and recommenders show product preferences that survive debiasing
+\cite{zhi2025productbias}, while surveys flag interpretability and
+generalizability as open problems \cite{elalami2025mlfinance}. What no prior
+benchmark supplies is a compact, replayable test that places a learned advisor
+against a transparent baseline and measures, together, whether its advice is
+operationally \emph{valid}, \emph{stable} across runs, and how far it
+\emph{agrees} with that baseline. We supply both the baseline and the protocol,
+and the advisor under test may be an LLM, a robo-allocator, or a heuristic.
 
 A large fraction of reported strategy performance does not survive out of
 sample; backtest overfitting is easy to produce and hard to detect
