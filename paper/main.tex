@@ -144,34 +144,43 @@ A fast-growing line uses language models to recommend assets or build
 portfolios, and evaluates them almost entirely by realized return or by
 alignment with a reference: media-driven LLM portfolios report strong but
 short-horizon gains \cite{oh2025alpha}, and knowledge-graph-aligned recommenders
-are scored on behavioral alignment \cite{spadea2025flarko}. Such verdicts are
-fragile. A contamination-free, multi-month benchmark finds that most LLM agents
-fail to beat passive buy-and-hold, and that strong financial question-answering
-does not transfer into trading skill \cite{chen2025stockbench}. The warning
-sharpens at longer horizons: evaluated over two decades and more than a hundred
-symbols, previously reported LLM advantages largely vanish once survivorship,
-look-ahead, and data-snooping biases are removed, leaving strategies that are
-overly conservative in bull markets and overly aggressive in bear markets
-\cite{li2026finsaber}. Live arenas push the other way, toward realism, yet find
-that the agent framework, not the model backbone, dominates trading behavior
-\cite{qian2026ama}. Two lessons follow. Because return is regime-dependent and
-the wrapper around a model changes its decisions, the object under test must be
-the advice an agent actually emits, not the backbone alone; and because
-bias-free return evaluation needs long horizons and clean point-in-time data, no
-single submission can settle it on return. We therefore evaluate advice where it
-is cheap, exact, and replayable: on frozen scenarios, against a deterministic
-baseline, before any return is computed. The backtest inherits the same
-discipline, estimating its allocator baselines walk-forward from past-only
-windows so that no future information leaks into the comparison
-\cite{bailey2014pseudo}. Field evidence on robo-advice is likewise cautious:
-automated advice can dampen behavioral biases without eliminating them
-\cite{dacunto2019robo}.
+are scored on behavioral alignment \cite{spadea2025flarko}. The verdict such
+studies reach, however, depends sharply on the evaluation window. A live,
+two-month, multi-market arena finds that LLM agents can beat a passive
+buy-and-hold baseline, with the strongest agents exploiting short bursts of
+volatility rather than following long trends \cite{qian2026ama}; a
+contamination-free, multi-month benchmark already tempers this, as most agents
+fail to beat buy-and-hold and strong financial question-answering does not
+transfer into trading skill \cite{chen2025stockbench}; and a two-decade,
+hundred-symbol evaluation reverses it outright, since reported advantages largely
+vanish once survivorship, look-ahead, and data-snooping biases are removed
+\cite{li2026finsaber}. That long-horizon study is also diagnostic. The agents are
+not merely weaker but \emph{miscalibrated}: too conservative in bull markets,
+where no active strategy beats buy-and-hold, and too aggressive in bear markets,
+where they take the heaviest losses. Larger models do not help, and a plain ARIMA
+predictor dominates them on risk-adjusted return, so the binding constraint is a
+missing layer of domain-aware financial logic, not model scale. Two signals
+nonetheless survive across these otherwise conflicting studies. First, both the
+live arena and the long-horizon study attribute behavior chiefly to the agent
+framework, its decision logic and risk controls, rather than to the
+language-model backbone \cite{qian2026ama, li2026finsaber}; the object worth
+auditing is therefore the advice an agent emits, not the model alone. Second,
+because the return verdict flips with horizon and regime, no single submission
+can settle an advisor on return. We take the complementary path: evaluate advice
+where it is cheap, exact, and replayable, against a deterministic baseline that
+supplies exactly the domain-aware financial logic the agents lack, before any
+return is computed. The backtest inherits the same discipline, estimating its
+allocator baselines walk-forward from past-only windows so that no future
+information leaks into the comparison \cite{bailey2014pseudo}. Field evidence on
+robo-advice is consistent: automated advice can dampen behavioral biases without
+eliminating them \cite{dacunto2019robo}.
 
 A complementary line documents failure modes a return or overlap score cannot
 see. Finance trustworthiness benchmarks now probe truthfulness, safety,
 fairness, privacy, and transparency rather than a single task score
-\cite{hu2025fintrust}; yet they grade what a model says, not whether the
-resulting trade is admissible. The gap is operational. LLM risk assessments
+\cite{hu2025fintrust}; yet even models that pass those safety checks show gaps in
+fiduciary alignment and disclosure, and the checks grade single-turn responses,
+not whether the resulting trade is admissible. The gap is operational. LLM risk assessments
 shift with irrelevant demographic attributes \cite{chawla2025riskadvice},
 investment analyses carry latent, confirmation-seeking bias \cite{lee2025bias},
 and recommenders show product preferences that survive debiasing
@@ -278,6 +287,14 @@ is reported when a scenario requires amounts. The audit is therefore replayable
 once the advisor outputs are frozen. It certifies process quality, not future
 return: advice must be admissible, repeatable, and grounded before performance
 statistics are meaningful.
+
+The sizing axis earns its place on the controls. In the sub-tranche scenario the
+naive diversifier repeats the same tickers on every run, so its set stability is
+a perfect $1.0$; it nonetheless shuffles the dollar split enough to drop $S_w$ to
+$0.93$, and an under-deploying control falls to $S_w=0.33$, while the
+deterministic policy holds both terms at $1.0$. Set overlap alone would certify
+the diversifier as perfectly stable, so the amount-aware term is what exposes the
+sizing drift that set overlap cannot see.
 
 The same audit can score real model output once the responses are frozen. We
 therefore include a small cached pilot: three scenarios, three repeated runs per
@@ -585,6 +602,18 @@ concrete: the isolated quality rank selects a 90-point Platforms candidate, but
 the portfolio-fit layer selects an 84-point Industrial candidate because the
 Platforms addition would raise theme exposure from 23.0\% to 30.7\%, while the
 Industrial addition creates a new 10.0\% theme exposure.
+
+This reframing also speaks to a tension in the recent agent literature. Live
+arenas and bias-mitigated long-horizon backtests disagree on whether
+language-model agents beat passive baselines, but they converge on two points:
+behavior is governed by the agent's decision and risk logic more than by the
+model backbone, and the agents' deepest weakness is a missing layer of
+domain-aware financial logic rather than insufficient scale. A deterministic
+verifier is precisely that layer, made explicit and external. It does not try to
+out-reason the model; it encodes the admissibility a portfolio actually imposes,
+so that the unit of evaluation shifts from a model family in the abstract to the
+action a system emits. The same move is what makes the audit cheap and stable
+while return verdicts swing with horizon and regime.
 
 The empirical calibration sharpens the claim. In fee-quantized markets,
 diversification has an implementation cost, and the planner should diversify
