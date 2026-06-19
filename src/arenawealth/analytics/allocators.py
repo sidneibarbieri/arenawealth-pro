@@ -27,10 +27,19 @@ def _aligned_returns(returns: ReturnMatrix) -> tuple[tuple[str, ...], np.ndarray
     return tickers, matrix
 
 
-def covariance_matrix(returns: ReturnMatrix) -> tuple[tuple[str, ...], np.ndarray]:
-    """Sample covariance of asset returns."""
+def covariance_matrix(
+    returns: ReturnMatrix, shrinkage: float = 0.0
+) -> tuple[tuple[str, ...], np.ndarray]:
+    """Sample covariance with optional constant-variance shrinkage."""
+    if not 0.0 <= shrinkage <= 1.0:
+        raise ValueError("shrinkage must be between 0 and 1")
     tickers, matrix = _aligned_returns(returns)
-    return tickers, np.cov(matrix)
+    sample = np.cov(matrix)
+    if shrinkage == 0.0:
+        return tickers, sample
+    average_variance = float(np.mean(np.diag(sample)))
+    target = np.eye(len(tickers)) * average_variance
+    return tickers, (1.0 - shrinkage) * sample + shrinkage * target
 
 
 def equal_weights(returns: ReturnMatrix) -> dict[str, float]:
@@ -42,7 +51,9 @@ def equal_weights(returns: ReturnMatrix) -> dict[str, float]:
     return {ticker: weight for ticker in tickers}
 
 
-def min_variance_weights(returns: ReturnMatrix) -> dict[str, float]:
+def min_variance_weights(
+    returns: ReturnMatrix, shrinkage: float = 0.0
+) -> dict[str, float]:
     """Long-only minimum-variance weights via active-set on the closed form.
 
     The unconstrained minimum is w* = sigma_inv @ 1 / (1' sigma_inv @ 1). When
@@ -51,7 +62,7 @@ def min_variance_weights(returns: ReturnMatrix) -> dict[str, float]:
     well-conditioned equity covariance matrices this converges in a handful of
     iterations.
     """
-    tickers, sigma = covariance_matrix(returns)
+    tickers, sigma = covariance_matrix(returns, shrinkage=shrinkage)
     if np.any(np.diag(sigma) <= 0):
         raise ValueError("every asset must have positive variance")
     active = list(range(len(tickers)))
@@ -74,13 +85,15 @@ def min_variance_weights(returns: ReturnMatrix) -> dict[str, float]:
         active.pop(worst_index)
 
 
-def risk_parity_weights(returns: ReturnMatrix) -> dict[str, float]:
+def risk_parity_weights(
+    returns: ReturnMatrix, shrinkage: float = 0.0
+) -> dict[str, float]:
     """Equal risk contribution weights via the Maillard iterative algorithm.
 
     Each asset's marginal risk contribution `w_i * (sigma @ w)_i` is driven to
     the mean of the contributions. Initialized from inverse-volatility weights.
     """
-    tickers, sigma = covariance_matrix(returns)
+    tickers, sigma = covariance_matrix(returns, shrinkage=shrinkage)
     asset_variances = np.diag(sigma)
     if np.any(asset_variances <= 0):
         raise ValueError("every asset must have positive variance")

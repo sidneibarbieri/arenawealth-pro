@@ -50,6 +50,8 @@ class BudgetEstimate:
         return self.input_cost_usd + self.output_cost_usd
 
 
+# Pricing snapshot verified on 2026-06-19. Re-check provider pricing before a
+# final paid collection.
 PRICING: dict[tuple[str, str], ModelPricing] = {
     ("openai", "gpt-5.5"): ModelPricing(
         provider="openai",

@@ -48,6 +48,7 @@ from arenawealth.analytics.price_backtest import (
     equal_weights,
     run_price_backtest,
     run_price_backtest_study,
+    run_price_backtest_study_from_aligned_returns,
 )
 from arenawealth.analytics.scoring import analyze, score_fundamentals
 from arenawealth.analytics.screening import CandidateAnalysis, screen_candidates
@@ -111,6 +112,7 @@ __all__ = [
     "run_backtest",
     "run_price_backtest",
     "run_price_backtest_study",
+    "run_price_backtest_study_from_aligned_returns",
     "score_fundamentals",
     "screen_candidates",
 ]

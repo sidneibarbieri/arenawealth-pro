@@ -12,17 +12,37 @@ from typing import Any
 import yfinance
 
 from arenawealth.analytics import (
+    AlignedReturnSeries,
     BacktestComparison,
     BacktestResult,
     PriceBacktestStudy,
     align_price_history,
     run_price_backtest_study,
+    run_price_backtest_study_from_aligned_returns,
 )
 
 DEFAULT_HOLDINGS = Path("data/carteira_atual.csv")
 DEFAULT_FIXTURE = Path("tests/fixtures/seed_portfolio_broker.csv")
 DEFAULT_OUTPUT_DIR = Path("exports")
 RETURN_MATRIX_PATH = Path("paper/data/returns_matrix.csv")
+REFERENCE_BACKTEST_PATH = Path("paper/data/price_backtest_reference.json")
+
+
+def load_return_matrix(path: Path = RETURN_MATRIX_PATH) -> AlignedReturnSeries:
+    with path.open(encoding="utf-8") as handle:
+        reader = csv.reader(handle)
+        header = next(reader)
+        tickers = tuple(ticker.strip().upper() for ticker in header[1:])
+        dates: list[str] = []
+        returns = {ticker: [] for ticker in tickers}
+        for row in reader:
+            dates.append(row[0])
+            for ticker, value in zip(tickers, row[1:], strict=True):
+                returns[ticker].append(float(value))
+    return AlignedReturnSeries(
+        dates=tuple(dates),
+        returns={ticker: tuple(values) for ticker, values in returns.items()},
+    )
 
 
 def write_return_matrix(
@@ -152,6 +172,8 @@ def study_to_payload(study: PriceBacktestStudy, generated_utc: str) -> dict[str,
         }
         if study.sota_weights is not None:
             payload["sota_weights"] = study.sota_weights
+        if study.sota_method is not None:
+            payload["sota_method"] = study.sota_method
     return payload
 
 
@@ -175,25 +197,44 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--rebalance-every", type=int, default=63)
     parser.add_argument("--cost-rate", type=float, default=0.001)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+    parser.add_argument("--return-matrix", type=Path)
+    parser.add_argument("--reference-output", type=Path)
+    parser.add_argument("--generated-utc")
     return parser.parse_args()
 
 
 def main() -> None:
     arguments = parse_arguments()
     weights = load_target_weights(arguments.holdings)
-    tickers = sorted({*weights, arguments.benchmark.upper()})
-    histories = fetch_close_history(tickers, arguments.start, arguments.end)
-    study = run_price_backtest_study(
-        histories,
-        weights,
-        benchmark_ticker=arguments.benchmark.upper(),
-        rebalance_every=arguments.rebalance_every,
-        cost_rate=arguments.cost_rate,
-    )
-    generated_utc = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
+    if arguments.return_matrix:
+        aligned = load_return_matrix(arguments.return_matrix)
+        study = run_price_backtest_study_from_aligned_returns(
+            aligned,
+            weights,
+            benchmark_ticker=arguments.benchmark.upper(),
+            rebalance_every=arguments.rebalance_every,
+            cost_rate=arguments.cost_rate,
+        )
+        matrix_path = arguments.return_matrix
+    else:
+        tickers = sorted({*weights, arguments.benchmark.upper()})
+        histories = fetch_close_history(tickers, arguments.start, arguments.end)
+        study = run_price_backtest_study(
+            histories,
+            weights,
+            benchmark_ticker=arguments.benchmark.upper(),
+            rebalance_every=arguments.rebalance_every,
+            cost_rate=arguments.cost_rate,
+        )
+        matrix_path = write_return_matrix(histories)
+    generated_utc = arguments.generated_utc or datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
     payload = study_to_payload(study, generated_utc)
-    output_path = write_payload(payload, arguments.output_dir)
-    matrix_path = write_return_matrix(histories)
+    if arguments.reference_output:
+        arguments.reference_output.parent.mkdir(parents=True, exist_ok=True)
+        arguments.reference_output.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        output_path = arguments.reference_output
+    else:
+        output_path = write_payload(payload, arguments.output_dir)
     print(f"Return matrix {matrix_path}")
     print(
         "Price backtest study "

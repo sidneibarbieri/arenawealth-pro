@@ -38,6 +38,7 @@ def test_report_payload_is_json_serializable():
         benchmark=benchmark,
         current_vs_equal_weight=compare_backtests(current, equal_weight),
         current_vs_benchmark=compare_backtests(current, benchmark),
+        sota_method={"method": "walk_forward_rolling_covariance"},
     )
     payload = study_to_payload(study, "20260521_180000")
 

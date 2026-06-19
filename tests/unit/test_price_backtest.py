@@ -3,10 +3,13 @@
 import pytest
 
 from arenawealth.analytics.price_backtest import (
+    WalkForwardAllocatorConfig,
     align_price_history,
     equal_weights,
     run_price_backtest,
     run_price_backtest_study,
+    run_walk_forward_backtest,
+    walk_forward_weight_schedule,
 )
 
 
@@ -93,3 +96,60 @@ def test_run_price_backtest_study_adds_equal_weight_and_rebalance_ablations():
     assert study.rebalanced_current is not None
     assert study.current_vs_rebalanced is not None
     assert study.rebalanced_current.total_cost > 0
+
+
+def _variance_allocator(asset_returns, shrinkage):
+    del shrinkage
+    variance_by_ticker = {
+        ticker: sum(value * value for value in series) for ticker, series in asset_returns.items()
+    }
+    best = min(variance_by_ticker, key=variance_by_ticker.get)
+    return {ticker: 1.0 if ticker == best else 0.0 for ticker in asset_returns}
+
+
+def test_walk_forward_schedule_uses_only_past_returns():
+    returns = {
+        "EARLY_LOW": (0.001, 0.001, 0.001, 0.20, -0.20, 0.20),
+        "EARLY_HIGH": (0.10, -0.10, 0.10, 0.001, 0.001, 0.001),
+    }
+    config = WalkForwardAllocatorConfig(
+        lookback=3,
+        min_observations=3,
+        rebalance_every=3,
+        shrinkage=0.0,
+    )
+
+    schedule = walk_forward_weight_schedule(
+        returns,
+        ("EARLY_LOW", "EARLY_HIGH"),
+        _variance_allocator,
+        config,
+    )
+
+    assert schedule[0] == {"EARLY_LOW": 0.5, "EARLY_HIGH": 0.5}
+    assert schedule[3] == {"EARLY_LOW": 1.0, "EARLY_HIGH": 0.0}
+
+
+def test_walk_forward_backtest_charges_rebalance_costs():
+    returns = {
+        "A": (0.01, 0.01, 0.01, 0.01),
+        "B": (0.0, 0.0, 0.0, 0.0),
+    }
+    config = WalkForwardAllocatorConfig(
+        lookback=2,
+        min_observations=2,
+        rebalance_every=2,
+        shrinkage=0.0,
+    )
+
+    result = run_walk_forward_backtest(
+        returns,
+        ("A", "B"),
+        _variance_allocator,
+        periods_per_year=1,
+        config=config,
+        cost_rate=0.01,
+    )
+
+    assert result.rebalances == 1
+    assert result.total_cost > 0

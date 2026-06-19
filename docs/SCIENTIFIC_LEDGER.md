@@ -31,16 +31,17 @@ Evidence:
 - `MIN_ORDER_AMOUNT` in `src/arenawealth/analytics/deployment.py`
 - `scripts/run_experiments.py` (`fee_sensitivity` JSON block)
 
-### F3. The fundamentals-weighted basket ranks third of five against allocator baselines
+### F3. Equal weighting remains the strongest current-basket allocator
 
 Backtested 2021-01-05 to 2026-06-04 (1360 days), the score-weighted basket beats
-SPY (+4.80 pp CAGR, +0.15 Sharpe) and minimum variance on return (+3.8 pp CAGR),
-but ranks third of five on Sharpe ratio: equal weight (1.19) and risk parity
-(1.18) both beat the tuned weighting (1.10), while minimum variance gives the
-shallowest drawdown (-19.2% vs -28.9%) at the cost of return. Two of the
-strongest baselines (equal weight, risk parity) use no fundamental data. This is
-a useful negative result consistent with the literature on naive diversification;
-it clarifies that the contribution is methodological, not performance.
+SPY (+5.12 pp CAGR, +0.16 Sharpe), but equal weighting has higher CAGR and
+Sharpe. The allocator baselines are now walk-forward: rolling 252-day covariance,
+20% constant-variance shrinkage, 63-day rebalancing, and 10 bp turnover cost.
+Risk parity nearly ties the tuned basket on Sharpe after rounding but earns lower
+return; minimum variance gives the shallowest drawdown (-21.7% vs -29.1%) at a
+large return cost. This is a useful negative result consistent with the
+literature on naive diversification; it clarifies that the contribution is
+methodological, not performance.
 
 Robustness (F5 method): the equal-weight-beats-current result holds in 47 of 53
 rolling one-year windows (89%); a 21-day block bootstrap (2000 resamples, fixed

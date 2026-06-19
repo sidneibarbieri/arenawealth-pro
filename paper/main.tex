@@ -104,9 +104,10 @@ subadditive, the minimum order follows directly from the cost tolerance, and the
 planner is regression-tested against those facts. Third, it calibrates the
 baseline against allocator baselines instead of treating the policy as a
 performance claim. The current basket beats the market benchmark, but equal
-weighting and risk parity are at least as strong on risk-adjusted return. This
-result sharpens the paper's claim: the contribution is verification of
-investment advice, not a new stock-selection factor.
+weighting is stronger and risk parity nearly ties it on Sharpe after removing
+look-ahead from the allocator baselines. This result sharpens the paper's claim:
+the contribution is verification of investment advice, not a new
+stock-selection factor.
 
 \section{Related Work}
 \label{sec:related}
@@ -382,45 +383,47 @@ claim about specific securities.)
 \end{figure}
 
 We backtested the 17-name basket against four baselines over 2021-01-05 to
-2026-05-28 (1355 trading days) using free adjusted closes
+2026-06-04 (1360 trading days) using free adjusted closes
 (Table~\ref{tab:backtest}). Two are naive
 (market-value ``current'' weighting and equal weighting); two are allocator
 baselines computable from the return matrix alone: long-only minimum variance
-and equal-risk-contribution (risk parity). No baseline uses information the
-others lack. Both allocators estimate the sample covariance over the full window
-with no shrinkage, are long-only and fully invested ($w\ge 0$, $\mathbf{1}^\top
-w=1$), and set weights once at the start (buy and hold, no rebalancing), so they
-are compared on the same footing as the other buy-and-hold baselines; minimum
-variance uses an active-set reduction on the closed-form solution and risk parity
-the Maillard fixed-point iteration. Reported estimation choices are deliberately
-plain, since the point is a fair reference, not a tuned competitor. The
-score-weighted basket beats the SPY benchmark by a wide margin
-($+4.80$ pp CAGR, $+0.15$ Sharpe) and beats minimum variance on return
-($+3.8$ pp CAGR), but it ranks \emph{third of five} on the Sharpe ratio: equal
-weighting ($1.19$) and risk parity ($1.18$) both edge out the tuned weighting
-($1.10$), and minimum variance delivers the shallowest drawdown ($-19.2\%$ versus
-$-28.9\%$) at the cost of return. Periodic rebalancing \emph{reduced} CAGR to
-$18.5\%$ from the $20.6\%$ buy-and-hold figure despite low explicit cost. The
-synthetic ablation and the real backtest point the same way: on this basket, two
-allocators that use \emph{no} fundamental data match or beat the
-fundamentals-weighted strategy on risk-adjusted return.
+and equal-risk-contribution (risk parity). To avoid look-ahead, allocator
+weights are estimated walk-forward from a rolling 252-day return window, use a
+20\% constant-variance shrinkage target, rebalance every 63 trading days, and pay
+10 bp turnover cost. Until 63 observations exist, the allocator uses equal
+weights. Minimum variance uses an active-set reduction on the closed-form
+solution and risk parity the Maillard fixed-point iteration. Reported estimation
+choices are deliberately plain, since the point is a fair reference, not a tuned
+competitor.
+
+The score-weighted basket beats the SPY benchmark by $+5.12$ pp CAGR and
+$+0.16$ Sharpe, but equal weighting is stronger ($22.8\%$ CAGR, $1.19$ Sharpe).
+The walk-forward risk-parity baseline nearly ties the tuned basket on Sharpe
+($1.11$ for both after rounding) while producing lower return; minimum variance
+buys the shallowest drawdown ($-21.7\%$) at a large return cost. Periodic
+rebalancing \emph{reduced} CAGR to $18.9\%$ from the $20.9\%$ buy-and-hold figure
+despite low explicit cost. The synthetic ablation and the real backtest point the
+same way: on this basket, selection matters more than a tuned fundamentals
+weighting scheme, and the paper's contribution is therefore the audit protocol
+rather than an alpha claim.
 
 \begin{table}[t]
-  \caption{Current-basket backtest, 2021-01-05 to 2026-05-28 (1355 days), buy
-  and hold unless noted. Allocator baselines use the return matrix only; this
-  is a current-basket calibration, not a point-in-time stock-selection test.}
+  \caption{Current-basket backtest, 2021-01-05 to 2026-06-04 (1360 days), buy
+  and hold unless noted. Allocator baselines are walk-forward, rolling-covariance
+  strategies with shrinkage and turnover cost; this is a current-basket
+  calibration, not a point-in-time stock-selection test.}
   \label{tab:backtest}
   \begin{tabular}{lrrr}
     \toprule
     Strategy & CAGR & Sharpe & Max DD \\
     \midrule
     Equal weight & $22.8\%$ & $\mathbf{1.19}$ & $-27.1\%$ \\
-    Risk parity & $20.9\%$ & $1.18$ & $-24.5\%$ \\
-    Current weight (ours) & $20.6\%$ & $1.10$ & $-28.9\%$ \\
-    Minimum variance & $16.8\%$ & $1.07$ & $\mathbf{-19.2\%}$ \\
+    Current weight (ours) & $20.9\%$ & $1.11$ & $-29.1\%$ \\
+    Risk parity & $18.8\%$ & $1.11$ & $-26.4\%$ \\
+    Minimum variance & $14.1\%$ & $0.94$ & $\mathbf{-21.7\%}$ \\
     Benchmark (SPY) & $15.8\%$ & $0.95$ & $-24.5\%$ \\
     \midrule
-    Rebalanced current & $18.5\%$ & $1.04$ & $-29.7\%$ \\
+    Rebalanced current & $18.9\%$ & $1.06$ & $-30.0\%$ \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -453,6 +456,7 @@ the paper into an alpha claim.
   \label{fig:robustness}
 \end{figure}
 
+\balance
 \section{Discussion}
 
 The contribution is a testable way to evaluate investment advice. The protocol

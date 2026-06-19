@@ -11,6 +11,9 @@ outputs; the deterministic audit, parsing rules, and metrics stay unchanged.
   `claude-opus-4-8`.
 - Cached pilot runs under `exports/advisor_runs/` are local generated output and
   are not part of the publishable artifact.
+- Frozen runs under `paper/data/advisor_runs/` are publishable evidence only
+  when they include raw responses, usage metadata, collection timestamps, and
+  hashes in `paper/data/DATA_HASHES.txt`.
 - A final run becomes paper evidence only after the JSON outputs are reviewed,
   frozen, hashed, and referenced by the audit script.
 
@@ -92,15 +95,16 @@ The default study is three scenarios, three repeated runs, and two providers:
 approximation and the configured output cap as a maximum. It is intentionally a
 pre-authorization ceiling, not a promise of exact billing.
 
-Official pricing used by the estimator:
+Pricing snapshot used by the estimator, verified on 2026-06-19 against the
+provider pricing pages for standard short-context synchronous calls:
 
 - OpenAI `gpt-5.5`: $5.00 per million input tokens and $30.00 per million
   output tokens for standard synchronous calls.
 - Anthropic `claude-opus-4-8`: $5.00 per million input tokens and $25.00 per
   million output tokens.
 
-No live provider calls should be made until the printed estimate is reviewed and
-approved.
+Re-verify provider prices before final paid collection. No live provider calls
+should be made until the printed estimate is reviewed and approved.
 
 ## Reproducibility Rule
 

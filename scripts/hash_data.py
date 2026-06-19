@@ -20,20 +20,30 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = ROOT / "paper" / "data" / "DATA_HASHES.txt"
-TRACKED_INPUTS = (
+STATIC_INPUTS = (
     "paper/data/returns_matrix.csv",
     "paper/data/price_backtest_reference.json",
     "paper/data/ai_advisor_scenarios.json",
     "paper/data/ai_advisor_audit_reference.json",
 )
+ADVISOR_RUNS = ROOT / "paper" / "data" / "advisor_runs"
 
 
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def tracked_inputs() -> tuple[str, ...]:
+    advisor_runs = [
+        path.relative_to(ROOT).as_posix()
+        for path in sorted(ADVISOR_RUNS.glob("**/*.json"))
+        if path.is_file()
+    ]
+    return (*STATIC_INPUTS, *advisor_runs)
+
+
 def current_digests() -> dict[str, str]:
-    return {name: sha256(ROOT / name) for name in TRACKED_INPUTS}
+    return {name: sha256(ROOT / name) for name in tracked_inputs()}
 
 
 def write_manifest() -> None:
@@ -55,9 +65,19 @@ def read_manifest() -> dict[str, str]:
 def verify() -> int:
     expected = read_manifest()
     actual = current_digests()
-    mismatches = [name for name in TRACKED_INPUTS if expected.get(name) != actual[name]]
-    if mismatches:
+    expected_names = set(expected)
+    actual_names = set(actual)
+    missing_files = sorted(expected_names - actual_names)
+    untracked_files = sorted(actual_names - expected_names)
+    mismatches = sorted(
+        name for name in expected_names & actual_names if expected[name] != actual[name]
+    )
+    if missing_files or untracked_files or mismatches:
         print("DATA INTEGRITY MISMATCH:", file=sys.stderr)
+        for name in missing_files:
+            print(f"  {name}: listed in manifest but missing from disk", file=sys.stderr)
+        for name in untracked_files:
+            print(f"  {name}: present on disk but missing from manifest", file=sys.stderr)
         for name in mismatches:
             print(f"  {name}: expected {expected.get(name)}, got {actual[name]}", file=sys.stderr)
         return 1

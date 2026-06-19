@@ -372,6 +372,7 @@ def _summarize_backtest(export: dict | None) -> dict | None:
             name: metrics(values) for name, values in sota_baselines.items()
         }
         summary["sota_comparisons"] = export.get("sota_comparisons")
+        summary["sota_method"] = export.get("sota_method")
     return summary
 
 

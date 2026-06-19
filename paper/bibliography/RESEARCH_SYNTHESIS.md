@@ -163,8 +163,10 @@ It requires:
 - `AZURE_OPENAI_API_KEY`
 - optional `AZURE_OPENAI_API_VERSION`
 
-Current local status: the API key is configured, but the endpoint is missing.
-No live call was made.
+Current local status: the Azure pilot has been collected and frozen under
+`paper/data/advisor_runs/azure/chat/`. Those JSON files include prompts, raw
+responses, usage metadata, prompt hashes, and collection timestamps, and are now
+listed in `paper/data/DATA_HASHES.txt`.
 
 ## Serendipities to Track
 

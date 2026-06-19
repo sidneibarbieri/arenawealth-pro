@@ -36,6 +36,24 @@ def test_min_variance_picks_lower_variance_asset():
     assert math.isclose(weights["LOW"] + weights["HIGH"], 1.0)
 
 
+def test_covariance_shrinkage_moves_toward_diagonal_target():
+    returns = {
+        "A": (0.01, 0.02, -0.01, 0.03),
+        "B": (0.02, 0.04, -0.02, 0.06),
+    }
+
+    tickers, shrunk = covariance_matrix(returns, shrinkage=1.0)
+
+    assert tickers == ("A", "B")
+    assert shrunk[0, 1] == pytest.approx(0.0)
+    assert shrunk[0, 0] == pytest.approx(shrunk[1, 1])
+
+
+def test_covariance_rejects_invalid_shrinkage():
+    with pytest.raises(ValueError, match="shrinkage"):
+        covariance_matrix({"A": (0.01, 0.02), "B": (0.0, 0.01)}, shrinkage=1.1)
+
+
 def test_min_variance_long_only_drops_negative():
     """High correlation with mismatched variances can produce negative closed-form
     weights, which the active-set must clip."""
