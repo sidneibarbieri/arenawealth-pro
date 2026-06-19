@@ -126,6 +126,26 @@ def test_two_orders_cost_same_as_one():
     assert plan.total_fee == compute_order_fee(1511.18, fee_params)
 
 
+def test_large_cash_uses_fee_neutral_multi_order_plan():
+    positions = [
+        make_position("A", 90.0, 6.0, "TA"),
+        make_position("B", 85.0, 6.0, "TB"),
+        make_position("C", 80.0, 6.0, "TC"),
+        make_position("D", 75.0, 6.0, "TD"),
+        make_position("E", 70.0, 6.0, "TE"),
+        make_position("F", 65.0, 6.0, "TF"),
+    ]
+    fee_params = FeeParameters()
+
+    plan = plan_deployment(positions, 100_000.0, fee_params)
+
+    assert len(plan.orders) == 6
+    assert sum(order.amount for order in plan.orders) == 100_000.0
+    assert plan.total_fee == compute_order_fee(100_000.0, fee_params)
+    assert all(order.amount >= fee_params.min_order_amount_usd for order in plan.orders)
+    assert tuple(order.ticker for order in plan.orders) == ("A", "B", "C", "D", "E", "F")
+
+
 def test_does_not_deploy_cash_below_economic_minimum():
     positions = [
         make_position("A", 80.0, 10.0, "TA"),

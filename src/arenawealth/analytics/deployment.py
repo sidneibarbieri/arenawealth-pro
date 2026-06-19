@@ -3,7 +3,7 @@
 This module implements a fee-optimal cash allocation strategy that respects:
 1. Concentration limits: positions above 1.3x equal weight are ineligible.
 2. Fee efficiency: splits are only diversified when fee-neutral.
-3. Theme diversification: top two picks are from distinct themes.
+3. Theme diversification: picks are drawn from distinct themes.
 4. Determinism: ties broken by ticker for reproducible ordering.
 
 The key fee invariant is sub-tranche fee-worsening: naive proportional splits in
@@ -18,6 +18,8 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 
 from arenawealth.analytics.models import DeploymentPlan, Order, PositionAnalysis
+
+MAX_LARGE_CASH_ORDERS = 6
 
 
 @dataclass(frozen=True)
@@ -121,6 +123,14 @@ def select_eligible_for_purchase(
     return selected_picks, blocked_tickers
 
 
+def max_orders_for_cash(cash_usd: float, fee_params: FeeParameters) -> int:
+    """Return the maximum order count supported by the cash regime."""
+    if cash_usd < fee_params.tranche_size_usd * 3:
+        return 2
+    tranche_count = max(1, int(cash_usd // fee_params.tranche_size_usd))
+    return min(MAX_LARGE_CASH_ORDERS, tranche_count)
+
+
 def build_single_order(
     analysis: PositionAnalysis,
     amount_usd: float,
@@ -168,6 +178,64 @@ def compute_score_based_split(
     return first_amount, second_amount
 
 
+def allocate_tranche_units(
+    candidates: Sequence[PositionAnalysis],
+    cash_usd: float,
+    fee_params: FeeParameters,
+) -> tuple[float, ...]:
+    """Allocate large cash as fee-neutral tranche-sized orders."""
+    tranche_count = math.ceil(cash_usd / fee_params.tranche_size_usd)
+    candidate_count = min(len(candidates), tranche_count, MAX_LARGE_CASH_ORDERS)
+    selected = candidates[:candidate_count]
+    if not selected:
+        return ()
+
+    total_score = sum(candidate.composite_score for candidate in selected)
+    if total_score <= 0:
+        unit_targets = [tranche_count / candidate_count for _ in selected]
+    else:
+        unit_targets = [
+            candidate.composite_score / total_score * tranche_count for candidate in selected
+        ]
+
+    units = [max(1, math.floor(target)) for target in unit_targets]
+    while sum(units) > tranche_count:
+        reducible_indexes = [
+            index for index, unit_count in enumerate(units) if unit_count > 1
+        ]
+        if not reducible_indexes:
+            return ()
+        index_to_reduce = min(
+            reducible_indexes,
+            key=lambda index: unit_targets[index] - math.floor(unit_targets[index]),
+        )
+        units[index_to_reduce] -= 1
+
+    while sum(units) < tranche_count:
+        index_to_increase = max(
+            range(candidate_count),
+            key=lambda index: unit_targets[index] - math.floor(unit_targets[index]),
+        )
+        units[index_to_increase] += 1
+
+    amounts = [unit_count * fee_params.tranche_size_usd for unit_count in units]
+    overage = sum(amounts) - cash_usd
+    if overage > 0:
+        reducible_indexes = [
+            index
+            for index, amount in enumerate(amounts)
+            if amount - overage >= fee_params.min_order_amount_usd
+        ]
+        if not reducible_indexes:
+            return ()
+        index_to_reduce = max(reducible_indexes, key=lambda index: amounts[index])
+        amounts[index_to_reduce] -= overage
+
+    if any(amount < fee_params.min_order_amount_usd for amount in amounts):
+        return ()
+    return tuple(amounts)
+
+
 def is_split_fee_neutral(
     split_orders: Sequence[Order],
     single_order: Order,
@@ -187,6 +255,19 @@ def is_split_fee_neutral(
     """
     split_fee_total = sum(order.fee for order in split_orders)
     return split_fee_total <= single_order.fee
+
+
+def build_fee_neutral_large_cash_orders(
+    candidates: Sequence[PositionAnalysis],
+    cash_usd: float,
+    fee_params: FeeParameters,
+) -> tuple[Order, ...]:
+    """Build a deterministic multi-order plan for large cash deployments."""
+    amounts = allocate_tranche_units(candidates, cash_usd, fee_params)
+    return tuple(
+        build_single_order(candidate, amount, fee_params)
+        for candidate, amount in zip(candidates, amounts, strict=False)
+    )
 
 
 def size_orders_for_cash(
@@ -214,6 +295,13 @@ def size_orders_for_cash(
         return ()
 
     single_order = build_single_order(candidates[0], cash_usd, fee_params)
+
+    if len(candidates) >= 3 and cash_usd >= fee_params.tranche_size_usd * 3:
+        large_cash_orders = build_fee_neutral_large_cash_orders(
+            candidates, cash_usd, fee_params
+        )
+        if large_cash_orders and is_split_fee_neutral(large_cash_orders, single_order):
+            return large_cash_orders
 
     if len(candidates) < 2 or cash_usd < min_order * 2:
         return (single_order,)
@@ -281,8 +369,9 @@ def plan_deployment(
     )
 
     theme_weights_map = compute_theme_weights(analyses)
+    max_picks = max_orders_for_cash(cash_usd, fee_params)
     candidates, theme_blocked_tickers = select_eligible_for_purchase(
-        ranked_by_score, theme_weights_map, concentration_limits
+        ranked_by_score, theme_weights_map, concentration_limits, max_picks=max_picks
     )
 
     orders = size_orders_for_cash(candidates, cash_usd, fee_params)

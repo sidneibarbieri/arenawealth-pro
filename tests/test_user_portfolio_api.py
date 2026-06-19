@@ -103,6 +103,20 @@ def test_portfolio_recommendation_offline_demo(api_client: TestClient) -> None:
     assert body["ranked_positions"]
 
 
+def test_large_cash_recommendation_diversifies_fee_neutrally(
+    api_client: TestClient,
+) -> None:
+    response = api_client.get(
+        "/api/v1/portfolio/user/recommendation?cash=100000&offline_demo=true"
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body["orders"]) > 2
+    assert sum(order["amount"] for order in body["orders"]) == 100000.0
+    assert sum(order["fee"] for order in body["orders"]) == 250.0
+
+
 def test_recommendation_is_replayable_from_same_inputs(api_client: TestClient) -> None:
     """The decision is a pure function of (holdings, cash, policy, provider mode).
 
@@ -356,4 +370,3 @@ def test_portfolio_audit_results_endpoint(api_client: TestClient) -> None:
     assert "overall" in body
     assert "by_advisor" in body
     assert "reports" in body
-
