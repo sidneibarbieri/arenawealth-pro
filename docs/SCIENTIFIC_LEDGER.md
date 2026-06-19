@@ -112,7 +112,27 @@ Evidence:
   threads)
 - downloaded open-access PDFs in `paper/bibliography/pdfs/` (git-ignored)
 
-### F8. AI should augment the decision workflow, not own the final policy
+### F8. Agreement-only false positives appear in a 120-scenario offline bank
+
+The advisor benchmark now contains 120 deterministic frozen scenarios across 12
+operational categories and evaluates five offline advisor configurations with
+five runs per scenario (3,000 outputs). The contract-following advisor is fully
+valid. The agreement-only splitter reaches 0.94 mean agreement and perfect set
+stability, but only 0.58 validity and a 0.42 agreement-only false-positive rate.
+The scenario-bank taxonomy records cash overruns, ungrounded facts,
+fee-worsening splits, too-many-recommendation violations, below-floor orders,
+and malformed amount outputs. This supports the paper's central claim at a
+larger scale than the cached nine-run model pilot: agreement and stability do
+not certify operational validity.
+
+Evidence:
+
+- `src/arenawealth/experiments/scenario_bank.py`
+- `tests/unit/test_ai_advisor_benchmark.py`
+- `scripts/run_experiments.py` (`advisor_scenario_bank` JSON block)
+- `paper/main.tex` (Table `tab:scenario-bank`)
+
+### F9. AI should augment the decision workflow, not own the final policy
 
 The state-of-the-art literature on financial LLMs and agents emphasizes workflow
 automation, data access, reasoning, and risk profiling. That suggests a more
@@ -128,7 +148,7 @@ Evidence:
 - `paper/references.bib` (`liu2024financialai`, `yang2024finrobot`,
   `chawla2025riskadvice`, `oehler2024chatgpt`, `ko2024chatgpt`)
 
-### F9. Strong AI-in-finance papers make a hidden failure mode measurable
+### F10. Strong AI-in-finance papers make a hidden failure mode measurable
 
 Recent award-level and accepted papers repeatedly turn a vague concern into a
 measurable benchmark: market spoofability under liquidity variation,
@@ -145,7 +165,7 @@ Evidence:
 - downloaded PDFs in `paper/bibliography/pdfs/` (git-ignored)
 - `src/arenawealth/experiments/ai_advisor.py`
 
-### F10. Advisor agreement is not enough without operational validity
+### F11. Advisor agreement is not enough without operational validity
 
 The offline AI-advisor audit suite evaluates frozen scenarios with synthetic
 failure-mode controls. It separates three quantities that are often conflated:
@@ -176,7 +196,7 @@ Evidence:
 - `scripts/run_ai_advisor_audit.py`
 - tests in `tests/unit/test_ai_advisor_benchmark.py`
 
-### F11. Top-finance related work narrows the claim to auditability
+### F12. Top-finance related work narrows the claim to auditability
 
 Adding anchors from empirical asset pricing, transaction-cost optimization, and
 robo-advising clarified the defensible gap. Prior finance work already owns
@@ -194,7 +214,7 @@ Evidence:
   `garleanu2013dynamic`, `dacunto2019robo`)
 - `paper/figures/ai_advisor_audit.tikz`
 
-### F12. AI advice can be treated as a candidate program with a deterministic verifier
+### F13. AI advice can be treated as a candidate program with a deterministic verifier
 
 The manually completed bibliography suggests a stronger computer-science
 framing: a language model is not the final investment policy, but a
@@ -212,7 +232,7 @@ Evidence:
 - `paper/bibliography/_order.txt` (only `kanuri2016moat.pdf` remains manual)
 - `scripts/collect_advisor_runs.py`
 
-### F13. A high-scoring asset can be portfolio-invalid
+### F14. A high-scoring asset can be portfolio-invalid
 
 The workbench now distinguishes candidate quality from portfolio fit. A candidate
 can score well on moat, compounding, and valuation while worsening concentration
@@ -236,7 +256,7 @@ Evidence:
 - `tests/unit/test_portfolio_fit_experiment.py`
 - `frontend/src/App.tsx` (portfolio-fit display in the candidate screen)
 
-### F14. The next benchmark dimension is temporal and operational trust
+### F15. The next benchmark dimension is temporal and operational trust
 
 The newly indexed EMNLP, WWW, and KDD papers sharpen the state of the art.
 `hu2025fintrust` treats finance LLM trustworthiness as a multi-axis benchmark.
@@ -258,7 +278,7 @@ Evidence:
 - `paper/bibliography/RESEARCH_SYNTHESIS.md`
 - `paper/references.bib` (`hu2025fintrust`, `qian2026ama`, `li2026finsaber`)
 
-### F15. Real model agreement still missed an operational failure
+### F16. Real model agreement still missed an operational failure
 
 The cached advisor pilot contains nine real model outputs over the same frozen
 audit scenarios used by the deterministic controls. Each run stores the prompt,
@@ -283,7 +303,7 @@ Evidence:
 - `scripts/collect_advisor_runs.py`
 - `paper/main.tex` (cached model pilot table)
 
-### F16. The fee-aware heuristic is exactly optimal in its design regime
+### F17. The fee-aware heuristic is exactly optimal in its design regime
 
 A reviewer can reasonably ask how far the deterministic heuristic falls short of
 the exact optimum. We measured it under the same fee schedule and concentration

@@ -127,10 +127,12 @@ The data limitations are listed in `docs/DATA_SOURCES.md`.
 make experiments
 ```
 
-This regenerates the fee, guardrail, ablation, and backtest figures under
-`paper/figures/` and writes an experiment JSON report under `exports/`. These
-experiments use the production engine and are the source for the manuscript's
-findings. The current research ledger is `docs/SCIENTIFIC_LEDGER.md`.
+This regenerates the fee, guardrail, ablation, robustness, and backtest figures
+under `paper/figures/` and writes an experiment JSON report under `exports/`.
+The same offline driver also runs the 120-scenario advisor benchmark used for
+the manuscript's failure-taxonomy table. These experiments use the production
+engine and are the source for the manuscript's findings. The current research
+ledger is `docs/SCIENTIFIC_LEDGER.md`.
 
 ## Bibliography Library
 

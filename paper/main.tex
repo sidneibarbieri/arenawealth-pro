@@ -268,6 +268,37 @@ and stability are intrinsic to the advisor and unchanged by the choice, so a
 different $k$, or a rank-correlation variant, would rescale agreement without
 altering which axis a failure appears on.
 
+The validity checks form a deterministic failure taxonomy
+(Table~\ref{tab:taxonomy}). Each category is an exact test on the advisor's
+output and the frozen scenario, so a failed run is attributable to a named cause
+with no second model in the loop, which is what keeps the verdict replayable and
+free of judgment. The categories are not hypothetical: the sub-tranche control
+triggers the fee-worsening split, the portfolio-fit case triggers the
+concentration breach, and the fact-hallucination control triggers the ungrounded
+fact.
+
+\begin{table}[t]
+  \caption{Deterministic failure taxonomy. Every category is flagged by an exact
+  test on the advisor's output and the frozen scenario, so a violation names its
+  own cause without a model in the loop. Here $a_i$ is the dollar amount of leg
+  $i$, $T$ the fee tranche, and $c/\tau$ the economic floor.}
+  \label{tab:taxonomy}
+  \begin{tabular}{ll}
+    \toprule
+    Failure & Deterministic test \\
+    \midrule
+    Out-of-universe ticker & ticker $\notin$ allowed set \\
+    Recommendation-cap breach & count $>$ cap \\
+    Already-owned (add-only) & ticker $\in$ held set \\
+    Cash overrun & $\textstyle\sum_i a_i >$ cash \\
+    Below-floor order & $a_i < c/\tau$ \\
+    Fee-worsening split & $\textstyle\sum_i \lceil a_i/T\rceil > \lceil (\textstyle\sum_i a_i)/T\rceil$ \\
+    Concentration breach & post-trade weight $>$ cap \\
+    Ungrounded cited fact & fact id $\notin$ scenario set \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
 The three axes do not substitute for one another. We show this with seven
 deterministic archetype controls: failure modes by construction, not model
 outputs (Figure~\ref{fig:audit}). The decisive control is the naive diversifier:
@@ -341,6 +372,45 @@ certify that run. The deterministic verifier rejects it.
     \bottomrule
   \end{tabular}
 \end{table}
+
+The pilot is intentionally small, so the artifact now includes a larger offline
+scenario bank to test whether the same separation appears in scale. The bank
+contains 120 frozen scenarios, ten variants each of twelve categories:
+new-cash deployment, sub-tranche cash, already-owned assets, fee-sensitive
+orders, insufficient cash, out-of-universe tickers, hallucinated or stale facts,
+drawdown cases, rebalance-versus-hold, fractional-share constraints, and
+conflicting rationales. Five deterministic advisor configurations run five
+times per scenario, for 3,000 replayed outputs. The configurations are synthetic
+stressors rather than provider claims: one implements the contract, one maximizes
+agreement while splitting orders, one changes tickers across runs, one cites
+unsupported facts, and one overspends cash.
+
+\begin{table}[t]
+  \caption{Frozen scenario-bank results over 120 scenarios and 3,000 advisor
+  outputs. High agreement and stability do not imply validity.}
+  \label{tab:scenario-bank}
+  \small
+  \begin{tabular}{lrrrr}
+    \toprule
+    Advisor & Valid & Agree & Set $S$ & Agr.-FP \\
+    \midrule
+    Contract & $1.00$ & $0.92$ & $1.00$ & $0.00$ \\
+    Agreement split & $0.58$ & $0.94$ & $1.00$ & $0.42$ \\
+    Unstable selector & $0.95$ & $0.32$ & $0.13$ & $0.00$ \\
+    Fact hallucination & $0.67$ & $0.92$ & $1.00$ & $0.33$ \\
+    Cash overrun & $0.50$ & $0.68$ & $1.00$ & $0.42$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Table~\ref{tab:scenario-bank} turns the pilot failure into a benchmark result.
+The agreement-only splitter has higher agreement than the contract and perfect
+set stability, yet 42\% of its runs are agreement-only false positives. The
+failure taxonomy is likewise operational: 300 cash overruns, 200 ungrounded
+facts, 150 fee-worsening splits, 150 too-many-recommendation violations, 100
+below-floor orders, and 30 malformed amount outputs. These are deterministic
+violations of the scenario contract, not judgments by another model, and the
+scenario manifest is hashed by the experiment driver.
 
 \section{Deterministic Verification}
 \label{sec:portfolio-verification}
