@@ -9,7 +9,7 @@ enter the manuscript only after the artifact produces supporting evidence.
 - `paper/bibliography/sources.json` tracks the bibliography source of truth.
 - `paper/bibliography/PDF_INDEX.json` records local PDF hashes.
 - `paper/bibliography/_order.txt` lists the remaining manual download.
-- Current coverage: 30 local PDFs out of 31 tracked papers.
+- Current coverage: 34 local PDFs out of 35 tracked papers.
 
 ## Main Scientific Opportunity
 
@@ -108,7 +108,31 @@ Supporting papers:
 - `saha2025agents`
 - `yang2024finrobot`
 - `chen2025stockbench`
+- `hu2025fintrust`
+- `qian2026ama`
+- `li2026finsaber`
 - `gu2024spoofability`
+
+### I5. Stronger LLM-finance benchmarks separate trust, regime, and deployment
+
+The newly indexed EMNLP, WWW, and KDD papers sharpen the gap. `hu2025fintrust`
+shows that finance LLMs need multi-axis trustworthiness evaluation, not only
+task accuracy. `qian2026ama` moves LLM-agent evaluation toward live verified
+streams and shows that agent architecture can matter more than model backbone.
+`li2026finsaber` finds that apparent LLM investing advantages weaken under
+longer horizons, broader universes, and regime analysis.
+
+Computation-theory angle: the audit should be an interpreter for candidate
+recommendation programs under a frozen information surface. Validity,
+stability, agreement, grounding, and regime-aware outcome can be measured as
+separate properties of the same candidate output.
+
+Supporting papers:
+
+- `hu2025fintrust`
+- `qian2026ama`
+- `li2026finsaber`
+- `benhenda2026lookahead`
 
 ## Proposed Best-Paper-Grade Experiment
 
@@ -192,6 +216,9 @@ Next:
 
 1. Add scenario perturbations: same facts with reordered prompt, renamed fields,
    and equivalent cash formatting to test invariance.
-2. Expand to 20 scenarios before making any paper-level claim about real LLMs.
-3. Use price/backtest outcomes only after validity filtering, not as the first
+2. Add temporal-contamination controls inspired by point-in-time benchmark
+   work: scenario facts must be dated, frozen, and unavailable facts must be
+   rejected by the grounding checker.
+3. Expand to 20 scenarios before making any paper-level claim about real LLMs.
+4. Use price/backtest outcomes only after validity filtering, not as the first
    metric.

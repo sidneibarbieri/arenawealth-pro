@@ -328,7 +328,7 @@ function App() {
         <header className="topbar">
           <div>
             <p className="eyebrow">Moat and compounding workbench</p>
-            <h1>ArenaWealth Pro</h1>
+            <h1>ArenaWealth</h1>
           </div>
           <button className="icon-button" type="button" onClick={refreshWorkspace}>
             <RefreshCw size={17} />

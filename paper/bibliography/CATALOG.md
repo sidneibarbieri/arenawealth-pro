@@ -42,7 +42,11 @@ ignored by Git; `_order.txt` lists missing or manually downloadable papers.
 | `yang2024finrobot` | FinRobot: An Open-Source AI Agent Platform for Financial Applications using Large Language Models | 2024 | arXiv | financial agent-system comparator | have |
 | `chen2025stockbench` | StockBench: Can LLM Agents Trade Stocks Profitably in Real-world Markets? | 2025 | arXiv | LLM trading-agent benchmark comparator | have |
 | `elalami2025mlfinance` | Machine Learning and Deep Learning in Computational Finance: A Systematic Review | 2025 | arXiv | computational-finance survey | have |
+| `hu2025fintrust` | FinTrust: A Comprehensive Benchmark of Trustworthiness Evaluation in Finance Domain | 2025 | EMNLP | finance trustworthiness benchmark | have |
 | `saha2025agents` | Large Language Model Agents for Investment Management | 2025 | SSRN | investment-management agent survey | have |
+| `benhenda2026lookahead` | Look-Ahead-Bench: a Standardized Benchmark of Look-ahead Bias in Point-in-Time LLMs for Finance | 2026 | arXiv | point-in-time LLM look-ahead-bias benchmark | have |
+| `li2026finsaber` | Can LLM-based Financial Investing Strategies Outperform the Market in Long Run? | 2026 | KDD | long-horizon LLM investing benchmark | have |
+| `qian2026ama` | When Agents Trade: Live Multi-Market Trading Arena for LLM Agents | 2026 | WWW | live multi-market LLM trading-agent benchmark | have |
 
 ## Market Simulation and Audit
 

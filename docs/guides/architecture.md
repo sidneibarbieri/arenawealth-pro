@@ -1,6 +1,6 @@
 # Architecture
 
-ArenaWealth Pro is organized around explicit boundaries:
+ArenaWealth is organized around explicit boundaries:
 
 - `arenawealth.domain`: immutable value objects for money, positions, and portfolios.
 - `arenawealth.importers`: CSV ingestion and normalization.

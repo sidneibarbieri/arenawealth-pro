@@ -84,7 +84,7 @@ wait_for_url "$UI_URL" "UI"
 
 cat <<EOF
 
-ArenaWealth Pro is running.
+ArenaWealth is running.
   App:      ${UI_URL}
   API:      ${API_URL}
   API docs: ${API_URL}/docs

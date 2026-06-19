@@ -1,6 +1,6 @@
-# ArenaWealth Pro
+# ArenaWealth
 
-ArenaWealth Pro is a portfolio analysis system for international equities. The
+ArenaWealth is a portfolio analysis system for international equities. The
 repository contains a FastAPI backend, a Vite/React dashboard, deterministic
 portfolio scoring utilities, and reviewer-facing validation scripts.
 

@@ -1,6 +1,6 @@
 # Investment Principles
 
-ArenaWealth Pro is built around deterministic portfolio rules. The system should
+ArenaWealth is built around deterministic portfolio rules. The system should
 only recommend trades that improve or preserve portfolio quality while
 respecting concentration constraints.
 

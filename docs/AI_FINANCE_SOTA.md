@@ -30,6 +30,10 @@ automation, and financial task orchestration. Representative works include:
 - `yang2024finrobot`: FinRobot, an LLM-agent platform for financial analysis.
 - `elalami2025mlfinance`: systematic review of ML and deep learning in
   computational finance.
+- `hu2025fintrust`: a finance-domain LLM trustworthiness benchmark.
+- `qian2026ama`: a live multi-market arena for LLM trading agents.
+- `li2026finsaber`: a long-horizon benchmark showing LLM investing claims weaken
+  under broader universes and regimes.
 
 Gap for us: these systems often optimize workflow capability, language
 reasoning, or prediction, but they do not provide a simple, replayable
@@ -57,6 +61,11 @@ transparent moat/quality/compounding baseline.
 
 The latest conference reading notes are tracked in
 `paper/bibliography/AI_FINANCE_READING_NOTES.md`.
+
+New synthesis: the stronger papers do not merely ask whether LLMs can trade.
+They make one hidden evaluation problem measurable: trustworthiness dimensions,
+live agent behavior, or long-horizon robustness. Our measurable problem is
+portfolio-action admissibility under frozen facts and deterministic constraints.
 
 ### 3. Quality, moat, and compounding
 
@@ -122,6 +131,10 @@ breaking constraints, changing hidden assumptions, or losing replayability.
    - agreement with deterministic policy;
    - realized performance in the same backtest harness;
    - explanation faithfulness to logged facts.
+
+   Add temporal-contamination controls before expanding claims: each scenario
+   must expose only dated facts, and the verifier should reject explanations
+   that cite unavailable future facts.
 
    Initial offline metric support lives in
    `src/arenawealth/experiments/ai_advisor.py`. Frozen scenario support now

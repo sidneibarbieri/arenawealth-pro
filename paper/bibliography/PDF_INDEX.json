@@ -138,12 +138,44 @@
       "source_url": "https://arxiv.org/abs/2511.21588"
     },
     {
+      "bib_key": "hu2025fintrust",
+      "bytes": 3372678,
+      "filename": "hu2025fintrust.pdf",
+      "pdf_url": "https://aclanthology.org/2025.emnlp-main.512.pdf",
+      "sha256": "9fc816513b72b1c3695b5e628c781c53700bf2ea989359bda5c95a6f423c173c",
+      "source_url": "https://aclanthology.org/2025.emnlp-main.512/"
+    },
+    {
       "bib_key": "saha2025agents",
       "bytes": 2856760,
       "filename": "saha2025agents.pdf",
       "pdf_url": null,
       "sha256": "d0f8e4b483cdc95ef575c38a935cd2c59e16c82694a7c577391adb9a5a838e1b",
       "source_url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5447274"
+    },
+    {
+      "bib_key": "benhenda2026lookahead",
+      "bytes": 150243,
+      "filename": "benhenda2026lookaheadbench.pdf",
+      "pdf_url": "https://arxiv.org/pdf/2601.13770",
+      "sha256": "bec1468a9da67ca545463aa6ced2529b21deffee1c34269a992ac31a4b44a357",
+      "source_url": "https://arxiv.org/abs/2601.13770"
+    },
+    {
+      "bib_key": "li2026finsaber",
+      "bytes": 1469084,
+      "filename": "li2026finsaber.pdf",
+      "pdf_url": null,
+      "sha256": "58ff3cdf0169b33cbbea2d5fa93f90711ae2e6324b4d632c06dbc574d9a4def5",
+      "source_url": "https://doi.org/10.1145/3770854.3785702"
+    },
+    {
+      "bib_key": "qian2026ama",
+      "bytes": 3113186,
+      "filename": "qian2026agent_market_arena.pdf",
+      "pdf_url": null,
+      "sha256": "fe82bdb4184a8b894cc2ac6cb2ed012dbf51a5ae6e87122c370908919c70fa9a",
+      "source_url": "https://doi.org/10.1145/3774904.3792821"
     },
     {
       "bib_key": "gu2024spoofability",
@@ -242,5 +274,5 @@
       "source_url": "https://arxiv.org/abs/2311.16204"
     }
   ],
-  "pdf_count": 30
+  "pdf_count": 34
 }

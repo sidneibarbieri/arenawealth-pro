@@ -1,6 +1,6 @@
 # Product Strategy
 
-ArenaWealth Pro should remain a deterministic decision-support system. It should
+ArenaWealth should remain a deterministic decision-support system. It should
 not present one universal portfolio as suitable for every investor.
 
 ## Primary Mode

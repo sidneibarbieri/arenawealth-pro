@@ -9,5 +9,5 @@ Publication/source: Applied Economics
 Role: moat-investing comparator
 URL: https://doi.org/10.1080/00036846.2016.1178850
 PDF URL: manual
-Status: manual; last download result: manual
+Status: manual; last download result: not-attempted
 Notes: Publisher page is available; add authorized PDF manually if needed.

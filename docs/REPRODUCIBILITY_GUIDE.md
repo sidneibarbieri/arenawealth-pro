@@ -1,6 +1,6 @@
 # Reproducibility Guide
 
-This guide describes the supported reviewer workflow for ArenaWealth Pro.
+This guide describes the supported reviewer workflow for ArenaWealth.
 
 ## Environment
 

@@ -203,12 +203,12 @@ contract: frozen facts, allowed universe, portfolio constraints, fee semantics,
 and replayable policy output. This converts AI advice into a verification
 problem: parse the candidate recommendation, reject non-executable or ungrounded
 actions, and only then measure novelty or realized outcome. This is the current
-best-paper-grade hypothesis to test with real model runs.
+highest-leverage hypothesis to test with real model runs.
 
 Evidence:
 
 - `paper/bibliography/RESEARCH_SYNTHESIS.md`
-- `paper/bibliography/PDF_INDEX.json` (30 local PDFs indexed)
+- `paper/bibliography/PDF_INDEX.json` (34 local PDFs indexed)
 - `paper/bibliography/_order.txt` (only `kanuri2016moat.pdf` remains manual)
 - `scripts/collect_advisor_runs.py`
 
@@ -235,6 +235,28 @@ Evidence:
 - `tests/unit/test_portfolio_review.py`
 - `tests/unit/test_portfolio_fit_experiment.py`
 - `frontend/src/App.tsx` (portfolio-fit display in the candidate screen)
+
+### F14. The next benchmark dimension is temporal and operational trust
+
+The newly indexed EMNLP, WWW, and KDD papers sharpen the state of the art.
+`hu2025fintrust` treats finance LLM trustworthiness as a multi-axis benchmark.
+`qian2026ama` evaluates trading agents on verified live streams. `li2026finsaber`
+shows that apparent LLM investing gains weaken under broader universes, longer
+horizons, and regime analysis. The arXiv `benhenda2026lookahead` paper adds a
+useful caution about temporal contamination and point-in-time evaluation.
+
+Takeaway: our benchmark should not compete by adding another return leaderboard.
+It should make one operational question measurable before returns are scored:
+given the same dated facts and portfolio constraints, does the advisor produce a
+valid, stable, grounded, and portfolio-admissible action? This is a stronger and
+cleaner computer-science contribution than claiming stock-picking alpha.
+
+Evidence:
+
+- `paper/bibliography/PDF_INDEX.json`
+- `paper/bibliography/AI_FINANCE_READING_NOTES.md`
+- `paper/bibliography/RESEARCH_SYNTHESIS.md`
+- `paper/references.bib` (`hu2025fintrust`, `qian2026ama`, `li2026finsaber`)
 
 ## State-of-the-Art Reference Points
 
@@ -300,7 +322,7 @@ Current honest position:
 - Reproducibility, framed initially as a compliance posture, became a
   scientific instrument: every figure in the paper exists because a pure
   function let us sweep its inputs exhaustively.
-- The best-paper pattern from recent AI-in-finance work is not maximum model
+- The high-impact pattern from recent AI-in-finance work is not maximum model
   complexity. It is a clean evaluation object plus a failure mode that becomes
   measurable.
 - The advisor audit exposed a metric trap: a recommendation can be stable and

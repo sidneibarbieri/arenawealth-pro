@@ -1,6 +1,6 @@
 # Vision
 
-ArenaWealth Pro aims to make portfolio decisions easier to audit. The product
+ArenaWealth aims to make portfolio decisions easier to audit. The product
 should expose the data, rules, and trade-offs behind each recommendation instead
 of presenting opaque advice.
 

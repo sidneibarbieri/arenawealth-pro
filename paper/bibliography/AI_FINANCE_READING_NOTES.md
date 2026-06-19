@@ -30,6 +30,10 @@ Git. The BibTeX source of truth is `paper/references.bib`.
 | `spadea2025flarko` | Closest LLM asset-recommendation comparator | Combines LLMs with knowledge graphs and behavior alignment. Our opportunity is a simpler deterministic benchmark that tests whether such systems improve, violate, or merely rationalize decisions. |
 | `lee2025bias` | Failure-mode comparator | Shows LLMs have latent investment biases and confirmation bias under evidence conflict. This motivates measuring stability, bias, and policy disagreement before trusting AI advice. |
 | `oh2025alpha` | Retail LLM portfolio-construction comparator | Uses public media and LLMs to build portfolios; reports high outperformance but has short-horizon and media-source limitations. Our benchmark can test whether such gains survive replay and stronger baselines. |
+| `hu2025fintrust` | Trustworthiness benchmark comparator | Shows that finance LLM evaluation is moving toward multi-axis trustworthiness: truthfulness, safety, fairness, privacy, transparency, and discovery. Our protocol should stay narrower and more operational: can the advice become a valid portfolio action? |
+| `li2026finsaber` | Long-horizon LLM investing comparator | Tests LLM investing strategies across longer periods and larger universes, finding that reported advantages weaken under broader evaluation. This supports our choice to avoid alpha claims and lead with auditability. |
+| `qian2026ama` | Live agent-market benchmark comparator | Evaluates LLM trading agents on verified live market streams. The important takeaway is not "more live trading"; it is disciplined input control and continuous evaluation. |
+| `benhenda2026lookahead` | Temporal-contamination study material | Highlights point-in-time and look-ahead bias risks in financial LLMs. This should inform scenario design and grounding checks, but it is not currently a core top-tier citation. |
 | `yang2024finrobot` | Agent-platform comparator | Shows the product direction: LLM agents orchestrate data, reports, and workflows. Our contribution should be the deterministic verification layer around agent outputs. |
 | `chawla2025riskadvice` | Risk-profile audit comparator | Measures correctness and consistency across profiles. We can adapt this design to investment recommendations: same scenario, repeated runs, constraint checks, and demographic/portfolio invariance tests. |
 | `liu2024financialai` | Survey and taxonomy | Confirms that benchmark construction, deployment constraints, and practical evaluation are central gaps in Financial AI. |
@@ -69,6 +73,13 @@ following together:
 - decision logs that can reproduce the final recommendation.
 
 This is the gap ArenaWealth can fill.
+
+The newest papers reinforce rather than replace this gap. Trustworthiness
+benchmarks are broad, live trading arenas are operational, and long-horizon
+backtests are stricter about regime and universe. None of those alone gives a
+small, replayable contract that checks whether an individual investment
+recommendation is executable for a specific portfolio before performance is
+measured.
 
 ## Candidate experiment: AI advice under deterministic audit
 
