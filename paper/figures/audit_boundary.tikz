@@ -1,0 +1,76 @@
+\begin{tikzpicture}[
+  x=1cm,
+  y=1cm,
+  >=Stealth,
+  awbox/.style={
+    rectangle,
+    rounded corners=1.2pt,
+    draw=black!48,
+    line width=.45pt,
+    align=center,
+    inner sep=2.8pt,
+    font=\sffamily\scriptsize
+  },
+  awinput/.style={awbox, draw=arenaBlue!70!black, fill=arenaBlue!7},
+  awauto/.style={awbox, draw=arenaGreen!55!black, fill=arenaGreen!8},
+  awrule/.style={awbox, draw=black!42, fill=black!4},
+  awout/.style={awbox, draw=black!52, fill=white},
+  awrisk/.style={rectangle, rounded corners=.8pt, draw=red!65!black,
+    fill=red!7, inner sep=1.5pt, font=\sffamily\tiny, align=center},
+  awarrow/.style={-{Stealth[length=3.6pt,width=4.6pt]}, draw=black!70,
+    line width=.5pt},
+  awdash/.style={awarrow, dashed, draw=black!50},
+  awnote/.style={font=\sffamily\tiny, text=black!58, align=center}
+]
+
+\node[awinput, text width=1.55cm] (scenario) at (0,1.05)
+  {Frozen\\scenario\\holdings/cash\\facts};
+\node[awinput, text width=1.55cm] (advisor) at (0,-.55)
+  {Advisor\\output\\tickers/amounts\\citations};
+
+\node[awauto, text width=1.55cm] (normalize) at (2.25,.25)
+  {Normalize\\to action\\list};
+\node[awrule, text width=2.2cm] (contract) at (4.45,1.05)
+  {Policy contract\\universe, cap, cash\\floor, split, facts};
+\node[awauto, text width=1.75cm] (verifier) at (4.45,-.55)
+  {Deterministic\\verifier};
+
+\node[awout, text width=1.65cm] (orders) at (6.9,1.05)
+  {Admissible\\orders};
+\node[awout, text width=1.65cm] (trace) at (6.9,-.55)
+  {Typed\\violation\\trace};
+\node[awout, text width=1.85cm] (metrics) at (4.45,-1.75)
+  {Metrics\\$V,\ S,\ S_w,\ A$};
+
+\node[awrisk, text width=1.3cm] (split) at (2.25,-1.25)
+  {fee-worsening\\split};
+\node[awrisk, text width=1.3cm] (fact) at (6.9,-1.55)
+  {ungrounded\\fact};
+
+\draw[awarrow] (scenario) -- (normalize);
+\draw[awarrow] (advisor) -- (normalize);
+\draw[awarrow] (normalize) -- (verifier);
+\draw[awarrow] (contract) -- (verifier);
+\draw[awarrow] (verifier) -- (orders);
+\draw[awarrow] (verifier) -- (trace);
+\draw[awarrow] (trace) -- (metrics);
+\draw[awdash] (split) -- (verifier);
+\draw[awdash] (fact) -- (trace);
+
+\begin{scope}[on background layer]
+  \node[
+    rounded corners=2pt,
+    draw=arenaGreen!45!black,
+    fill=arenaGreen!4,
+    line width=.45pt,
+    fit=(normalize)(contract)(verifier)(orders)(trace)(metrics)(split)(fact),
+    inner xsep=5pt,
+    inner ysep=6pt,
+    label={[awnote]above:pre-return audit boundary}
+  ] {};
+\end{scope}
+
+\node[awnote] at (0,-1.45) {model proposes};
+\node[awnote] at (4.45,-2.3) {verifier enforces};
+\node[awnote] at (6.9,-2.05) {records replay};
+\end{tikzpicture}

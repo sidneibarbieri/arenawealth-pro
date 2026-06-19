@@ -12,6 +12,7 @@
 \emergencystretch=2em
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
+\usetikzlibrary{arrows.meta,positioning,fit,backgrounds,calc}
 \definecolor{arenaGreen}{HTML}{00C78A}
 \definecolor{arenaGold}{HTML}{F5C84C}
 \definecolor{arenaBlue}{HTML}{3BA4FF}
@@ -48,7 +49,8 @@ a higher-scoring asset when it worsens concentration. We make no alpha claim. Th
 baseline is a transparent verifier whose cost guardrails follow from the fee
 schedule, whose decisions replay from frozen inputs, and whose current-basket
 backtest we report against equal-weight, risk-parity, minimum-variance, and
-market baselines. Every figure and table regenerates offline from the artifact.
+market baselines. Every empirical figure and table regenerates offline from the
+artifact.
 \end{abstract}
 
 \begin{CCSXML}
@@ -210,9 +212,9 @@ A large fraction of reported strategy performance does not survive out of
 sample; backtest overfitting is easy to produce and hard to detect
 \cite{bailey2014pseudo}, and naive $1/N$ diversification is a stubborn baseline
 \cite{demiguel2009naive}. The artifact follows the discipline these results
-require: the engine is deterministic, every figure is regenerated from it, and
-the calibration is reported even when simple allocators outperform the tuned
-weighting.
+require: the engine is deterministic, every empirical figure is regenerated from
+it, and the calibration is reported even when simple allocators outperform the
+tuned weighting.
 This is the trustworthy-finance stance: explainable, reproducible, and
 auditable decisions applied to the universal cash-deployment
 step.
@@ -228,7 +230,7 @@ recommendation is a pure function of the tuple
   (\text{holdings},\ \text{fundamentals},\ \text{cash},\ \text{policy version}).
 \]
 Referential transparency is what makes the rest of this paper possible. Every
-figure and table below is produced by a single offline driver
+quantitative figure and table below is produced by a single offline driver
 (\texttt{scripts/run\_experiments.py}) and is regression-tested; no result
 depends on live data or hidden state. The purity is enforced, not merely
 asserted: a replay test feeds the same input tuple twice and checks that the
@@ -241,7 +243,20 @@ floating-point equality. Fees and the economic floor are integer tranche counts,
 validity and agreement are set memberships, and stability is a ratio of those
 sets, so a low-order bit difference across a math library or CPU cannot flip an
 audit outcome; the replay test pins byte-identical orders, exclusions, and
-rankings on the reference platform.
+rankings on the reference platform. Figure~\ref{fig:workflow} shows where this
+boundary sits: the model proposes text, while deterministic code emits
+executable orders or typed violations.
+
+\begin{figure}[t]
+  \centering
+  \resizebox{\columnwidth}{!}{\input{figures/audit_boundary.tikz}}
+  \caption{The audit boundary turns advisor text into executable orders and
+  typed violations before any return is computed.}
+  \Description{A mechanism diagram showing frozen scenario data and advisor
+  output entering a normalizer and deterministic verifier, which applies policy
+  rules and emits admissible orders, violation traces, and audit metrics.}
+  \label{fig:workflow}
+\end{figure}
 
 The composite score is the bounded linear functional
 $s=w_m\,\mathrm{moat}+w_c\,\mathrm{comp}+w_v\,\mathrm{val}$, with sub-scores in
@@ -560,7 +575,11 @@ oracles. The fee oracle is the consolidated-order lower bound from
 Equation~\ref{eq:premium}. The deployment oracle is a mixed-integer program that
 chooses order sizes and on/off flags to maximize deployed cash under the same
 budget, economic floor, theme-cap, and per-name headroom constraints as the
-planner. It is an upper bound on feasible deployment, not a return forecast.
+planner. Concretely, it uses allocation variables $x_i$ and order flags $z_i$,
+maximizes $\sum_i x_i$, and enforces cash budget, $x_i=0$ unless $z_i=1$,
+$x_i\ge(c/\tau)z_i$, theme caps, and per-name headroom. The artifact solves this
+reference with PuLP/CBC and records status, time, deployed cash, and order count.
+It is an upper bound on feasible deployment, not a return forecast.
 
 Across a small-cash grid from \$250 to \$5{,}000 in the planner's design regime,
 the planner matches both references exactly. It deploys the same cash as the MIP
