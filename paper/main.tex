@@ -405,6 +405,18 @@ a \$1 fee gives a \$100 floor at the same 1\% tolerance, a \$5 fee gives a \$500
 floor, and zero commission collapses the guardrail to zero. The rule is therefore
 not a tuned constant; it is the fee schedule made explicit.
 
+A heuristic invites the question of how far it can fall short of the exact
+optimum, so we measure it. Under the same fee schedule and concentration limits,
+subadditivity makes the consolidated single-order fee the minimum fee to deploy a
+given amount, and a mixed-integer program gives the maximum admissibly deployable
+cash. Across a small-cash grid from \$250 to \$5{,}000 in the planner's design
+regime, the planner matches both references exactly: it deploys the same cash as
+the MIP optimum at every point and holds the fee at the subadditive lower bound,
+so the deployment gap and the fee premium are both zero. Its suboptimality there
+is not merely small but zero; the MIP can deploy more only once a concentration
+limit binds and the heuristic stops, which lies outside the recurring small-cash
+setting this planner targets.
+
 \section{Experimental Findings}
 \label{sec:weighting}
 

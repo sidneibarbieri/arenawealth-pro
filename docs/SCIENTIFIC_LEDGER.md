@@ -283,6 +283,31 @@ Evidence:
 - `scripts/collect_advisor_runs.py`
 - `paper/main.tex` (cached model pilot table)
 
+### F16. The fee-aware heuristic is exactly optimal in its design regime
+
+A reviewer can reasonably ask how far the deterministic heuristic falls short of
+the exact optimum. We measured it under the same fee schedule and concentration
+limits against two references: the closed-form fee lower bound (the consolidated
+single-order fee, by subadditivity) and a mixed-integer program that maximizes
+admissibly deployable cash. Across a small-cash grid from USD 250 to USD 5,000 in
+the planner's design regime, the planner deploys exactly as much cash as the MIP
+optimum and pays exactly the fee lower bound: the deployment gap and the fee
+premium are both zero at every grid point. The suboptimality is zero, not merely
+small. The MIP can deploy more cash only once a per-name concentration limit
+binds and the heuristic stops, which is outside the recurring small-cash regime
+the planner targets.
+
+Takeaway: report suboptimality as a measured bound, not a hope. The MIP is a
+comparator here, not the deployed policy; the public planner stays deterministic
+and simple.
+
+Evidence:
+
+- `src/arenawealth/experiments/planner_optimality.py`
+- `tests/unit/test_planner_optimality.py`
+- `make experiments` -> `planner_optimality` JSON block under `exports/`
+- `paper/main.tex` (Deterministic Verification, optimality paragraph)
+
 ## State-of-the-Art Reference Points
 
 The project should be compared against these families, not against vague

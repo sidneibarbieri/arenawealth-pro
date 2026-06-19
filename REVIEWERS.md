@@ -43,8 +43,9 @@ make experiments   # regenerate figures and the JSON report
 
 | Paper element | Produced by |
 | --- | --- |
-| Fee propositions | `src/arenawealth/analytics/deployment.py` and deployment tests |
-| Fee premium + guardrail figures | `src/arenawealth/experiments/fee_landscape.py` |
+| Fee rules and guardrail | `src/arenawealth/analytics/deployment.py` and deployment tests |
+| Fee premium figure | `src/arenawealth/experiments/fee_landscape.py` |
+| Planner optimality vs MIP | `src/arenawealth/experiments/planner_optimality.py` (in `make experiments`) |
 | Schedule table | `src/arenawealth/experiments/fee_sensitivity.py` |
 | Ablation evidence | `src/arenawealth/experiments/ablation.py` |
 | Backtest table | `paper/data/price_backtest_reference.json` |

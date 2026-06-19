@@ -40,6 +40,9 @@ from arenawealth.experiments.fee_sensitivity import (
     reference_schedules,
     schedule_floors,
 )
+from arenawealth.experiments.planner_optimality import (
+    reference_report as planner_optimality_report,
+)
 from arenawealth.experiments.portfolio_fit import controlled_portfolio_fit_experiment
 from arenawealth.experiments.robustness import (
     block_bootstrap_sharpe_diff,
@@ -300,6 +303,9 @@ def main() -> None:
     # Experiment G: isolated asset quality versus portfolio fit
     portfolio_fit = controlled_portfolio_fit_experiment()
 
+    # Experiment H: planner suboptimality against the MIP deployment optimum
+    optimality = planner_optimality_report()
+
     # Figures. The sensitivity sweep and the backtest are reported in prose and
     # the backtest table; their data still feeds the JSON below, but a figure
     # would only restate the closed form and the table, so none is rendered.
@@ -342,6 +348,11 @@ def main() -> None:
             "top_k_stable": all(not row.top_k_changed for row in sensitivity_rows),
         },
         "portfolio_fit": asdict(portfolio_fit),
+        "planner_optimality": {
+            "max_deployment_gap": optimality.max_deployment_gap,
+            "max_fee_premium": optimality.max_fee_premium,
+            "points": [asdict(point) for point in optimality.points],
+        },
         "backtest": _summarize_backtest(backtest),
     }
     out = EXPORT_DIR / f"experiments_{stamp}.json"
