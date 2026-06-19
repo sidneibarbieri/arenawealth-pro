@@ -48,6 +48,22 @@ The script records:
 
 The output is written to `exports/reviewer_metrics_<timestamp>.json`.
 
+## Reviewer Dashboard
+
+Run the web workbench with tracked fixture data and a clean temporary decision
+log:
+
+```bash
+rm -f tmp/reviewer-dashboard.db
+ARENAWEALTH_PORTFOLIO_INBOX="$PWD/tests/fixtures" \
+ARENAWEALTH_DATABASE_PATH="$PWD/tmp/reviewer-dashboard.db" \
+./run.sh
+```
+
+Open `http://127.0.0.1:5173/?offline_demo=true&cash=1511.18` and click
+`Analyze`. The dashboard shows the tracked input source, deterministic reviewer
+mode, proposed orders, guardrails, and the decision log.
+
 ## Portfolio Analysis
 
 ```bash
@@ -88,8 +104,25 @@ curl "http://127.0.0.1:8000/api/v1/data-sources/health?live=true"
 Optional keys can be stored in `.env` or `~/.arenawealth/credentials.env`.
 Reviewer runs do not require them.
 
+## Cached Advisor Outputs
+
+The paper's small paid-provider pilot is preserved under
+`paper/data/advisor_runs/azure/chat/`. Re-audit those cached outputs without
+making provider calls:
+
+```bash
+make advisor-run-audit
+```
+
+To estimate a future live run before spending money:
+
+```bash
+make advisor-budget
+```
+
 ## Known Limits
 
-The current artifact includes a current-basket price study. It does not yet
-include a point-in-time fundamental selection backtest, factor-adjusted alpha, or
-paper table generation. Performance claims require that empirical work first.
+The current artifact includes a current-basket price study and regenerated
+paper figures. It does not include a point-in-time fundamental selection
+backtest or factor-adjusted alpha. Performance claims require that empirical
+work first.

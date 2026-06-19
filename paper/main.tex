@@ -554,32 +554,22 @@ directly. The guardrail is the fee schedule made explicit, not a tuned threshold
   \end{tabular}
 \end{table}
 
-A heuristic invites the question of how far it can fall short of the exact
-optimum, so we measure it. Under the same fee schedule and concentration limits,
-subadditivity makes the consolidated single-order fee the minimum fee to deploy a
-given amount, and a mixed-integer program gives the maximum admissibly deployable
-cash. For allocation $x_i$ and activation $z_i$ on candidate $i$, cash $C$,
-economic floor $m=c/\tau$, theme bounds $B_h$, and per-name headroom $H_i$, the
-oracle solves
-\begin{equation}
-\begin{aligned}
-  \max_{x,z}\quad & \sum_i x_i \\
-  \text{s.t.}\quad
-  & \sum_i x_i \le C, \\
-  & m z_i \le x_i \le C z_i && \forall i, \\
-  & \sum_{i:t_i=h} x_i \le B_h && \forall h, \\
-  & x_i \le H_i,\quad z_i\in\{0,1\} && \forall i.
-\end{aligned}
-\end{equation}
-The MIP is a deployment upper bound, not a return optimizer; the fee reference
-is the separate lower bound from Equation~\ref{eq:premium}. Across a small-cash
-grid from \$250 to \$5{,}000 in the planner's design regime, the planner matches
-both references exactly: it deploys the same cash as the MIP optimum at every
-point and holds the fee at the subadditive lower bound, so the deployment gap and
-the fee premium are both zero. Its suboptimality there is not merely small but
-zero; the MIP can deploy more only once a concentration limit binds and the
-heuristic stops, which lies outside the recurring small-cash setting this planner
-targets.
+The remaining risk is heuristic optimism: a planner can look sensible while
+leaving deployable cash on the table. We therefore compare it with two simple
+oracles. The fee oracle is the consolidated-order lower bound from
+Equation~\ref{eq:premium}. The deployment oracle is a mixed-integer program that
+chooses order sizes and on/off flags to maximize deployed cash under the same
+budget, economic floor, theme-cap, and per-name headroom constraints as the
+planner. It is an upper bound on feasible deployment, not a return forecast.
+
+Across a small-cash grid from \$250 to \$5{,}000 in the planner's design regime,
+the planner matches both references exactly. It deploys the same cash as the MIP
+oracle and pays the fee lower bound, so the measured deployment gap and fee
+premium are both zero. The MIP can deploy more only once a concentration limit
+binds and the heuristic stops, which lies outside the recurring small-cash
+setting this planner targets. The takeaway is deliberately narrow: for the
+fee-quantized cash deployments studied here, the planner's cost behavior is
+measured against exact references rather than asserted.
 
 \section{Experimental Findings}
 \label{sec:weighting}

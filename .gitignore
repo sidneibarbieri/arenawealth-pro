@@ -85,7 +85,6 @@ htmlcov/
 *_excellence_report_*.md
 archive/
 old_arenawealth-pro/
-project-framework/
 /.playwright-mcp/
 /.playwright-cli/
 portfolio-editor-*.png

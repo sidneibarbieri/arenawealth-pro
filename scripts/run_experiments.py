@@ -148,7 +148,9 @@ def figure_fee_premium_tikz(landscape, path: Path) -> None:
     axis_style = _axis_style(
         "xmin=250, xmax=5000, ymin=0, ymax=3.0, "
         "xlabel={Cash to deploy (USD)}, ylabel={Premium (USD)}, "
-        "legend pos=north east"
+        "legend style={draw=none, fill=white, fill opacity=0.9, text opacity=1, "
+        "font=\\scriptsize, at={(0.5,1.02)}, anchor=south}, "
+        "legend columns=-1"
     )
     naive_coordinates = _tikz_coordinates(naive_points)
     engine_coordinates = _tikz_coordinates(engine_points)
@@ -160,7 +162,7 @@ def figure_fee_premium_tikz(landscape, path: Path) -> None:
   {axis_style}
 ]
 \addplot+[mark=none, very thick, color=red!70!black] coordinates {{{naive_coordinates}}};
-\addlegendentry{{Naive proportional split}}
+\addlegendentry{{Naive split}}
 \addplot+[mark=none, very thick, color=arenaGreen] coordinates {{{engine_coordinates}}};
 \addlegendentry{{Fee-aware planner}}
 \end{{axis}}

@@ -214,7 +214,7 @@ def write_advisor_audit_tikz(summary: dict[str, Any], path: Path) -> None:
   tick style={{draw=black!45}},
   legend style={{draw=none, fill=white, fill opacity=0.85, text opacity=1,
     font=\scriptsize, at={{(0.98,0.98)}}, anchor=north east}},
-  legend columns=3,
+  legend columns=1,
 ]
 \addplot+[draw=none, fill=arenaGreen] coordinates {{{coordinates["valid"]}}};
 \addplot+[draw=none, fill=arenaGold] coordinates {{{coordinates["agreement"]}}};

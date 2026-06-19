@@ -296,7 +296,7 @@ def test_upload_broker_csv_becomes_active_source(
     )
     response = api_client.post(
         "/api/v1/portfolio/user/source/upload",
-        files={"file": ("portfolio-25-05-2026.csv", broker_csv, "text/csv")},
+        files={"file": ("broker-export-fixture.csv", broker_csv, "text/csv")},
     )
 
     assert response.status_code == 200

@@ -18,7 +18,7 @@
   tick style={draw=black!45},
   legend style={draw=none, fill=white, fill opacity=0.85, text opacity=1,
     font=\scriptsize, at={(0.98,0.98)}, anchor=north east},
-  legend columns=3,
+  legend columns=1,
 ]
 \addplot+[draw=none, fill=arenaGreen] coordinates {(1,1.000) (2,1.000) (3,1.000) (4,0.000) (5,0.000) (6,0.000) (7,0.000)};
 \addplot+[draw=none, fill=arenaGold] coordinates {(1,1.000) (2,0.000) (3,0.400) (4,1.000) (5,0.500) (6,0.133) (7,0.000)};

@@ -1,5 +1,6 @@
 """Database models and connection management."""
 
+import os
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
@@ -8,7 +9,9 @@ from sqlalchemy import event
 from sqlmodel import Field, Session, SQLModel, create_engine
 
 ROOT = Path(__file__).resolve().parents[3]
-DATABASE_PATH = ROOT / "data" / "arenawealth.db"
+DATABASE_PATH = Path(
+    os.getenv("ARENAWEALTH_DATABASE_PATH", str(ROOT / "data" / "arenawealth.db"))
+).expanduser()
 DATABASE_PATH.parent.mkdir(parents=True, exist_ok=True)
 DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
 

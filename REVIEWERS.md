@@ -37,7 +37,26 @@ make setup      # installs Python and frontend dependencies
 make verify-data   # SHA-256 of tracked inputs vs paper/data/DATA_HASHES.txt
 make verify        # tests + lint
 make experiments   # regenerate figures and the JSON report
+make ai-advisor-audit
+make advisor-run-audit   # re-audit cached paid-provider outputs, no live calls
 ```
+
+## Dashboard path
+
+The dashboard is a reviewer aid, not required for the paper claims. To run it
+against the tracked fixture and a clean temporary SQLite database:
+
+```bash
+rm -f tmp/reviewer-dashboard.db
+ARENAWEALTH_PORTFOLIO_INBOX="$PWD/tests/fixtures" \
+ARENAWEALTH_DATABASE_PATH="$PWD/tmp/reviewer-dashboard.db" \
+./run.sh
+```
+
+Open `http://127.0.0.1:5173/?offline_demo=true&cash=1511.18` and click
+`Analyze`. The UI exposes the same evidence path as the paper: tracked input
+source, deterministic reviewer mode, proposed orders, guardrails, and a decision
+log.
 
 ## What maps to what
 
@@ -52,6 +71,7 @@ make experiments   # regenerate figures and the JSON report
 | Robustness figure | `src/arenawealth/experiments/robustness.py` and tracked returns |
 | Advisor audit | `src/arenawealth/experiments/ai_advisor.py` and frozen scenarios |
 | Audit scenarios (frozen) | `paper/data/ai_advisor_scenarios.json` |
+| Cached paid-provider pilot | `paper/data/advisor_runs/azure/chat/*.json` |
 | Replay determinism | `tests/test_user_portfolio_api.py` |
 
 ## Determinism
@@ -64,9 +84,9 @@ statistics. The recommendation path is a pure function of
 ## Scope
 
 The bibliography under `paper/bibliography/` catalogs all cited works; paywalled
-PDFs are listed in `paper/bibliography/order.txt`. Findings are reported with
+PDFs are listed in `paper/bibliography/_order.txt`. Findings are reported with
 their limitations: the audit protocol is demonstrated on deterministic archetype
-controls (not live model outputs); the backtest is a single-basket,
+controls plus a small cached provider pilot; the backtest is a single-basket,
 non-point-in-time study; and the weighting ablation uses deterministic synthetic
 fundamentals to demonstrate mechanism.
 
