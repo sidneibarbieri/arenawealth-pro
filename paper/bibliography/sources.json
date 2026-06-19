@@ -156,9 +156,9 @@
       "role": "moat-investing comparator",
       "thread": "quality-and-profitability",
       "filename": "kanuri2016moat.pdf",
-      "status": "manual",
+      "status": "have",
       "source_url": "https://doi.org/10.1080/00036846.2016.1178850",
-      "notes": "Publisher page is available; add authorized PDF manually if needed."
+      "notes": "Authorized PDF added locally; grounds the moat sub-score in related work."
     },
     {
       "bib_key": "liu2004transaction",

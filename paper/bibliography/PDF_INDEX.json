@@ -194,6 +194,14 @@
       "source_url": "https://doi.org/10.1016/j.jfineco.2013.01.003"
     },
     {
+      "bib_key": "kanuri2016moat",
+      "bytes": 1354811,
+      "filename": "kanuri2016moat.pdf",
+      "pdf_url": null,
+      "sha256": "2dc1af4895ae68aa27e6ba67c0a7b613465193227578659f3d15f2c0de349c22",
+      "source_url": "https://doi.org/10.1080/00036846.2016.1178850"
+    },
+    {
       "bib_key": "asness2019qmj",
       "bytes": 1904397,
       "filename": "asness2019qmj.pdf",
@@ -274,5 +282,5 @@
       "source_url": "https://arxiv.org/abs/2311.16204"
     }
   ],
-  "pdf_count": 34
+  "pdf_count": 35
 }

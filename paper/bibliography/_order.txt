@@ -2,12 +2,3 @@
 #
 # Drop each PDF into paper/bibliography/pdfs/ using the bracketed filename.
 # Do not bypass paywalls; use open, author-hosted, institutional, or licensed copies.
-
-[kanuri2016moat.pdf]
-Kanuri, McLeod (2016). "Sustainable Competitive Advantage and Stock Performance: The Case for Wide Moat Stocks."
-Publication/source: Applied Economics
-Role: moat-investing comparator
-URL: https://doi.org/10.1080/00036846.2016.1178850
-PDF URL: manual
-Status: manual; last download result: not-attempted
-Notes: Publisher page is available; add authorized PDF manually if needed.

@@ -59,7 +59,7 @@ ignored by Git; `_order.txt` lists missing or manually downloadable papers.
 | BibKey | Work | Year | Publication | Role | Status |
 | --- | --- | --- | --- | --- | --- |
 | `novyMarx2013` | The Other Side of Value: The Gross Profitability Premium | 2013 | Journal of Financial Economics | quality factor baseline | have |
-| `kanuri2016moat` | Sustainable Competitive Advantage and Stock Performance: The Case for Wide Moat Stocks | 2016 | Applied Economics | moat-investing comparator | manual |
+| `kanuri2016moat` | Sustainable Competitive Advantage and Stock Performance: The Case for Wide Moat Stocks | 2016 | Applied Economics | moat-investing comparator | have |
 | `asness2019qmj` | Quality Minus Junk | 2019 | Review of Accounting Studies | quality factor baseline | have |
 | `gu2020machine` | Empirical Asset Pricing via Machine Learning | 2020 | Review of Financial Studies | machine-learning asset-pricing baseline | have |
 | `otero2025quality` | How to Improve Quality Investing | 2025 | BRQ Business Research Quarterly | quality-investing comparator | have |
