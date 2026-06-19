@@ -38,13 +38,15 @@ repeated runs, and agreement with the baseline.
 
 On frozen scenarios these axes separate cleanly. One control agrees with the
 baseline and never drifts, yet is invalid because it wastes transaction fees;
-another is valid and stable while sharing nothing with the baseline. The same
-verifier exposes portfolio-level validity, rejecting a higher-scoring asset when
-it worsens concentration. We make no alpha claim: the baseline is a transparent
-verifier whose cost guardrails follow from the fee schedule, whose decisions
-replay from frozen inputs, and whose current-basket backtest we report against
-equal-weight, risk-parity, minimum-variance, and market baselines. Every figure
-and table regenerates offline from the artifact.
+another is valid and stable while sharing nothing with the baseline. A cached
+nine-run model pilot shows the same failure mode in real output: perfect policy
+agreement can still hide an invalid cash split. The same verifier exposes
+portfolio-level validity, rejecting a higher-scoring asset when it worsens
+concentration. We make no alpha claim: the baseline is a transparent verifier
+whose cost guardrails follow from the fee schedule, whose decisions replay from
+frozen inputs, and whose current-basket backtest we report against equal-weight,
+risk-parity, minimum-variance, and market baselines. Every figure and table
+regenerates offline from the artifact.
 \end{abstract}
 
 \begin{CCSXML}
@@ -98,16 +100,16 @@ yardstick rests on reproducibility, not on a claim to beat the market.
 
 The paper makes three contributions. First, it defines an audit protocol for
 investment advice that measures validity, stability, and agreement separately,
-and shows why agreement alone is insufficient. Second, it provides the
-deterministic baseline that makes the audit replayable: the fee model is
-subadditive, the minimum order follows directly from the cost tolerance, and the
-planner is regression-tested against those facts. Third, it calibrates the
-baseline against allocator baselines instead of treating the policy as a
-performance claim. The current basket beats the market benchmark, but equal
-weighting is stronger and risk parity nearly ties it on Sharpe after removing
-look-ahead from the allocator baselines. This result sharpens the paper's claim:
-the contribution is verification of investment advice, not a new
-stock-selection factor.
+and shows why agreement alone is insufficient in both deterministic controls and
+a cached model pilot. Second, it provides the deterministic baseline that makes
+the audit replayable: the fee model is subadditive, the minimum order follows
+directly from the cost tolerance, and the planner is regression-tested against
+those facts. Third, it calibrates the baseline against allocator baselines
+instead of treating the policy as a performance claim. The current basket beats
+the market benchmark, but equal weighting is stronger and risk parity nearly
+ties it on Sharpe after removing look-ahead from the allocator baselines. This
+result sharpens the paper's claim: the contribution is verification of
+investment advice, not a new stock-selection factor.
 
 \section{Related Work}
 \label{sec:related}
@@ -213,15 +215,12 @@ so the order does not depend on input ordering, and the scoring and sizing
 arithmetic uses ordinary IEEE-754 doubles whose operations are reproducible
 across platforms for these magnitudes.
 
-The composite score is a linear functional of three bounded sub-scores,
-\begin{equation}
-  s = w_m\,\mathrm{moat} + w_c\,\mathrm{comp} + w_v\,\mathrm{val},
-  \qquad \mathrm{moat},\mathrm{comp},\mathrm{val}\in[0,100],
-  \label{eq:composite}
-\end{equation}
-with $(w_m,w_c,w_v)=(0.40,0.35,0.25)$. Holdings already above $1.3\times$ equal
-weight, or in a theme at its concentration cap, are excluded; the planner then
-ranks the remainder by $s$ and sizes orders against available cash.
+The composite score is the bounded linear functional
+$s=w_m\,\mathrm{moat}+w_c\,\mathrm{comp}+w_v\,\mathrm{val}$, with sub-scores in
+$[0,100]$ and weights $(w_m,w_c,w_v)=(0.40,0.35,0.25)$. Holdings already above
+$1.3\times$ equal weight, or in a theme at its concentration cap, are excluded;
+the planner then ranks the remainder by $s$ and sizes orders against available
+cash.
 
 We evaluate an advisor not by how well it agrees with the baseline but by three
 axes a single number conflates. Fix a \emph{scenario}: current holdings,
@@ -268,12 +267,41 @@ scenario with baseline top-$k$ set $b$, the metrics are:
   \end{aligned}
 \]
 where $J$ is the Jaccard overlap and $\mathrm{viol}$ the constraint set of
-$w_j$ normalizes run $j$'s dollar amounts to weights and
-$\mathrm{TV}$ is total-variation distance, so the sizing stability $S_w\in[0,1]$
+$r_j$, $w_j$ normalizes run $j$'s dollar amounts to weights, and
+$\mathrm{TV}$ is total-variation distance. The sizing stability $S_w\in[0,1]$
 is reported when a scenario requires amounts. The audit is therefore replayable
 once the advisor outputs are frozen. It certifies process quality, not future
 return: advice must be admissible, repeatable, and grounded before performance
 statistics are meaningful.
+
+The same audit can score real model output once the responses are frozen. We
+therefore include a small cached pilot: three scenarios, three repeated runs per
+scenario, collected at temperature $0.7$ from a hosted language-model endpoint.
+Each record stores the prompt, prompt hash, raw response, parsed output, usage
+metadata, and collection timestamp, and the records are part of the artifact's
+data-hash manifest. This is not a provider comparison; it tests whether the
+protocol catches operational failures in real output. It does
+(Table~\ref{tab:model-pilot}). The model agrees with the baseline on all three
+scenarios, yet one run in the sub-tranche cash scenario splits \$900 into two
+\$450 orders and pays an avoidable extra fee. A top-$k$ agreement score would
+certify that run. The deterministic verifier rejects it.
+
+\begin{table}[t]
+  \caption{Cached model pilot over the frozen audit scenarios. Agreement alone
+  misses the invalid sub-tranche split; amount-aware stability exposes the
+  sizing drift.}
+  \label{tab:model-pilot}
+  \small
+  \begin{tabular}{lcccc}
+    \toprule
+    Scenario & Valid & Agree & Set $S$ & Amt. $S_w$ \\
+    \midrule
+    New position & $3/3$ & $1.00$ & $1.00$ & -- \\
+    Sub-tranche cash & $2/3$ & $1.00$ & $0.67$ & $0.67$ \\
+    Owned/fact & $3/3$ & $1.00$ & $1.00$ & -- \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 \section{Deterministic Verification}
 \label{sec:portfolio-verification}
@@ -378,9 +406,9 @@ not a tuned constant; it is the fee schedule made explicit.
 \section{Experimental Findings}
 \label{sec:weighting}
 
-Because the composite (\ref{eq:composite}) is linear, the ranking it induces is
-directly ablatable: zeroing a weight isolates a factor, and the score can be
-recomposed from per-position sub-scores without re-fetching data.
+Because the composite score is linear, the ranking it induces is directly
+ablatable: zeroing a weight isolates a factor, and the score can be recomposed
+from per-position sub-scores without re-fetching data.
 
 On a fixed, deterministic basket we recomposed the ranking under single-factor
 and equal weights and measured Spearman correlation to the baseline ordering and
@@ -477,7 +505,52 @@ the paper into an alpha claim.
   \label{fig:robustness}
 \end{figure}
 
-\balance
+\section{Implications for AI-Finance Benchmarks}
+
+The experiments change what should be treated as the unit of evaluation. A
+finance model is rarely used as a bare backbone; it is embedded in a prompt,
+tooling layer, retrieval surface, portfolio state, and execution policy. Recent
+live-agent evidence reaches the same conclusion from the market side: the agent
+framework can dominate the model backbone. Our protocol therefore evaluates the
+\emph{action emitted by the advisor}, not a model family in the abstract. Once
+the action is frozen, validity, stability, and agreement are measurable without
+rerunning the model or depending on a live provider.
+
+The cached pilot illustrates why this matters. The model's ticker choices agree
+with the baseline in every scenario. If the benchmark stopped at top-$k$
+overlap, the pilot would look perfect. The amount-aware audit instead observes
+the order as an executable object and catches the sub-tranche split that pays an
+avoidable fee. This is not a subtle return-estimation issue; it is a deterministic
+validity error available before any price path is realized. For financial
+recommendation systems, that ordering is essential: first establish that an
+action is admissible, grounded, and repeatable; then evaluate realized outcome.
+
+The portfolio-fit experiment extends the same point beyond transaction costs. A
+candidate's isolated quality score is not a portfolio decision. The verifier
+observes the current holdings, existing theme exposure, cash, and fee schedule,
+then decides whether the candidate improves the portfolio state. This
+decomposition gives AI systems a useful role without giving them final authority:
+the model can search the space of plausible theses, while the deterministic
+layer checks whether each thesis is executable under the declared contract.
+
+This framing also makes reproducibility concrete. A live model call is not
+reproducible by itself; the response, prompt, parser output, usage metadata, and
+timestamp must be frozen. The artifact treats those records as data, includes
+them in the hash manifest, and recomputes the audit summary from cache without
+network calls. The same principle governs prices and scenarios: inputs are
+versioned, figures are regenerated from scripts, and a changed input hash is a
+changed experiment. That discipline is what lets the paper report negative
+results, such as equal weighting outperforming the tuned basket, without
+weakening the contribution.
+
+The resulting benchmark is intentionally narrow: it does not claim that a model
+or basket beats the market. Its delta is an operational boundary that current
+return and overlap benchmarks lack. Any advisor can be placed behind the same
+interface and asked: given these dated facts, this portfolio, and this cost
+model, did it emit a valid, stable, grounded, portfolio-admissible action? That
+question is small enough to answer exactly and important enough to ask before
+larger performance claims.
+
 \section{Discussion}
 
 The contribution is a testable way to evaluate investment advice. The protocol
@@ -508,13 +581,13 @@ portfolio action.
 The protocol carries an explicit interpretation contract. It scores process:
 advice must be executable, repeatable, grounded in the frozen scenario, and
 compatible with portfolio constraints before its return means anything. The
-advisor study reported here uses deterministic archetype controls; cached
-language-model outputs can be evaluated in the same frozen scenarios without
-changing the metrics. The
-backtest is a current-basket calibration on free adjusted closes, not a
-point-in-time selection test, and the cost model covers fixed per-order tranche
-fees rather than spreads, taxes, slippage, or integer lots. These boundaries are
-what make the artifact reproducible and every claim auditable.
+cached model pilot is deliberately small, but it shows why that contract matters:
+the model matches the baseline tickers and still violates the fee rule in one
+sub-tranche cash run. The backtest is a current-basket calibration on free
+adjusted closes, not a point-in-time selection test, and the cost model covers
+fixed per-order tranche fees rather than spreads, taxes, slippage, or integer
+lots. These boundaries are what make the artifact reproducible and every claim
+auditable.
 
 \section{Conclusion}
 

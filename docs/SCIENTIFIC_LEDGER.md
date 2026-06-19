@@ -258,6 +258,31 @@ Evidence:
 - `paper/bibliography/RESEARCH_SYNTHESIS.md`
 - `paper/references.bib` (`hu2025fintrust`, `qian2026ama`, `li2026finsaber`)
 
+### F15. Real model agreement still missed an operational failure
+
+The cached advisor pilot contains nine real model outputs over the same frozen
+audit scenarios used by the deterministic controls. Each run stores the prompt,
+prompt hash, raw response, parsed output, token/latency usage, collection
+timestamp, provider, and model label, and every JSON record is included in the
+data-hash manifest. The pilot is small and should not be reported as a provider
+comparison. Its scientific value is narrower and cleaner: it shows that the
+protocol catches the same failure mode in real output. In the sub-tranche cash
+scenario the model matches the baseline policy tickers, but one of three runs
+splits USD 900 into two USD 450 orders, paying an avoidable extra fixed fee.
+Policy agreement stays 1.0; validity drops to 2/3; amount-aware stability drops
+to 0.67.
+
+Takeaway: top-k agreement and set stability are insufficient for investment
+advice. The verifier must inspect order amounts and fee semantics.
+
+Evidence:
+
+- `paper/data/advisor_runs/azure/chat/*.json`
+- `paper/data/advisor_runs/azure/chat/audit_summary.json`
+- `paper/data/DATA_HASHES.txt`
+- `scripts/collect_advisor_runs.py`
+- `paper/main.tex` (cached model pilot table)
+
 ## State-of-the-Art Reference Points
 
 The project should be compared against these families, not against vague
