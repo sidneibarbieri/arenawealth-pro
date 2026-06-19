@@ -230,8 +230,10 @@ recommendation is a pure function of the tuple
   (\text{holdings},\ \text{fundamentals},\ \text{cash},\ \text{policy version}).
 \]
 Referential transparency is what makes the rest of this paper possible. Every
-quantitative figure and table below is produced by a single offline driver
-(\texttt{scripts/run\_experiments.py}) and is regression-tested; no result
+quantitative result below is backed by an offline driver in the reviewer path:
+\texttt{run\_experiments.py} for the experiment JSON and generated TikZ figures,
+\texttt{run\_ai\_advisor\_audit.py} for the advisor-audit panel, and
+\texttt{collect\_advisor\_runs.py} for the cached pilot audit. No result
 depends on live data or hidden state. The purity is enforced, not merely
 asserted: a replay test feeds the same input tuple twice and checks that the
 orders, exclusions, and ranked candidates are byte-identical. This is the
