@@ -91,3 +91,6 @@ portfolio-editor-*.png
 
 # Bibliography PDFs: copyrighted, large; track only the catalog and order list
 paper/bibliography/pdfs/
+
+# Personal working list of papers to download (not part of the artifact)
+_orders.txt

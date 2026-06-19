@@ -28,22 +28,23 @@ Replayable Baseline}
 \email{anonymous@example.com}
 
 \begin{abstract}
-AI systems increasingly produce investment recommendations, but the usual
-evaluations ask the wrong question. Return is noisy and easy to overfit, while
-agreement with a reference portfolio can reward advice that is impossible to
-execute. This paper evaluates advice as an operational object. We introduce a
-deterministic, replayable baseline and score any advisor on three axes:
-validity under portfolio and fee constraints, stability across repeated runs,
-and agreement with the baseline. On frozen scenarios, these axes separate
-cleanly. One control agrees with the baseline and is perfectly stable, yet is
-invalid because it wastes transaction fees; another is valid and stable while
-disagreeing with the baseline. The artifact also exposes portfolio-level
-validity: a higher-scoring asset can be rejected when it worsens concentration.
-The baseline is not presented as an alpha model. It is a transparent verifier:
-its cost guardrails are derived from the fee schedule, its decisions replay from
-frozen inputs, and its current-basket backtest is reported against equal-weight,
-risk-parity, minimum-variance, and market baselines. Every figure and table is
-regenerated offline from the artifact.
+AI systems increasingly produce investment recommendations, yet the usual
+evaluations ask the wrong question. Realized return is noisy and easy to overfit;
+agreement with a reference portfolio can reward advice that cannot be executed.
+We instead treat advice as an operational object. We introduce a deterministic,
+replayable baseline and score any advisor on three axes that a single number
+conflates: validity under portfolio and fee constraints, stability across
+repeated runs, and agreement with the baseline.
+
+On frozen scenarios these axes separate cleanly. One control agrees with the
+baseline and never drifts, yet is invalid because it wastes transaction fees;
+another is valid and stable while sharing nothing with the baseline. The same
+verifier exposes portfolio-level validity, rejecting a higher-scoring asset when
+it worsens concentration. We make no alpha claim: the baseline is a transparent
+verifier whose cost guardrails follow from the fee schedule, whose decisions
+replay from frozen inputs, and whose current-basket backtest we report against
+equal-weight, risk-parity, minimum-variance, and market baselines. Every figure
+and table regenerates offline from the artifact.
 \end{abstract}
 
 \begin{CCSXML}
@@ -479,18 +480,15 @@ being hard to beat \cite{demiguel2009naive}. The payoff is not a new alpha
 factor; it is a replayable boundary between generated advice and executable
 portfolio action.
 
-\section{Scope}
-\label{sec:scope}
-
-The artifact evaluates process quality: advice must be executable, repeatable,
-grounded in the frozen scenario, and compatible with portfolio constraints
-before its performance can be interpreted. The advisor study uses deterministic
-archetype controls; real language-model outputs can be dropped into the same
-frozen scenarios without changing the metrics. The backtest is a current-basket
-calibration using free adjusted closes, not a point-in-time stock-selection
-test. The cost model covers fixed per-order tranche fees rather than spreads,
-taxes, slippage, or integer-lot constraints. This boundary is deliberate: it
-makes the artifact reproducible and keeps each reported claim auditable.
+The protocol carries an explicit interpretation contract. It scores process:
+advice must be executable, repeatable, grounded in the frozen scenario, and
+compatible with portfolio constraints before its return means anything. The
+advisor study uses deterministic archetype controls, and real language-model
+outputs drop into the same frozen scenarios without changing the metrics. The
+backtest is a current-basket calibration on free adjusted closes, not a
+point-in-time selection test, and the cost model covers fixed per-order tranche
+fees rather than spreads, taxes, slippage, or integer lots. These boundaries are
+what make the artifact reproducible and every claim auditable.
 
 \section{Conclusion}
 
