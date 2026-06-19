@@ -107,8 +107,11 @@ machine-checkable.
 The paper makes three contributions. First, it defines an audit protocol for
 investment advice that measures validity, stability, and agreement separately,
 and shows that agreement with a reference can certify an operationally invalid
-action, in both deterministic controls and a cached model pilot. Second, it provides the deterministic baseline that makes
-the audit replayable: the fee model is subadditive, the minimum order follows
+action, in both deterministic controls and a cached model pilot. Second, it
+provides the deterministic baseline that makes the audit
+replayable\footnote{\url{https://anonymous.4open.science/r/arenawealth-reproducibility-artifact-9F3C/}
+- The artifact will be publicly released after completion of the double-blind
+review process.}: the fee model is subadditive, the minimum order follows
 directly from the cost tolerance, and the planner is regression-tested against
 those facts. Third, it calibrates the baseline against allocator baselines
 instead of treating the policy as a performance claim. The current basket beats
@@ -379,11 +382,14 @@ contains 120 frozen scenarios, ten variants each of twelve categories:
 new-cash deployment, sub-tranche cash, already-owned assets, fee-sensitive
 orders, insufficient cash, out-of-universe tickers, hallucinated or stale facts,
 drawdown cases, rebalance-versus-hold, fractional-share constraints, and
-conflicting rationales. Five deterministic advisor configurations run five
-times per scenario, for 3,000 replayed outputs. The configurations are synthetic
-stressors rather than provider claims: one implements the contract, one maximizes
-agreement while splitting orders, one changes tickers across runs, one cites
-unsupported facts, and one overspends cash.
+conflicting rationales. The fact scenarios use dated market fact identifiers
+for returns, rates, employment, and concentration claims, so grounding is tested
+against realistic inputs while remaining a deterministic set check. Five
+deterministic advisor configurations run five times per scenario, for 3,000
+replayed outputs. The configurations are synthetic stressors rather than
+provider claims: one implements the contract, one maximizes agreement while
+splitting orders, one changes tickers across runs, one cites unsupported facts,
+and one overspends cash.
 
 \begin{table}[t]
   \caption{Frozen scenario-bank results over 120 scenarios and 3,000 advisor
@@ -462,9 +468,12 @@ stays within a $20\%$ exposure cap; the order is at least the economic floor
 $c/\tau$; any split is fee-neutral against the consolidated order; and every fact
 the advisor cites is present in the scenario snapshot. The first two bounds are
 ratios of equal weight and a single cap, not per-asset tuning, so the same
-contract applies to any basket. Fact-grounding is a set test, not a language
-model judgment: the scenario fixes a finite set of citable fact identifiers, and
-a citation outside that set is a violation, which gives a deterministic check on
+contract applies to any basket. Theme membership is also part of the frozen
+input, not a live classifier: the artifact uses a versioned ticker-to-theme map
+and logs the map with the scenario, so changing the taxonomy is a changed
+experiment. Fact-grounding is likewise a set test, not a language model
+judgment: the scenario fixes a finite set of citable fact identifiers, and a
+citation outside that set is a violation, which gives a deterministic check on
 explanation faithfulness without a second model in the loop.
 
 The same verifier must translate a ranking into executable orders. That
@@ -549,13 +558,28 @@ A heuristic invites the question of how far it can fall short of the exact
 optimum, so we measure it. Under the same fee schedule and concentration limits,
 subadditivity makes the consolidated single-order fee the minimum fee to deploy a
 given amount, and a mixed-integer program gives the maximum admissibly deployable
-cash. Across a small-cash grid from \$250 to \$5{,}000 in the planner's design
-regime, the planner matches both references exactly: it deploys the same cash as
-the MIP optimum at every point and holds the fee at the subadditive lower bound,
-so the deployment gap and the fee premium are both zero. Its suboptimality there
-is not merely small but zero; the MIP can deploy more only once a concentration
-limit binds and the heuristic stops, which lies outside the recurring small-cash
-setting this planner targets.
+cash. For allocation $x_i$ and activation $z_i$ on candidate $i$, cash $C$,
+economic floor $m=c/\tau$, theme bounds $B_h$, and per-name headroom $H_i$, the
+oracle solves
+\begin{equation}
+\begin{aligned}
+  \max_{x,z}\quad & \sum_i x_i \\
+  \text{s.t.}\quad
+  & \sum_i x_i \le C, \\
+  & m z_i \le x_i \le C z_i && \forall i, \\
+  & \sum_{i:t_i=h} x_i \le B_h && \forall h, \\
+  & x_i \le H_i,\quad z_i\in\{0,1\} && \forall i.
+\end{aligned}
+\end{equation}
+The MIP is a deployment upper bound, not a return optimizer; the fee reference
+is the separate lower bound from Equation~\ref{eq:premium}. Across a small-cash
+grid from \$250 to \$5{,}000 in the planner's design regime, the planner matches
+both references exactly: it deploys the same cash as the MIP optimum at every
+point and holds the fee at the subadditive lower bound, so the deployment gap and
+the fee premium are both zero. Its suboptimality there is not merely small but
+zero; the MIP can deploy more only once a concentration limit binds and the
+heuristic stops, which lies outside the recurring small-cash setting this planner
+targets.
 
 \section{Experimental Findings}
 \label{sec:weighting}
@@ -705,6 +729,7 @@ model, did it emit a valid, stable, grounded, portfolio-admissible action? That
 question is small enough to answer exactly and important enough to ask before
 larger performance claims.
 
+\balance
 \section{Discussion}
 
 The contribution is a testable way to evaluate investment advice. The protocol
@@ -757,17 +782,19 @@ auditable.
 
 Those boundaries are also the extension path, and they extend without disturbing
 the protocol. Because admissibility is a declarative contract rather than a
-learned scorer, richer microstructure enters as additional predicates: a spread
-or slippage term and integer-lot rounding sharpen the fee and order checks, and
-per-sector or liquidity caps join the concentration check. Each is one more
-clause the advisor's output must satisfy, still evaluated exactly and replayably
-on frozen inputs, so the audit scales with the realism of the cost and constraint
-model while keeping its defining property, that a recommendation is judged as an
-executable object before any return is computed. For the ICAIF community this
-suggests a portable target: a shared bank of frozen scenarios and a declarative
-admissibility contract against which heterogeneous advisors, from prompted LLMs
-to robo-allocators, can be compared on identical, replayable terms, and whose
-decision records double as the audit trail a compliance review already requires.
+learned scorer, richer microstructure enters as additional predicates: an
+integer-share rule requires $a_i/p_i\in\mathbb{Z}$, a spread budget requires
+$s_i a_i$ to stay below the scenario tolerance, and a liquidity cap bounds order
+size as a fraction of frozen volume. Per-sector or liquidity caps join the same
+constraint set. Each is one more clause the advisor's output must satisfy, still
+evaluated exactly and replayably on frozen inputs, so the audit scales with the
+realism of the cost and constraint model while keeping its defining property,
+that a recommendation is judged as an executable object before any return is
+computed. For the ICAIF community this suggests a portable target: a shared bank
+of frozen scenarios and a declarative admissibility contract against which
+heterogeneous advisors, from prompted LLMs to robo-allocators, can be compared on
+identical, replayable terms, and whose decision records double as the audit trail
+a compliance review already requires.
 
 \section{Conclusion}
 

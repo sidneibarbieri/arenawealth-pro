@@ -2,7 +2,9 @@
 
 The default paper policy is the deterministic fee-aware planner in
 `deployment.py`. This module provides a solver-backed comparator for cash
-deployment under the same concentration, fee, and economic constraints.
+deployment under the same concentration and economic minimum-order constraints.
+Fee optimality is checked separately against the closed-form subadditive lower
+bound in `planner_optimality.py`.
 """
 
 import time
@@ -45,13 +47,12 @@ def plan_deployment_mip(
     Maximizes deployed cash subject to:
     - Theme concentration caps
     - Overweight limits
-    - Fee efficiency (neutrality or consolidation)
-    - Economic minimum ($250 floor)
+    - Economic minimum order ($250 floor under the default fee schedule)
 
     Args:
         candidates: Ranked position analyses (best to worst).
         cash_usd: Available cash to deploy.
-        fee_params: Fee model (uses defaults if None).
+        fee_params: Fee model used for the minimum order and returned orders.
         concentration_limits: Portfolio rules (uses defaults if None).
         solver_backend: PuLP solver ('PULP_CBC_CMD', 'PULP_HIGHS', etc).
         max_solve_time_seconds: Timeout for solver.
@@ -98,10 +99,7 @@ def plan_deployment_mip(
         prob += allocations[candidate_index] <= cash_usd * is_ordered[candidate_index]
 
     for candidate_index in range(candidate_count):
-        prob += (
-            allocations[candidate_index]
-            >= MIN_ORDER_AMOUNT * is_ordered[candidate_index]
-        )
+        prob += allocations[candidate_index] >= MIN_ORDER_AMOUNT * is_ordered[candidate_index]
 
     theme_totals = {}
     for candidate_index, candidate in enumerate(candidates):
@@ -117,9 +115,7 @@ def plan_deployment_mip(
 
     for candidate_index, candidate in enumerate(candidates):
         if candidate.market_value and candidate.market_value > 0:
-            max_position_size = (
-                candidate.market_value * concentration_limits.overweight_multiple
-            )
+            max_position_size = candidate.market_value * concentration_limits.overweight_multiple
             prob += allocations[candidate_index] <= max_position_size
 
     # Solve. msg=0 silences solver output; getSolver forwards it to the backend,

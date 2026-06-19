@@ -62,12 +62,9 @@ def evaluate_suite(suite: dict[str, Any]) -> tuple[AdvisorRunSetReport, ...]:
     reports: list[AdvisorRunSetReport] = []
     for scenario_payload in suite["scenarios"]:
         scenario = scenario_from_payload(scenario_payload)
-        for advisor_label, recommendation_payloads in scenario_payload[
-            "recommendations"
-        ].items():
+        for advisor_label, recommendation_payloads in scenario_payload["recommendations"].items():
             recommendations = tuple(
-                recommendation_from_payload(payload)
-                for payload in recommendation_payloads
+                recommendation_from_payload(payload) for payload in recommendation_payloads
             )
             reports.append(evaluate_run_set(scenario, advisor_label, recommendations))
     return tuple(reports)
@@ -108,9 +105,7 @@ def mean_amount_stability(reports: tuple[AdvisorRunSetReport, ...]) -> float | N
     return mean(values) if values else None
 
 
-def summarize_by_advisor(
-    reports: tuple[AdvisorRunSetReport, ...]
-) -> dict[str, dict[str, Any]]:
+def summarize_by_advisor(reports: tuple[AdvisorRunSetReport, ...]) -> dict[str, dict[str, Any]]:
     grouped: dict[str, list[AdvisorRunSetReport]] = defaultdict(list)
     for report in reports:
         grouped[report.advisor_label].append(report)
@@ -119,9 +114,7 @@ def summarize_by_advisor(
             "scenarios": len(items),
             "mean_valid_rate": mean(item.valid_rate for item in items),
             "mean_policy_jaccard": mean(item.mean_policy_jaccard for item in items),
-            "mean_stability": mean(
-                item.stability.mean_pairwise_jaccard for item in items
-            ),
+            "mean_stability": mean(item.stability.mean_pairwise_jaccard for item in items),
             "mean_amount_stability": mean_amount_stability(tuple(items)),
             "violation_counts": flatten_violation_counts(tuple(items)),
         }
@@ -129,9 +122,7 @@ def summarize_by_advisor(
     }
 
 
-def flatten_violation_counts(
-    reports: tuple[AdvisorRunSetReport, ...]
-) -> dict[str, int]:
+def flatten_violation_counts(reports: tuple[AdvisorRunSetReport, ...]) -> dict[str, int]:
     counts: dict[str, int] = {}
     for report in reports:
         for violation, count in report.violation_counts:
@@ -167,8 +158,7 @@ def write_markdown(summary: dict[str, Any], path: Path) -> None:
     ]
     for advisor_label, values in summary["by_advisor"].items():
         violations = ", ".join(
-            f"{violation}={count}"
-            for violation, count in values["violation_counts"].items()
+            f"{violation}={count}" for violation, count in values["violation_counts"].items()
         )
         if not violations:
             violations = "none"
@@ -193,16 +183,13 @@ def write_advisor_audit_tikz(summary: dict[str, Any], path: Path) -> None:
     ]
     coordinates = {
         "valid": " ".join(
-            f"({index + 1},{valid:.3f})"
-            for index, (_, valid, _, _) in enumerate(rows)
+            f"({index + 1},{valid:.3f})" for index, (_, valid, _, _) in enumerate(rows)
         ),
         "agreement": " ".join(
-            f"({index + 1},{agreement:.3f})"
-            for index, (_, _, agreement, _) in enumerate(rows)
+            f"({index + 1},{agreement:.3f})" for index, (_, _, agreement, _) in enumerate(rows)
         ),
         "stability": " ".join(
-            f"({index + 1},{stability:.3f})"
-            for index, (_, _, _, stability) in enumerate(rows)
+            f"({index + 1},{stability:.3f})" for index, (_, _, _, stability) in enumerate(rows)
         ),
         "labels": ",".join(label for label, *_ in rows),
     }
@@ -211,7 +198,7 @@ def write_advisor_audit_tikz(summary: dict[str, Any], path: Path) -> None:
 \begin{{axis}}[
   ybar,
   width=\columnwidth,
-  height=0.46\columnwidth,
+  height=0.58\columnwidth,
   ymin=0,
   ymax=1.05,
   bar width=2.6pt,

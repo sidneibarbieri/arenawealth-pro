@@ -2,7 +2,7 @@
 
 Validates:
 - MIP deploys more cash than greedy heuristic
-- All constraints respected (concentration, overweight, fees)
+- All constraints respected (concentration, overweight, economic floor)
 - Deterministic and reproducible
 - Performance within SLA (< 500ms)
 - Solver metadata tracking
@@ -205,8 +205,7 @@ class TestMIPPerformance:
     ):
         """MIP should solve large universe within performance budget."""
         candidates = [
-            _make_position_analysis(f"TICK{i:03d}", score=0.5 + i * 0.001)
-            for i in range(100)
+            _make_position_analysis(f"TICK{i:03d}", score=0.5 + i * 0.001) for i in range(100)
         ]
 
         cash_available = 50000.0

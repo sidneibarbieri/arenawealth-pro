@@ -2,7 +2,7 @@
 \begin{axis}[
   ybar,
   width=\columnwidth,
-  height=0.46\columnwidth,
+  height=0.58\columnwidth,
   ymin=0,
   ymax=1.05,
   bar width=2.6pt,

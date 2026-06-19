@@ -390,39 +390,20 @@ def plan_deployment(
     )
 
 
-# ===== Backwards Compatibility Layer (Deprecated) =====
+# Scalar helpers bound to the default fee model. The experiment scripts reason
+# about a single cash amount under one fee schedule, so they call these rather
+# than threading a FeeParameters instance through every call site.
 _default_fee_params = FeeParameters()
 MIN_ORDER_AMOUNT: float = _default_fee_params.min_order_amount_usd
 TRANCHE_SIZE: float = _default_fee_params.tranche_size_usd
 FEE_PER_TRANCHE: float = _default_fee_params.fee_per_tranche_usd
-OVERWEIGHT_MULTIPLE: float = ConcentrationLimits().overweight_multiple
-THEME_CONCENTRATION_CAP: float = ConcentrationLimits().theme_concentration_cap_pct
-MAX_FEE_PCT: float = _default_fee_params.max_fee_impact_pct
 
 
 def order_fee(amount: float) -> float:
-    """Deprecated: use compute_order_fee with FeeParameters instead."""
+    """Broker fee for one order under the default fee schedule."""
     return compute_order_fee(amount, _default_fee_params)
 
 
-def theme_weights(analyses: Sequence[PositionAnalysis]) -> dict[str, float]:
-    """Deprecated: use compute_theme_weights instead."""
-    return compute_theme_weights(analyses)
-
-
-def pick_top_two(
-    ranked: Sequence[PositionAnalysis], theme_weight: dict[str, float]
-) -> tuple[list[PositionAnalysis], list[str]]:
-    """Deprecated: use select_eligible_for_purchase instead."""
-    concentration_limits = ConcentrationLimits()
-    return select_eligible_for_purchase(ranked, theme_weight, concentration_limits, max_picks=2)
-
-
-def build_order(analysis: PositionAnalysis, amount: float) -> Order:
-    """Deprecated: use build_single_order instead."""
-    return build_single_order(analysis, amount, _default_fee_params)
-
-
 def size_orders(picks: Sequence[PositionAnalysis], cash: float) -> tuple[Order, ...]:
-    """Deprecated: use size_orders_for_cash instead."""
+    """Size orders for the given cash under the default fee schedule."""
     return size_orders_for_cash(picks, cash, _default_fee_params)

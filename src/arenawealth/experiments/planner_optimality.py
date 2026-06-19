@@ -98,9 +98,7 @@ def planner_optimality(
         plan = plan_deployment(candidates, cash, fee_params, limits)
         deployed_planner = sum(order.amount for order in plan.orders)
         fee_lower_bound = compute_order_fee(deployed_planner, fee_params)
-        mip_orders, mip_metadata = plan_deployment_mip(
-            list(candidates), cash, fee_params, limits
-        )
+        mip_orders, mip_metadata = plan_deployment_mip(list(candidates), cash, fee_params, limits)
         deployed_mip = mip_metadata.deployed_amount_usd if mip_orders else 0.0
         points.append(
             OptimalityPoint(

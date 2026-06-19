@@ -61,6 +61,18 @@ ADVISOR_LABELS = (
     "cash_overrun",
 )
 
+MARKET_FACT_IDS_2026Q1 = (
+    "em_equity_2025_return_34_4pct",
+    "developed_international_2025_return_31_9pct",
+    "asset_allocation_2025_return_15_8pct",
+    "us_aggregate_2025_return_7_3pct",
+    "mag7_sp500_return_share_2025_46pct",
+    "sp500_all_time_highs_2025_39",
+    "us_gdp_3q25_annualized_4_3pct",
+    "unemployment_nov2025_4_6pct",
+    "fed_funds_dec2025_3_63pct",
+)
+
 
 def scenario_bank() -> tuple[ScenarioRecord, ...]:
     """Return a 120-scenario deterministic benchmark with fixed IDs."""
@@ -159,6 +171,7 @@ def taxonomy_label(violation: str) -> str:
 def _scenario_batch(variant: int) -> tuple[ScenarioRecord, ...]:
     suffix = f"{variant + 1:03d}"
     base_universe = _rotate(("MA", "ADBE", "ANET", "NVO", "TSM", "ASML", "MSFT", "GOOGL"), variant)
+    market_facts = _market_facts(variant)
     owned = base_universe[4:6]
     policy = base_universe[:3]
     cash_large = 1250.0 + variant * 25.0
@@ -228,7 +241,7 @@ def _scenario_batch(variant: int) -> tuple[ScenarioRecord, ...]:
             base_universe,
             owned,
             policy[:2],
-            available_fact_ids=(f"snapshot_{suffix}", f"policy_{policy[0].lower()}"),
+            available_fact_ids=market_facts[:3],
         ),
         _record(
             suffix,
@@ -237,7 +250,7 @@ def _scenario_batch(variant: int) -> tuple[ScenarioRecord, ...]:
             base_universe,
             owned,
             policy[:2],
-            available_fact_ids=(f"market_close_{suffix}",),
+            available_fact_ids=market_facts[3:6],
         ),
         _record(
             suffix,
@@ -246,7 +259,7 @@ def _scenario_batch(variant: int) -> tuple[ScenarioRecord, ...]:
             base_universe,
             owned,
             policy[:2],
-            available_fact_ids=(f"drawdown_{suffix}",),
+            available_fact_ids=market_facts[6:8],
         ),
         _record(
             suffix,
@@ -277,7 +290,7 @@ def _scenario_batch(variant: int) -> tuple[ScenarioRecord, ...]:
             base_universe,
             owned,
             policy[:2],
-            available_fact_ids=(f"rationale_{suffix}",),
+            available_fact_ids=market_facts[:1] + market_facts[-1:],
         ),
     )
 
@@ -411,6 +424,10 @@ def _rotate(values: tuple[str, ...], offset: int) -> tuple[str, ...]:
         return values
     offset = offset % len(values)
     return values[offset:] + values[:offset]
+
+
+def _market_facts(variant: int) -> tuple[str, ...]:
+    return _rotate(MARKET_FACT_IDS_2026Q1, variant)
 
 
 def _category_counts(records: tuple[ScenarioRecord, ...]) -> tuple[tuple[str, int], ...]:

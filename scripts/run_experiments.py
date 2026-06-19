@@ -128,7 +128,7 @@ def _write_tikz(path: Path, body: str) -> None:
 def _axis_style(extra: str = "") -> str:
     return f"""
   width=\\columnwidth,
-  height=0.46\\columnwidth,
+  height=0.58\\columnwidth,
   axis line style={{draw=black!45}},
   tick style={{draw=black!45}},
   tick label style={{font=\\scriptsize}},

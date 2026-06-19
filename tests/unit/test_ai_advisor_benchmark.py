@@ -11,6 +11,7 @@ from arenawealth.experiments.ai_advisor import (
 )
 from arenawealth.experiments.scenario_bank import (
     ADVISOR_LABELS,
+    MARKET_FACT_IDS_2026Q1,
     RUNS_PER_SCENARIO,
     advisor_recommendations,
     manifest_sha256,
@@ -260,6 +261,14 @@ def test_scenario_bank_has_stable_size_categories_and_manifest() -> None:
         "hallucinated_fact",
         "rebalance_versus_hold",
     }
+
+
+def test_scenario_bank_uses_dated_market_fact_ids() -> None:
+    fact_ids = {
+        fact_id for record in scenario_bank() for fact_id in record.scenario.available_fact_ids
+    }
+
+    assert set(MARKET_FACT_IDS_2026Q1) <= fact_ids
 
 
 def test_scenario_bank_advisors_emit_fixed_run_count() -> None:
