@@ -198,27 +198,32 @@ def write_advisor_audit_tikz(summary: dict[str, Any], path: Path) -> None:
 \begin{{axis}}[
   ybar,
   width=\columnwidth,
-  height=0.58\columnwidth,
+  height=0.52\columnwidth,
+  clip=false,
   ymin=0,
   ymax=1.05,
-  bar width=2.6pt,
-  enlarge x limits=0.08,
+  bar width=3.1pt,
+  enlarge x limits=0.10,
   ylabel={{Score}},
   symbolic x coords={{1,2,3,4,5,6,7}},
   xtick={{1,2,3,4,5,6,7}},
   xticklabels={{{coordinates["labels"]}}},
   x tick label style={{font=\scriptsize, align=center}},
   ymajorgrids=true,
-  grid style={{draw=black!12}},
-  axis line style={{draw=black!45}},
-  tick style={{draw=black!45}},
-  legend style={{draw=none, fill=white, fill opacity=0.85, text opacity=1,
-    font=\scriptsize, at={{(0.98,0.98)}}, anchor=north east}},
-  legend columns=1,
+  grid style={{draw=arenaGray!18}},
+  axis line style={{draw=arenaInk!45}},
+  tick style={{draw=arenaInk!45}},
+  tick label style={{font=\scriptsize}},
+  label style={{font=\scriptsize}},
+  legend style={{draw=none, fill=none, font=\scriptsize,
+    at={{(0.5,1.16)}}, anchor=south}},
+  legend image code/.code={{\draw[#1, draw=none] (0cm,-0.05cm) rectangle (.14cm,.07cm);}},
+  legend columns=3,
+  /tikz/every even column/.append style={{column sep=5pt}},
 ]
-\addplot+[draw=none, fill=arenaGreen] coordinates {{{coordinates["valid"]}}};
-\addplot+[draw=none, fill=arenaGold] coordinates {{{coordinates["agreement"]}}};
-\addplot+[draw=none, fill=arenaBlue] coordinates {{{coordinates["stability"]}}};
+\addplot+[draw=none, fill=arenaGreen!85!black] coordinates {{{coordinates["valid"]}}};
+\addplot+[draw=none, fill=arenaGold!95!black] coordinates {{{coordinates["agreement"]}}};
+\addplot+[draw=none, fill=arenaBlue!90] coordinates {{{coordinates["stability"]}}};
 \legend{{Valid,Agreement,Stability}}
 \end{{axis}}
 \end{{tikzpicture}}

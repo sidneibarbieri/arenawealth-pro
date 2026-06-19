@@ -13,9 +13,13 @@
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
 \usetikzlibrary{arrows.meta,positioning,fit,backgrounds,calc}
-\definecolor{arenaGreen}{HTML}{00C78A}
-\definecolor{arenaGold}{HTML}{F5C84C}
-\definecolor{arenaBlue}{HTML}{3BA4FF}
+\definecolor{arenaGreen}{HTML}{228833}
+\definecolor{arenaGold}{HTML}{CCBB44}
+\definecolor{arenaBlue}{HTML}{4477AA}
+\definecolor{arenaRed}{HTML}{CC6677}
+\definecolor{arenaGray}{HTML}{667085}
+\definecolor{arenaLight}{HTML}{F5F7FA}
+\definecolor{arenaInk}{HTML}{344054}
 
 \title{Auditing AI Investment Recommendations Against a Deterministic,
 Replayable Baseline}
@@ -366,11 +370,12 @@ sizing drift that set overlap cannot see.
 
 The same audit can score real model output once the responses are frozen. We
 therefore include a small cached pilot: three scenarios, three repeated runs per
-scenario, collected at temperature $0.7$ from a hosted language-model endpoint.
-Each record stores the prompt, prompt hash, raw response, parsed output, usage
-metadata, and collection timestamp, and the records are part of the artifact's
-data-hash manifest. This is not a provider comparison; it tests whether the
-protocol catches operational failures in real output. It does
+scenario, collected as single-message JSON-only calls at temperature $0.7$, with
+a 500-token output cap, no tools, and no retry loop. Each record stores the
+provider, deployment label, prompt, prompt hash, raw response, parsed output,
+usage metadata, and collection timestamp, and the records are part of the
+artifact's data-hash manifest. This is not a provider comparison; it tests
+whether the protocol catches operational failures in real output. It does
 (Table~\ref{tab:model-pilot}). The model agrees with the baseline on all three
 scenarios, yet one run in the sub-tranche cash scenario splits \$900 into two
 \$450 orders and pays an avoidable extra fee. A top-$k$ agreement score would
@@ -401,12 +406,14 @@ orders, insufficient cash, out-of-universe tickers, hallucinated or stale facts,
 drawdown cases, rebalance-versus-hold, fractional-share constraints, and
 conflicting rationales. The fact scenarios use dated market fact identifiers
 for returns, rates, employment, and concentration claims, so grounding is tested
-against realistic inputs while remaining a deterministic set check. Five
-deterministic advisor configurations run five times per scenario, for 3,000
-replayed outputs. The configurations are synthetic stressors rather than
-provider claims: one implements the contract, one maximizes agreement while
-splitting orders, one changes tickers across runs, one cites unsupported facts,
-and one overspends cash.
+against realistic inputs while remaining a deterministic set check. The oracle is
+the manifest itself: cash, allowed tickers, baseline tickers, fact ids, and
+constraints are frozen before any advisor output is scored. Five deterministic
+advisor configurations run five times per scenario, for 3,000 replayed outputs.
+The configurations are synthetic stressors rather than provider claims: one
+implements the contract, one maximizes agreement while splitting orders, one
+changes tickers across runs, one cites unsupported facts, and one overspends
+cash.
 
 \begin{table}[t]
   \caption{Frozen scenario-bank results over 120 scenarios and 3,000 advisor

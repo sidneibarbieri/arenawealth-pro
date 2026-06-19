@@ -1,20 +1,25 @@
 \begin{tikzpicture}
 \begin{axis}[
   width=\columnwidth,
-  height=0.58\columnwidth,
-  axis line style={draw=black!45},
-  tick style={draw=black!45},
+  height=0.52\columnwidth,
+  clip=false,
+  axis line style={draw=arenaInk!45},
+  tick style={draw=arenaInk!45},
   tick label style={font=\scriptsize},
   label style={font=\scriptsize},
-  legend style={draw=none, fill=white, fill opacity=0.85, text opacity=1, font=\scriptsize},
+  title style={font=\scriptsize\bfseries, align=center},
   ymajorgrids=true,
-  grid style={draw=black!12},
-  ybar, bar width=2.2pt, xmin=0, xmax=54, ymin=-0.35, ymax=0.55, xlabel={Rolling 1-year window}, ylabel={Sharpe difference}, xtick={1,10,20,30,40,50}, legend pos=south west
+  grid style={draw=arenaGray!18},
+  ybar, bar width=2.5pt, xmin=0, xmax=54, ymin=-0.35, ymax=0.55, xlabel={Rolling 1-year window}, ylabel={Sharpe difference}, xtick={1,10,20,30,40,50}, ytick={-0.2,0,0.2,0.4}, axis x line*=bottom, axis y line*=left
 ]
-\addplot+[draw=none, fill=arenaGreen] coordinates {(1,0.1029) (2,0.0477) (3,0.049) (4,0.1103) (5,0.0882) (6,0.068) (7,0.077) (8,0.0543) (9,0.0849) (10,0.0757) (11,0.0942) (12,0.0707) (13,0.0551) (14,0.0415) (15,0.003) (16,0.0261) (17,0.0691) (18,0.089) (19,0.0792) (20,0.1168) (21,0.113) (22,0.1241) (23,0.0675) (24,0.1092) (25,0.1336) (26,0.1861) (27,0.2009) (28,0.2001) (29,0.1873) (30,0.1844) (31,0.2206) (32,0.1353) (33,0.1198) (34,0.0958) (35,0.1226) (36,0.1327) (37,0.0912) (38,0.0825) (39,0.0632) (40,0.0298) (46,0.0025) (47,0.0415) (48,0.0935) (49,0.0541) (50,0.0951) (51,0.0173) (53,0.1427)};
-\addlegendentry{Equal higher}
-\addplot+[draw=none, fill=red!70!black] coordinates {(41,-0.0608) (42,-0.0573) (43,-0.0557) (44,-0.089) (45,-0.034) (52,-0.0042)};
-\addlegendentry{Current higher}
-\addplot+[mark=none, black!70] coordinates {(0,0) (54,0)};
+\addplot+[draw=none, fill=arenaGreen!85!black]
+  coordinates {(1,0.1029) (2,0.0477) (3,0.049) (4,0.1103) (5,0.0882) (6,0.068) (7,0.077) (8,0.0543) (9,0.0849) (10,0.0757) (11,0.0942) (12,0.0707) (13,0.0551) (14,0.0415) (15,0.003) (16,0.0261) (17,0.0691) (18,0.089) (19,0.0792) (20,0.1168) (21,0.113) (22,0.1241) (23,0.0675) (24,0.1092) (25,0.1336) (26,0.1861) (27,0.2009) (28,0.2001) (29,0.1873) (30,0.1844) (31,0.2206) (32,0.1353) (33,0.1198) (34,0.0958) (35,0.1226) (36,0.1327) (37,0.0912) (38,0.0825) (39,0.0632) (40,0.0298) (46,0.0025) (47,0.0415) (48,0.0935) (49,0.0541) (50,0.0951) (51,0.0173) (53,0.1427)};
+\addplot+[draw=none, fill=arenaRed!90!black]
+  coordinates {(41,-0.0608) (42,-0.0573) (43,-0.0557) (44,-0.089) (45,-0.034) (52,-0.0042)};
+\addplot+[mark=none, arenaInk!70, line width=.45pt] coordinates {(0,0) (54,0)};
+\node[anchor=west, font=\scriptsize, text=arenaGreen!45!black]
+  at (axis cs:4,.34) {equal higher: 47/53};
+\node[anchor=west, font=\scriptsize, text=arenaRed!65!black]
+  at (axis cs:40,-.24) {current higher: 6/53};
 \end{axis}
 \end{tikzpicture}

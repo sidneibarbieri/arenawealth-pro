@@ -128,14 +128,15 @@ def _write_tikz(path: Path, body: str) -> None:
 def _axis_style(extra: str = "") -> str:
     return f"""
   width=\\columnwidth,
-  height=0.58\\columnwidth,
-  axis line style={{draw=black!45}},
-  tick style={{draw=black!45}},
+  height=0.52\\columnwidth,
+  clip=false,
+  axis line style={{draw=arenaInk!45}},
+  tick style={{draw=arenaInk!45}},
   tick label style={{font=\\scriptsize}},
   label style={{font=\\scriptsize}},
-  legend style={{draw=none, fill=white, fill opacity=0.85, text opacity=1, font=\\scriptsize}},
+  title style={{font=\\scriptsize\\bfseries, align=center}},
   ymajorgrids=true,
-  grid style={{draw=black!12}},
+  grid style={{draw=arenaGray!18}},
   {extra}
 """.strip()
 
@@ -147,10 +148,10 @@ def figure_fee_premium_tikz(landscape, path: Path) -> None:
     engine_points = [(p.cash, p.engine_premium) for p in deployed]
     axis_style = _axis_style(
         "xmin=250, xmax=5000, ymin=0, ymax=3.0, "
-        "xlabel={Cash to deploy (USD)}, ylabel={Premium (USD)}, "
-        "legend style={draw=none, fill=white, fill opacity=0.9, text opacity=1, "
-        "font=\\scriptsize, at={(0.5,1.02)}, anchor=south}, "
-        "legend columns=-1"
+        "xlabel={Cash to deploy (USD)}, ylabel={Extra fee vs single order (USD)}, "
+        "xtick={1000,2000,3000,4000,5000}, ytick={0,2.5}, "
+        "axis x line*=bottom, axis y line*=left, "
+        "enlarge x limits=false"
     )
     naive_coordinates = _tikz_coordinates(naive_points)
     engine_coordinates = _tikz_coordinates(engine_points)
@@ -161,10 +162,14 @@ def figure_fee_premium_tikz(landscape, path: Path) -> None:
 \begin{{axis}}[
   {axis_style}
 ]
-\addplot+[mark=none, very thick, color=red!70!black] coordinates {{{naive_coordinates}}};
-\addlegendentry{{Naive split}}
-\addplot+[mark=none, very thick, color=arenaGreen] coordinates {{{engine_coordinates}}};
-\addlegendentry{{Fee-aware planner}}
+\addplot+[const plot, mark=none, line width=.9pt, color=arenaRed!90!black]
+  coordinates {{{naive_coordinates}}};
+\addplot+[mark=none, line width=1.15pt, color=arenaGreen!80!black]
+  coordinates {{{engine_coordinates}}};
+\node[anchor=west, font=\scriptsize, text=arenaRed!70!black]
+  at (axis cs:1040,2.62) {{naive split: +\$2.50 bands}};
+\node[anchor=east, font=\scriptsize, text=arenaGreen!45!black]
+  at (axis cs:4920,.28) {{fee-aware: zero premium}};
 \end{{axis}}
 \end{{tikzpicture}}
 """,
@@ -203,9 +208,10 @@ def figure_robustness_tikz(
     positive_points = [(index, value) for index, value in points if value > 0]
     negative_points = [(index, value) for index, value in points if value <= 0]
     axis_style = _axis_style(
-        "ybar, bar width=2.2pt, xmin=0, xmax=54, ymin=-0.35, ymax=0.55, "
+        "ybar, bar width=2.5pt, xmin=0, xmax=54, ymin=-0.35, ymax=0.55, "
         "xlabel={Rolling 1-year window}, ylabel={Sharpe difference}, "
-        "xtick={1,10,20,30,40,50}, legend pos=south west"
+        "xtick={1,10,20,30,40,50}, ytick={-0.2,0,0.2,0.4}, "
+        "axis x line*=bottom, axis y line*=left"
     )
     _write_tikz(
         path,
@@ -214,11 +220,15 @@ def figure_robustness_tikz(
 \begin{{axis}}[
   {axis_style}
 ]
-\addplot+[draw=none, fill=arenaGreen] coordinates {{{_tikz_coordinates(positive_points)}}};
-\addlegendentry{{Equal higher}}
-\addplot+[draw=none, fill=red!70!black] coordinates {{{_tikz_coordinates(negative_points)}}};
-\addlegendentry{{Current higher}}
-\addplot+[mark=none, black!70] coordinates {{(0,0) (54,0)}};
+\addplot+[draw=none, fill=arenaGreen!85!black]
+  coordinates {{{_tikz_coordinates(positive_points)}}};
+\addplot+[draw=none, fill=arenaRed!90!black]
+  coordinates {{{_tikz_coordinates(negative_points)}}};
+\addplot+[mark=none, arenaInk!70, line width=.45pt] coordinates {{(0,0) (54,0)}};
+\node[anchor=west, font=\scriptsize, text=arenaGreen!45!black]
+  at (axis cs:4,.34) {{equal higher: 47/53}};
+\node[anchor=west, font=\scriptsize, text=arenaRed!65!black]
+  at (axis cs:40,-.24) {{current higher: 6/53}};
 \end{{axis}}
 \end{{tikzpicture}}
 """,
@@ -227,26 +237,28 @@ def figure_robustness_tikz(
 
 def figure_ablation_tikz(ablation_rows, path: Path) -> None:
     coordinates = [
-        (index, row.spearman_vs_baseline) for index, row in enumerate(ablation_rows, start=1)
+        (row.spearman_vs_baseline, index) for index, row in enumerate(ablation_rows, start=1)
     ]
+    positive_coordinates = [(x, y) for x, y in coordinates if x >= 0]
+    negative_coordinates = [(x, y) for x, y in coordinates if x < 0]
     labels = ",".join(
         {
             "baseline_40_35_25": "baseline",
-            "moat_only": "moat",
+            "moat_only": "moat only",
             "compounding_only": "comp.",
-            "valuation_only": "value",
+            "valuation_only": "value only",
             "equal_thirds": "equal",
         }.get(row.label, row.label.replace("_", " "))
         for row in ablation_rows
     )
     axis_style = _axis_style(
-        f"ybar, bar width=8pt, xmin=0.4, xmax={len(ablation_rows) + 0.6}, "
-        "ymin=-0.65, ymax=1.1, ylabel={Spearman vs baseline}, "
-        f"xtick={{1,...,{len(ablation_rows)}}}, xticklabels={{{labels}}}, "
-        "xticklabel style={font=\\scriptsize, align=center}"
+        f"xbar, bar width=5.5pt, xmin=-0.65, xmax=1.08, ymin=0.4, "
+        f"ymax={len(ablation_rows) + 0.6}, xlabel={{Spearman rank correlation}}, "
+        f"ytick={{1,...,{len(ablation_rows)}}}, yticklabels={{{labels}}}, "
+        "yticklabel style={font=\\scriptsize, align=right}, y dir=reverse, "
+        "xmajorgrids=true, ymajorgrids=false, xtick={-0.5,0,0.5,1.0}, "
+        "axis x line*=bottom, axis y line*=left"
     )
-    ablation_coordinates = _tikz_coordinates(coordinates)
-    zero_line_end = _tikz_number(len(ablation_rows) + 0.6)
     _write_tikz(
         path,
         rf"""
@@ -254,8 +266,14 @@ def figure_ablation_tikz(ablation_rows, path: Path) -> None:
 \begin{{axis}}[
   {axis_style}
 ]
-\addplot+[draw=none, fill=arenaBlue] coordinates {{{ablation_coordinates}}};
-\addplot+[mark=none, black!70] coordinates {{(0.4,0) ({zero_line_end},0)}};
+\addplot+[draw=none, fill=arenaBlue!86]
+  coordinates {{{_tikz_coordinates(positive_coordinates)}}};
+\addplot+[draw=none, fill=arenaRed!80]
+  coordinates {{{_tikz_coordinates(negative_coordinates)}}};
+\addplot+[mark=none, arenaInk!70, line width=.45pt]
+  coordinates {{(0,0.4) (0,{len(ablation_rows) + 0.6})}};
+\node[anchor=west, font=\scriptsize, text=arenaBlue!55!black]
+  at (axis cs:.58,{len(ablation_rows) + .25}) {{equal tracks baseline}};
 \end{{axis}}
 \end{{tikzpicture}}
 """,
