@@ -1,7 +1,12 @@
 \documentclass[sigconf,review,anonymous]{acmart}
 
+\acmConference[Anonymous Review]{Anonymous Review}{2026}{Anonymous}
+\acmYear{2026}
+\copyrightyear{2026}
+\acmDOI{}
+\acmISBN{}
 \microtypesetup{expansion=false}
-\settopmatter{printacmref=false}
+\settopmatter{printacmref=true}
 \renewcommand\footnotetextcopyrightpermission[1]{}
 \pagestyle{plain}
 \emergencystretch=2em
@@ -23,26 +28,47 @@ Replayable Baseline}
 \email{anonymous@example.com}
 
 \begin{abstract}
-Large language models increasingly generate investment recommendations, and a
-growing literature evaluates them by return or by agreement with a reference
-portfolio. We argue that agreement is the wrong yardstick and provide a better
-one: a \emph{deterministic, replayable baseline}---a quality, moat, and
-compounding policy with provable cost guardrails---together with an audit
-protocol that scores any advisor on three independent axes: operational
-\emph{validity} under explicit constraints, \emph{stability} across repeated
-runs, and \emph{agreement} with the baseline. On a set of frozen scenarios we
-show the axes are independent: a control with $\mathrm{agree}=1.0$ and
-$\mathrm{stab}=1.0$ is nonetheless \emph{invalid} because it wastes fees,
-while a valid control is unstable. An evaluation that reports only
-recommendation overlap would rank both as good advice. The baseline earns its
-role as a yardstick through reproducibility: its cost behavior is provable (the
-fee is subadditive and the economic order floor is a closed-form fixed point),
-its decisions are pure functions of their inputs, and a 2021--2026 backtest
-against minimum-variance, risk-parity, and equal-weight allocators shows the
-baseline does not overclaim---equal weighting matches it, consistent with the
-difficulty of beating $1/N$ \cite{demiguel2009naive}. The artifact regenerates
-every figure offline.
+AI systems increasingly produce investment recommendations, but the usual
+evaluations ask the wrong question. Return is noisy and easy to overfit, while
+agreement with a reference portfolio can reward advice that is impossible to
+execute. This paper evaluates advice as an operational object. We introduce a
+deterministic, replayable baseline and score any advisor on three axes:
+validity under portfolio and fee constraints, stability across repeated runs,
+and agreement with the baseline. On frozen scenarios, these axes separate
+cleanly. One control agrees with the baseline and is perfectly stable, yet is
+invalid because it wastes transaction fees; another is valid and stable while
+disagreeing with the baseline. The artifact also exposes portfolio-level
+validity: a higher-scoring asset can be rejected when it worsens concentration.
+The baseline is not presented as an alpha model. It is a transparent verifier:
+its cost guardrails are derived from the fee schedule, its decisions replay from
+frozen inputs, and its current-basket backtest is reported against equal-weight,
+risk-parity, minimum-variance, and market baselines. Every figure and table is
+regenerated offline from the artifact.
 \end{abstract}
+
+\begin{CCSXML}
+<ccs2012>
+ <concept>
+  <concept_id>10010147.10010257</concept_id>
+  <concept_desc>Computing methodologies~Artificial intelligence</concept_desc>
+  <concept_significance>500</concept_significance>
+ </concept>
+ <concept>
+  <concept_id>10002951.10003260.10003309</concept_id>
+  <concept_desc>Information systems~Decision support systems</concept_desc>
+  <concept_significance>300</concept_significance>
+ </concept>
+ <concept>
+  <concept_id>10010405.10010455</concept_id>
+  <concept_desc>Applied computing~Economics</concept_desc>
+  <concept_significance>300</concept_significance>
+ </concept>
+</ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Computing methodologies~Artificial intelligence}
+\ccsdesc[300]{Information systems~Decision support systems}
+\ccsdesc[300]{Applied computing~Economics}
 
 \keywords{AI in finance, investment recommendations, benchmark, trustworthy AI,
 reproducibility, transaction costs}
@@ -62,46 +88,39 @@ irrelevant changes and carry latent bias \cite{chawla2025riskadvice, lee2025bias
 which a return or overlap score cannot detect.
 
 We take a different stance: evaluate an advisor against a \emph{deterministic,
-replayable baseline} on three axes that a single number conflates---operational
+replayable baseline} on three axes that a single number conflates: operational
 \emph{validity} under explicit constraints, \emph{stability} across repeated
 runs, and \emph{agreement} with the baseline. The baseline is a transparent
 quality, moat, and compounding policy whose recommendations are pure functions
 of their inputs, so any run can be replayed and diffed. Its trustworthiness as a
 yardstick rests on reproducibility, not on a claim to beat the market.
 
-\begin{enumerate}
-  \item An audit protocol and a frozen-scenario benchmark that score any advisor
-  on validity, stability, and agreement, and a finding that these axes are
-  \emph{independent}: a control can reach $\mathrm{agree}=1.0$ and
-  $\mathrm{stab}=1.0$ yet be invalid, so agreement-only evaluation is
-  misleading (Section~\ref{sec:audit}).
-  \item The deterministic baseline that makes the protocol trustworthy: its fee
-  is provably subadditive and its economic order floor is a closed-form fixed
-  point (Sections~\ref{sec:fees}--\ref{sec:guardrail}); exhaustive reproducible
-  sweeps even surfaced and fixed a latent defect in our own planner.
-  \item An honest calibration of the baseline: a 2021--2026 backtest against
-  minimum-variance, risk-parity, and equal-weight allocators shows it does not
-  overclaim---equal weighting matches it on risk-adjusted return
-  (Section~\ref{sec:weighting}).
-\end{enumerate}
+The paper makes three contributions. First, it defines an audit protocol for
+investment advice that measures validity, stability, and agreement separately,
+and shows why agreement alone is insufficient. Second, it provides the
+deterministic baseline that makes the audit replayable: the fee model is
+subadditive, the minimum order follows directly from the cost tolerance, and the
+planner is regression-tested against those facts. Third, it calibrates the
+baseline against allocator baselines instead of treating the policy as a
+performance claim. The current basket beats the market benchmark, but equal
+weighting and risk parity are at least as strong on risk-adjusted return. This
+result sharpens the paper's claim: the contribution is verification of
+investment advice, not a new stock-selection factor.
 
 \section{Related Work}
 \label{sec:related}
 
-Our work sits at the intersection of four lines.
-
-\paragraph{What to own: quality and profitability.}
-Factor research establishes durable signals for security selection: gross
+Our work sits at the intersection of four lines. Factor research establishes
+durable signals for security selection: gross
 profitability \cite{novyMarx2013}, the quality-minus-junk composite
 \cite{asness2019qmj}, and high-dimensional machine-learning predictors in the
 cross-section \cite{gu2020machine}. We treat selection as given and do not
 propose a new factor; our scoring reuses such signals only to rank an existing
 basket. This choice matters for scope. A stock-picking paper must show
 out-of-sample alpha against factor and machine-learning baselines. Our claim is
-orthogonal---the layer that audits \emph{whether advice can be executed}
+orthogonal: the layer that audits \emph{whether advice can be executed}
 replayably and cheaply once a candidate set exists.
 
-\paragraph{How to trade it: transaction-cost theory and planning.}
 Classical theory shows that transaction costs induce a \emph{no-trade region}:
 proportional costs make the optimal policy a band around the target where one
 does not rebalance \cite{constantinides1986capital, davis1990portfolio}. With
@@ -115,7 +134,6 @@ narrower and more auditable: recurring small-cash deployment under a quantized
 step fee. The fixed-cost guardrail is the small-cash analogue of the no-trade
 region: below the floor, the optimal action is to hold.
 
-\paragraph{Evaluating learned investment advice.}
 A fast-growing line uses language models to recommend assets or build portfolios
 and evaluates them mainly by return or by alignment with a reference: media-driven
 LLM portfolios report strong but short-horizon gains \cite{oh2025alpha}, and
@@ -124,7 +142,7 @@ knowledge-graph-aligned recommenders are scored on behavioral alignment
 multi-month trading benchmark finds that most LLM agents fail to beat a passive
 buy-and-hold baseline, and that strong financial question-answering does not
 translate into trading skill \cite{chen2025stockbench}. Top-finance field
-evidence on robo-advice is likewise cautious---automated advice can reduce
+evidence on robo-advice is likewise cautious: automated advice can reduce
 behavioral biases without eliminating them \cite{dacunto2019robo}. A complementary
 line documents failure modes a return or overlap score cannot see: LLM risk
 assessments vary with irrelevant demographic attributes \cite{chawla2025riskadvice},
@@ -138,19 +156,19 @@ measures, together, whether its advice is operationally \emph{valid},
 supply that baseline and protocol; the advisor under test may be an LLM, a
 robo-allocator, or a heuristic.
 
-\paragraph{Whether to believe it: reproducibility over overfitting.}
 A large fraction of reported strategy performance does not survive out of
 sample; backtest overfitting is easy to produce and hard to detect
 \cite{bailey2014pseudo}, and naive $1/N$ diversification is a stubborn baseline
-\cite{demiguel2009naive}. We take the defensive posture these results imply: the
-engine is deterministic and every figure is regenerated from it, we tune nothing
-for performance, and we report a negative result (our weighting loses to equal
-weighting and risk parity) rather than search for a configuration that wins.
-This is the trustworthy-finance stance---explainable, reproducible, and
-auditable decisions---applied to the unglamorous but universal cash-deployment
+\cite{demiguel2009naive}. The artifact follows the discipline these results
+require: the engine is deterministic, every figure is regenerated from it, and
+the calibration is reported even when simple allocators outperform the tuned
+weighting.
+This is the trustworthy-finance stance: explainable, reproducible, and
+auditable decisions applied to the universal cash-deployment
 step.
 
-\section{System Design}
+\section{Artifact and Audit Protocol}
+\label{sec:audit}
 
 The backend separates API DTOs, portfolio importers, provider adapters,
 analytics scoring, and deployment planning. Network access is isolated behind
@@ -165,7 +183,7 @@ figure and table below is produced by a single offline driver
 depends on live data or hidden state. The purity is enforced, not merely
 asserted: a replay test feeds the same input tuple twice and checks that the
 orders, exclusions, and ranked candidates are byte-identical. This is the
-auditability guarantee a compliance reviewer needs---any past recommendation can
+auditability guarantee a compliance reviewer needs: any past recommendation can
 be regenerated and diffed from its logged inputs. Determinism is engineered, not
 incidental: the engine draws no random numbers, ranking ties are broken by ticker
 so the order does not depend on input ordering, and the scoring and sizing
@@ -182,65 +200,42 @@ with $(w_m,w_c,w_v)=(0.40,0.35,0.25)$. Holdings already above $1.3\times$ equal
 weight, or in a theme at its concentration cap, are excluded; the planner then
 ranks the remainder by $s$ and sizes orders against available cash.
 
-\section{The Audit Protocol}
-\label{sec:audit}
-
 We evaluate an advisor not by how well it agrees with the baseline but by three
 axes a single number conflates. Fix a \emph{scenario}: current holdings,
 available cash, an allowed universe, per-scenario constraints (a recommendation
 cap, add-only or trim rules, the economic order floor of
 Section~\ref{sec:guardrail}), and the baseline's own recommendation. An advisor
 returns a set of tickers (optionally with dollar amounts and cited facts). We
-score it on:
+score three quantities. \emph{Validity} is the fraction of runs with no
+constraint violation: no out-of-universe ticker, no cap breach, no add-only
+ownership violation, no cash overrun, no below-floor order, no fee-worsening
+split, and no cited fact absent from the frozen scenario. \emph{Stability} is
+the mean pairwise overlap of repeated recommendations, with an amount-aware
+sizing score when dollar allocations are returned. \emph{Agreement} is the
+overlap with the baseline's top-$k$ set. Agreement is reported, not rewarded by
+itself, because disagreement can be either useful novelty or error.
 
-\begin{description}
-  \item[Validity.] The fraction of runs with no constraint violation:
-  recommending outside the universe, exceeding the cap, buying an already-owned
-  name under add-only, exceeding cash, ordering below the economic floor, or
-  splitting cash so that the fee exceeds the single-order fee
-  (Section~\ref{sec:fees}). Citing a fact absent from the scenario snapshot is
-  also a violation, giving a check on explanation faithfulness.
-  \item[Stability.] The mean pairwise Jaccard overlap of the recommended sets
-  across repeated runs of the same scenario, complemented by an amount-aware
-  \emph{sizing stability} (one minus the mean pairwise total-variation distance
-  between allocation weights) wherever the advisor returns dollar amounts. A
-  trustworthy advisor should not change its picks---or its sizing---when nothing
-  changed.
-  \item[Agreement.] Overlap at $k$ and Jaccard against the baseline's ranking.
-  This is reported, not optimized: disagreement may be useful novelty or a
-  mistake, which only validity and realized outcome can disambiguate.
-\end{description}
-
-\paragraph{The axes are independent.}
-To show that no single axis substitutes for the others, we run the protocol on
-seven deterministic \emph{archetype} controls across frozen scenarios---failure
-modes by construction, not model outputs
-(Figure~\ref{fig:audit}). Two are decisive. A \emph{naive diversifier} with
-$\mathrm{agree}=1.0$ against the baseline and no repeated-run drift
-($\mathrm{stab}=1.0$) is nonetheless \emph{invalid} ($\mathrm{valid}=0.0$): it
-splits sub-tranche cash and pays an avoidable fee. Conversely a
-\emph{valid-but-disagreeing} control is fully valid and stable yet shares
-nothing with the baseline ($\mathrm{agree}=0.0$). An evaluation reporting only
-agreement would rank the first as ideal and the second as worst---exactly
-inverting their operational validity. Validity, stability, and agreement are
-therefore independent axes; an advisor benchmark must report all three.
+The three axes do not substitute for one another. We show this with seven
+deterministic archetype controls: failure modes by construction, not model
+outputs (Figure~\ref{fig:audit}). The decisive control is the naive diversifier:
+it agrees with the baseline and is perfectly stable, yet is invalid because it
+splits sub-tranche cash and pays an avoidable fee. The mirror image is a
+valid-but-disagreeing control: fully valid and stable, but with zero agreement.
+An overlap-only benchmark would rank the first above the second, which reverses
+their operational quality.
 
 \begin{figure}[t]
   \centering
   \input{figures/ai_advisor_audit.tikz}
-  \caption{Validity, agreement, and stability for the archetype controls. The
-  naive diversifier (high agreement and stability, zero validity) and the
-  valid-but-disagreeing control (high validity and stability, zero agreement)
-  show that the axes do not substitute for one another.}
+  \caption{The archetype controls separate validity, agreement, and stability.}
   \Description{Grouped bar chart of validity, agreement, and stability across
   seven advisor archetypes, showing that high agreement does not coincide with
   high validity.}
   \label{fig:audit}
 \end{figure}
 
-\paragraph{Metrics, precisely.}
-For an advisor that returns sets of tickers $r_1,\dots,r_n$ over $n$ repeated
-runs of a scenario with baseline top-$k$ set $b$, we report
+For an advisor that returns ticker sets $r_1,\dots,r_n$ over repeated runs of a
+scenario with baseline top-$k$ set $b$, the metrics are:
 \[
   \begin{aligned}
   V &= \tfrac1n\!\sum_j \mathbf{1}[\,\mathrm{viol}(r_j)=\varnothing\,],\\
@@ -250,76 +245,77 @@ runs of a scenario with baseline top-$k$ set $b$, we report
   \end{aligned}
 \]
 where $J$ is the Jaccard overlap and $\mathrm{viol}$ the constraint set of
-Section~\ref{sec:audit}; $w_j$ normalizes run $j$'s dollar amounts to weights and
+$w_j$ normalizes run $j$'s dollar amounts to weights and
 $\mathrm{TV}$ is total-variation distance, so the sizing stability $S_w\in[0,1]$
-is reported on the scenarios that require amounts. Validity $V$ and stability
-$S,S_w$ are intrinsic to the advisor; agreement $A$ is relative to the baseline
-and reported, never optimized. All are deterministic given the runs, so the audit
-of a fixed set of outputs is itself replayable.
+is reported when a scenario requires amounts. The audit is therefore replayable
+once the advisor outputs are frozen. It certifies process quality, not future
+return: advice must be admissible, repeatable, and grounded before performance
+statistics are meaningful.
 
-\paragraph{What the protocol does and does not certify.}
-It certifies \emph{process}---that advice is admissible, repeatable, and grounded
-in the scenario---not \emph{outcome}. A valid, stable, agreeing advisor can still
-be wrong if the baseline itself is wrong; this is exactly why we calibrate the
-baseline against standard allocators and report that it does not beat them
-(Section~\ref{sec:weighting}). Agreement is descriptive: disagreement may be
-useful novelty or error, separable only by realized outcome. Stability is
-measured over ticker sets and, where amounts are required, over allocation
-weights via $S_w$, so an advisor consistent in names but erratic in sizing is
-still flagged: on the sub-tranche control $S_w$ separates the deterministic
-baseline ($1.0$) from an underdeploying advisor ($0.33$). The archetypes are controls that
-establish discriminating power, not claims about any model. These boundaries are
-what keep the protocol honest: it tells a practitioner whether an advisor is
-\emph{safe to deploy}, a prerequisite that return curves alone never establish.
-
-The archetypes establish the protocol and its discriminating power offline and
-deterministically. Running real language-model advisors through the same frozen
-scenarios is the natural next study; the protocol, scenarios, and metrics are
-already in place to receive their outputs without changing the rules.
-
-\section{The Fee Structure as an Object of Study}
+\section{Deterministic Verification}
+\label{sec:portfolio-verification}
 \label{sec:fees}
+\label{sec:guardrail}
 
-The broker charges a fixed cost $c$ per \emph{started} tranche of size $T$ in a
-single-symbol order. A partially used tranche is billed in full, so the fee is
-the \emph{ceiling} (not the floor) of the tranche count:
+The audit protocol treats an advisor as a candidate generator, not as the final
+policy. This distinction matters in portfolio advice. A ticker can be attractive
+in isolation and still be the wrong next action for a specific portfolio because
+it increases concentration, consumes cash inefficiently, or repeats an exposure
+that is already full. The deterministic layer therefore verifies each candidate
+against the current portfolio before it can become a recommendation.
+
+The verifier uses information the advisor must already expose: current holdings,
+themes, cash, fees, and the candidate score. It estimates the projected theme
+weight of a starter position, assigns a structural role (diversifier, theme
+reinforcement, or concentration watch), and ranks the candidate by portfolio fit
+after the quality score is known. Table~\ref{tab:portfolio-fit} shows the
+controlled scenario used in the artifact. The highest-quality candidate is not
+selected because it would push an already-crowded theme from 23.0\% to 30.7\%.
+The selected candidate has a lower isolated score but creates a new 10.0\%
+theme exposure.
+
+\begin{table}[t]
+  \caption{Controlled portfolio-fit scenario. The isolated rank selects
+  Platforms; portfolio verification selects Industrial.}
+  \label{tab:portfolio-fit}
+  \begin{tabular}{lrrl}
+    \toprule
+    Candidate & Quality & Theme & Role \\
+    \midrule
+    Platforms & 90 & $30.7\%$ & Watch \\
+    Industrial & 84 & $10.0\%$ & Diversifier \\
+    Healthcare & 82 & $14.5\%$ & Reinforce \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+This is the core computer-science move in the paper. The learned system may
+search a large, noisy space of plausible investment theses; the deterministic
+artifact checks admissibility against a compact contract. The contract is small
+enough to replay and audit, but strong enough to reject advice that a pure
+ranking metric would accept.
+
+The same verifier must translate a ranking into executable orders. That
+translation matters whenever the broker charges a fixed cost $c$ for each
+started tranche of size $T$ in a single-symbol order:
 \begin{equation}
   f(a) = \left\lceil \tfrac{a}{T} \right\rceil c,
   \qquad T = \$1000,\ c = \$2.50.
   \label{eq:fee}
 \end{equation}
-For example $f(\$1{,}001)=\lceil 1.001\rceil c = 2c = \$5.00$, the same as
-$f(\$2{,}000)$; a single dollar past a boundary starts a new tranche. The fee is
-charged per order for one symbol, so deploying cash across $k$ distinct symbols
-incurs $k$ separate fees. We assume fractional shares, so order size is
-continuous in dollars; integer-share rounding would only add a second, smaller
-quantization on top of the tranche effect and does not change the argument.
+The ceiling is the important detail. A \$1{,}001 order pays two tranches, the
+same as a \$2{,}000 order. Since ceilings are subadditive,
+$f(a+b)\le f(a)+f(b)$: splitting cash across symbols never lowers the fee and
+can raise it.
 
-\begin{proposition}[Subadditivity]
-\label{prop:sub}
-$f$ is subadditive: for all $a,b \ge 0$, $f(a+b) \le f(a) + f(b)$.
-\end{proposition}
-\begin{proof}
-The ceiling is subadditive, $\lceil x+y\rceil \le \lceil x\rceil + \lceil y\rceil$
-for all reals $x,y$, because $\lceil x\rceil + \lceil y\rceil$ is an integer that
-is $\ge x+y$ and the ceiling is the least such integer. Setting $x=a/T$, $y=b/T$
-and multiplying by $c>0$ gives the claim. (The floor is \emph{super}additive, so
-a floor-based fee would not yield this inequality; the ``per started tranche''
-billing is what makes the cost subadditive.)
-\end{proof}
-
-The consequence is immediate and practical: \emph{consolidating cash into one
-single-symbol order weakly minimizes fees}. Splitting a fixed budget across
-orders $a_1,\dots,a_k$ (necessarily across distinct symbols) pays a
-\emph{diversification fee premium}
+We measure the excess fee from splitting as a diversification premium,
 \begin{equation}
   \pi(a_1,\dots,a_k) = \sum_i f(a_i) - f\!\Big(\sum_i a_i\Big) \;\ge\; 0,
   \label{eq:premium}
 \end{equation}
-where the single-order reference $f(\sum_i a_i)$ is the hypothetical cost of the
-same dollars in one symbol; it is a lower bound on any multi-symbol split, not an
-achievable diversified portfolio. The premium quantifies what diversification
-costs under this fee, and motivates the fee-aware planner below.
+where the right-hand term is the lower bound charged by one order of the same
+size. This is not a recommendation to buy only one asset; it is the cost
+reference that tells the planner when diversification is worth paying for.
 
 We swept cash from \$250 to \$5000 and compared three policies against the
 single-order lower bound: a \emph{naive} split strictly proportional to score, a
@@ -329,174 +325,53 @@ tranche boundary (Figure~\ref{fig:premium}).
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\columnwidth]{figures/fee_premium.png}
-  \caption{Subadditive fees penalize naive splitting. The naive proportional
-  policy pays a one-tranche premium in recurring bands; the fee-aware planner
+  \input{figures/fee_premium.tikz}
+  \caption{Naive splitting pays recurring fee premiums; the fee-aware planner
   stays on the zero-premium frontier.}
   \Description{Line chart showing naive split fee premiums above zero in
   repeated bands, while the fee-aware planner remains at zero premium.}
   \label{fig:premium}
 \end{figure}
 
-\paragraph{A defect surfaced by the sweep.}
-The sweep did not merely confirm theory; it falsified an assumption in our own
-code. The planner's prior implementation aligned one leg to a whole tranche to
-preserve the single-order fee, which is correct for cash above one tranche but
-\emph{not} for sub-tranche cash. The exact failure region has a closed form.
-Write $\mathrm{MIN}$ for the economic order floor derived in
-Section~\ref{sec:guardrail}, and let a budget $a$ be split by score share into
-legs $a\rho$ and $a(1-\rho)$ with the larger share $\rho\in[\tfrac12,1)$.
+The sweep exposed and fixed a real planner defect. A score-proportional split can
+pay an extra \$2.50 when two sub-tranche legs each start a fee unit. The earlier
+planner made that mistake for cash between \$625 and \$1000 under a 60/40 split.
+The corrected rule is direct: diversify only when the split is fee-neutral;
+otherwise consolidate. A property test now asserts that planner fee never
+exceeds the single-order lower bound across the cash grid.
 
-\begin{proposition}[Sub-tranche fee-worsening]
-\label{prop:worsen}
-If both legs clear the floor and the budget fits one tranche, i.e.
-\[
-  \frac{\mathrm{MIN}}{1-\rho} \;\le\; a \;\le\; T,
-\]
-then the two-order split overpays consolidation by exactly one unit of cost:
-$f(a\rho)+f(a(1-\rho))-f(a)=c$.
-\end{proposition}
-\begin{proof}
-The lower bound gives $a(1-\rho)\ge\mathrm{MIN}>0$, and $\rho\ge\tfrac12$ gives
-$a\rho\ge a(1-\rho)>0$, so both legs are positive and each at most $a\le T$; hence
-$\lceil a\rho/T\rceil=\lceil a(1-\rho)/T\rceil=1$. The budget $a\le T$ gives
-$\lceil a/T\rceil=1$. The difference is $c(1+1)-c(1)=c$.
-\end{proof}
-
-With $\mathrm{MIN}=\$250$, $\rho=0.6$, $T=\$1000$ the band is $[\$625,\$1000]$,
-exactly the region the sweep flagged. The general fix follows from
-Proposition~\ref{prop:sub}: diversify \emph{only when it is fee-neutral}, i.e.
-keep the split iff $f(a\rho)+f(a(1-\rho))=f(a)$, otherwise consolidate. A property
-test asserts $\,\text{planner fee}\le f(\text{cash})\,$ across the grid, and the
-engine premium is now zero everywhere it deploys (Figure~\ref{fig:premium},
-green).
-
-The two-order rule extends to any number of legs, which bounds how widely a
-budget can be diversified without paying for it.
-
-\begin{proposition}[$k$-way fee-neutrality]
-\label{prop:kway}
-A split of budget $a$ into legs $a_1,\dots,a_k$ ($\sum_i a_i=a$, $a_i>0$) is
-fee-neutral, $\sum_i f(a_i)=f(a)$, iff
-$\sum_i \lceil a_i/T\rceil = \lceil a/T\rceil$. The number of fee-neutral legs is
-therefore at most $\lceil a/T\rceil$, and this bound is achieved by allocating
-cash such that each leg is at most a single tranche size (i.e., $a_i \le T$), with at
-most one leg being fractional if $a$ is not a multiple of $T$. Requiring each leg
-also to be economic ($a_i\ge\mathrm{MIN}$) caps the breadth at
-$\min\!\big(\lceil a/T\rceil, \lfloor a/\mathrm{MIN}\rfloor\big)$.
-\end{proposition}
-\begin{proof}
-$f(a_i)=\lceil a_i/T\rceil c$ and $f(a)=\lceil a/T\rceil c$, so neutrality is
-exactly $\sum_i\lceil a_i/T\rceil=\lceil a/T\rceil$. Each leg contributes
-$\lceil a_i/T\rceil\ge 1$, so $k\le\sum_i\lceil a_i/T\rceil=\lceil a/T\rceil$;
-$k=\lceil a/T\rceil$ is reachable by allocating whole tranches. The economic
-constraint $a_i\ge\mathrm{MIN}$ admits at most $\lfloor a/\mathrm{MIN}\rfloor$
-legs, giving the stated minimum.
-\end{proof}
-
-This unifies the two guardrails: fee-neutrality limits diversification breadth to
-$\lceil a/T\rceil$ tranches, and the economic floor limits it to
-$\lfloor a/\mathrm{MIN}\rfloor$ orders; the planner funds the smaller of the two.
-For small incremental cash both bounds are one or two, which is why the planner
-rarely places more than a pair of orders.
-
-\section{The Guardrail Is a Fixed Point}
-\label{sec:guardrail}
-
-A trade should not lose a meaningful fraction of its value to fees. Fixing a
-tolerance $\tau$ on fee impact for a single-tranche order gives
-$f_{\min}/a \le \tau$, i.e. $c/a \le \tau$. The binding case yields the economic
-order floor
+A second cost rule prevents tiny orders. If a trade should lose at most a
+fraction $\tau$ to the fixed fee, then the binding first-tranche order is
 \begin{equation}
   \mathrm{MIN} = \frac{c}{\tau} = \frac{\$2.50}{0.01} = \$250,
   \label{eq:min}
 \end{equation}
-the cash level at which one tranche's fee is exactly $\tau=1\%$ of the order.
-This is a \emph{derived fixed point of the cost model}, not a tuned parameter.
-Below \$250 the planner holds cash; a second economic order requires
-$2\,\mathrm{MIN}=\$500$. Figure~\ref{fig:guardrail} shows fee impact touching
-exactly $1\%$ at the floor and declining thereafter, with sawtooths only at the
-genuine tranche boundaries.
+Below this floor the planner holds cash. A second economic order requires at
+least \$500. The formula is linear in the fixed fee and inverse in the tolerance:
+a \$1 fee gives a \$100 floor at the same 1\% tolerance, a \$5 fee gives a \$500
+floor, and zero commission collapses the guardrail to zero. The rule is therefore
+not a tuned constant; it is the fee schedule made explicit.
 
-The closed form $\mathrm{MIN}=c/\tau$ holds only while it stays inside the first
-tranche. The next proposition makes the regime explicit and shows what happens
-outside it.
-
-\begin{proposition}[Feasibility of the floor]
-\label{prop:floor}
-Let $g(a)=f(a)/a=\lceil a/T\rceil c/a$ be the fee impact of a single order of
-size $a$. Within tranche $k$ (for $a\in((k-1)T, kT]$) $g$ decreases from its supremum
-(which is $\infty$ for $k=1$, and $kc/((k-1)T)$ for $k>1$) to its tranche minimum
-$g(kT)=c/T$; hence $\min_{a>0} g(a)=c/T$, attained at every boundary $a=kT$.
-Consequently, for a tolerance $\tau$:
-\begin{itemize}
-  \item if $\tau \ge c/T$, the smallest order meeting the tolerance is
-  $\mathrm{MIN}=c/\tau\le T$ (first tranche), the fixed point of
-  Eq.~(\ref{eq:min});
-  \item if $\tau < c/T$, no order meets the tolerance: $g(a)>\tau$ for all
-  $a>0$, and in particular the naive value $a=c/\tau>T$ pays
-  $\lceil a/T\rceil\,c/a \ge 2\tau$.
-\end{itemize}
-\end{proposition}
-\begin{proof}
-On tranche $k$, $\lceil a/T\rceil=k$ is constant, so $g(a)=kc/a$ is strictly
-decreasing; its infimum on the tranche is at the right endpoint $a=kT$, where
-$g=kc/(kT)=c/T$, independent of $k$. Thus the global minimum of $g$ is $c/T$. If
-$\tau\ge c/T$ the equation $c/a=\tau$ has its solution $a=c/\tau$ in $(0,T]$, and
-$g$ first reaches $\tau$ there; if $\tau<c/T$ then $g(a)\ge c/T>\tau$ everywhere.
-For $a=c/\tau>T$ we have $\lceil a/T\rceil\ge 2$, so $g(a)\ge 2c/a=2\tau$.
-\end{proof}
-
-With $c=\$2.50$ and $T=\$1000$ the feasibility threshold is $c/T=0.25\%$, so the
-$\$250$ floor is well inside the valid regime at $\tau=1\%$. The proposition also
-says the cost model has a hard floor on fee impact, $c/T$: no order, however
-large within a tranche, is cheaper than a quarter percent except exactly at a
-tranche boundary.
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\columnwidth]{figures/guardrail.png}
-  \caption{The \$250 floor is the $1\%$ fee-impact fixed point. Fee impact is
-  $0$ below the floor (hold cash), peaks at exactly $1\%$ at the floor, and
-  steps only at real tranche boundaries.}
-  \Description{Line chart of fee impact versus cash. The curve is zero below
-  the minimum order, reaches one percent at 250 dollars, then declines with
-  sawtooth jumps at tranche boundaries.}
-  \label{fig:guardrail}
-\end{figure}
-
-\paragraph{Sensitivity and generality.}
-The \$250 number is specific to our $(c,\tau)$; the formula is not. Since
-$\mathrm{MIN}=c/\tau$, the floor is linear in the fixed cost, inverse in the
-tolerance, and \emph{independent of the tranche size} $T$: any positive order
-starts exactly one tranche, so the binding fee at the floor is one unit of $c$
-regardless of $T$ (which only rescales the premium bands of
-Section~\ref{sec:fees}). Proposition~\ref{prop:floor} gives the floor for any
-schedule with an additive fixed cost. At $\tau=1\%$ a flat \$1 fee yields a \$100
-floor, \$5 yields \$500, and \$9.99 yields \$999; the guardrail degenerates to
-``always trade'' under zero commission ($c=0$). The studied \$2.50 tranche (floor
-\$250) is typical for brokered international or non-US-equity access.
-
-\section{What Actually Drives the Decision}
+\section{Experimental Findings}
 \label{sec:weighting}
 
 Because the composite (\ref{eq:composite}) is linear, the ranking it induces is
 directly ablatable: zeroing a weight isolates a factor, and the score can be
 recomposed from per-position sub-scores without re-fetching data.
 
-\paragraph{Ablation (mechanism).}
 On a fixed, deterministic basket we recomposed the ranking under single-factor
 and equal weights and measured Spearman correlation to the baseline ordering and
-the churn in the funded top-2 (Figure~\ref{fig:ablation}). Single factors reorder the basket sharply---moat-only
-and valuation-only are \emph{anti-correlated} with the baseline---while equal
-thirds reproduce the baseline almost exactly ($\rho=0.97$, zero churn). The
+the churn in the funded top-2 (Figure~\ref{fig:ablation}). Single factors reorder
+the basket sharply: moat-only and valuation-only are \emph{anti-correlated} with
+the baseline, while equal thirds reproduce the baseline almost exactly
+($\rho=0.97$, zero churn). The
 funded picks are stable under $\pm10\%$ weight perturbation. (This basket uses
 deterministic synthetic fundamentals; it demonstrates the \emph{mechanism}, not a
 claim about specific securities.)
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\columnwidth]{figures/ablation.png}
+  \input{figures/ablation.tikz}
   \caption{Each factor reshapes the ranking differently; equal weighting tracks
   the tuned baseline.}
   \Description{Bar chart comparing Spearman rank correlation and top-two churn
@@ -505,13 +380,12 @@ claim about specific securities.)
   \label{fig:ablation}
 \end{figure}
 
-\paragraph{Backtest against allocator baselines (real data).}
 We backtested the 17-name basket against four baselines over 2021-01-05 to
 2026-05-28 (1355 trading days) using free adjusted closes
 (Table~\ref{tab:backtest}). Two are naive
 (market-value ``current'' weighting and equal weighting); two are allocator
-baselines computable from the return matrix alone---long-only minimum variance
-and equal-risk-contribution (risk parity)---so no baseline uses information the
+baselines computable from the return matrix alone: long-only minimum variance
+and equal-risk-contribution (risk parity). No baseline uses information the
 others lack. Both allocators estimate the sample covariance over the full window
 with no shrinkage, are long-only and fully invested ($w\ge 0$, $\mathbf{1}^\top
 w=1$), and set weights once at the start (buy and hold, no rebalancing), so they
@@ -532,8 +406,8 @@ fundamentals-weighted strategy on risk-adjusted return.
 
 \begin{table}[t]
   \caption{Current-basket backtest, 2021-01-05 to 2026-05-28 (1355 days), buy
-  and hold unless noted. Allocator baselines use the return matrix only. Not
-  point-in-time; see limitations.}
+  and hold unless noted. Allocator baselines use the return matrix only; this
+  is a current-basket calibration, not a point-in-time stock-selection test.}
   \label{tab:backtest}
   \begin{tabular}{lrrr}
     \toprule
@@ -551,7 +425,6 @@ fundamentals-weighted strategy on risk-adjusted return.
 \end{table}
 
 
-\paragraph{Is the result robust?}
 A single full-sample comparison cannot separate structure from luck, so we probe
 the equal-versus-current result two ways over the same daily-return matrix, using
 fixed-weight (daily-rebalanced) portfolios for a clean Sharpe comparison. First,
@@ -562,14 +435,14 @@ of 21-day blocks, fixed seed) on the full-period Sharpe difference
 $\mathrm{Sharpe}(\text{equal})-\mathrm{Sharpe}(\text{current})$ gives a point
 estimate of $+0.076$ with a $95\%$ interval $[-0.008, +0.168]$ and
 $P(\text{equal better})=96\%$. The direction is robust; the magnitude is
-\emph{not} decisive at the $5\%$ level, the interval grazing zero. We therefore
-state the finding precisely: on this basket equal weighting is reliably at least
-as good as the tuned weighting, which is enough to support the methodological
-claim without overstating performance.
+\emph{not} decisive at the $5\%$ level, the interval grazing zero. The finding is
+therefore precise: on this basket, equal weighting is reliably at least as good
+as the tuned weighting, which supports the methodological claim without turning
+the paper into an alpha claim.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\columnwidth]{figures/robustness.png}
+  \input{figures/robustness.tikz}
   \caption{Rolling one-year excess Sharpe of equal over current weighting. The
   difference is positive in $47$ of $53$ windows; the negative band is a single
   2024--2025 stretch.}
@@ -581,98 +454,56 @@ claim without overstating performance.
 
 \section{Discussion}
 
-\paragraph{Principal contribution.}
-The contribution is a way to evaluate investment advice: an audit protocol that
-scores any advisor on validity, stability, and agreement against a deterministic,
-replayable baseline, and the finding that these axes are independent so an
-agreement- or return-only score is misleading (Section~\ref{sec:audit}). The
-baseline earns the role of yardstick by being provably reproducible---its fee is
-subadditive and its order floor is a closed-form fixed point
-(Equations~(\ref{eq:fee})--(\ref{eq:min}))---not by claiming to beat the market.
-This is a performance-free, falsifiable basis for asking when learned advice
-actually helps.
+The contribution is a testable way to evaluate investment advice. The protocol
+scores any advisor on validity, stability, and agreement against a deterministic
+baseline, and the frozen controls show that these axes are independent. A
+recommendation can match the baseline and repeat across runs while still being
+invalid. A return-only or overlap-only benchmark misses that failure.
 
-\paragraph{Takeaways and a useful negative result.}
-First, in fee-quantized markets, diversification is not free; the right default
-is to diversify only when fee-neutral. Second, the cost guardrail is derivable,
-not tunable. Third---the result we did not expect---the fundamentals-weighted
-basket ranks third of five on risk-adjusted return, behind both equal weighting
-and risk parity, two allocators that consume no fundamental data. This is
-consistent with $1/N$ diversification being hard to beat \cite{demiguel2009naive}.
-Selection appears to matter more than weighting here; we would rather report this
-than hide it. The result also clarifies where the contribution does \emph{not}
-lie: not in outperforming standard allocators, but in making each deployment
-decision cheap, bounded, and auditable.
+The protocol also separates idea generation from portfolio verification. A
+learned advisor may propose plausible tickers; the portfolio layer decides
+whether each candidate is admissible for a particular portfolio. In
+computer-science terms, the advisor is a candidate generator and the baseline is
+a deterministic verifier. The controlled addition experiment makes the point
+concrete: the isolated quality rank selects a 90-point Platforms candidate, but
+the portfolio-fit layer selects an 84-point Industrial candidate because the
+Platforms addition would raise theme exposure from 23.0\% to 30.7\%, while the
+Industrial addition creates a new 10.0\% theme exposure.
 
-\paragraph{Serendipity of measurement.}
-Each finding came from instrumenting a deterministic engine rather than from a
-prior hypothesis. The fee defect was invisible in code review and obvious in a
-parameter sweep. The audit's central finding was the same kind of surprise: a
-control built only to ``agree with the policy'' reached agreement 1.0 and
-stability 1.0 yet was invalid, which is what convinced us that agreement-only
-evaluation---common in LLM-advice studies---hides operational failure.
-Reproducibility was not a compliance checkbox but the instrument that produced
-the science.
+The empirical calibration sharpens the claim. In fee-quantized markets,
+diversification has an implementation cost, and the planner should diversify
+only when the split is fee-neutral. The fundamentals-weighted basket beats the
+market benchmark but ranks third of five on risk-adjusted return, behind equal
+weighting and risk parity. That result is consistent with $1/N$ diversification
+being hard to beat \cite{demiguel2009naive}. The payoff is not a new alpha
+factor; it is a replayable boundary between generated advice and executable
+portfolio action.
 
-\section{Limitations}
+\section{Scope}
+\label{sec:scope}
 
-The audit protocol is demonstrated on deterministic archetype controls, not on
-live language-model outputs; the controls establish that the three axes
-discriminate, but a study of real advisors is required to draw conclusions about
-any specific model, and is the immediate next step. The backtest is a
-current-basket study on free adjusted closes; it is subject to survivorship and
-selection bias and is \emph{not} a point-in-time stock-selection backtest. The
-ablation uses deterministic synthetic fundamentals and demonstrates mechanism,
-not performance claims. The cost model is the
-fixed per-order tranche fee only: it omits bid-ask spreads, slippage,
-integer-lot constraints, and taxes, and it applies where brokers charge such a
-fee (common for international or non-US-equity access) rather than under
-zero-commission US-equity trading. The guardrail generalizes to any fee with a
-fixed per-order component, but the specific \$250 floor is a function of the
-$(c,\tau)$ pair. We probe the weighting result with rolling windows and a block
-bootstrap, but on a single basket; out-of-sample point-in-time evaluation, richer
-cost models, and \emph{cross-universe} robustness over independent baskets remain
-future work. The system is not a registered
-investment adviser, broker-dealer, or execution system; commercial use requires
-legal, compliance, data-licensing, and suitability review.
-
-\section{The Audit Protocol's Decision Space}
-\label{sec:decision-space}
-
-The independence of the three axes (valid, agree, stab) creates an operational
-decision space where an AI advisor's output can be characterized precisely. Each
-axis is measured over frozen scenarios with deterministic controls, producing a
-point $(v,a,s)\in[0,1]^3$.
-
-The discovery that independence holds has two implications. First, practitioners
-and regulators can no longer rely on a single metric (e.g., agreement via overlap@k,
-which several LLM-advice papers report). Second, the protocol can be calibrated
-around a safety threshold---e.g., $v > \tau_v$ (regulatory guardrail), $s >
-\tau_s$ (operational stability floor)---which a real advisor either crosses or does
-not. This turns evaluation from a ranking into a compliance gate.
-
-The existing baseline (deterministic policy) occupies $(1,1,1)$, the corner with
-validity 1.0, agreement 1.0, and stability 1.0. The archetype controls form a
-polytope around it: naive diversifier at $(0,1,1)$, valid-but-disagreeing at
-$(1,0,1)$, and drifting advisor at $(1,0.4,0.07)$. Real advisors will land
-inside or outside this convex hull. A robustness evaluation should measure all
-three; a compliance regime should set thresholds and audit membership.
-The auditor is thus simultaneously a research tool (showing what can fail in each
-dimension) and a deployment gate (showing what threshold an advisor must clear).
+The artifact evaluates process quality: advice must be executable, repeatable,
+grounded in the frozen scenario, and compatible with portfolio constraints
+before its performance can be interpreted. The advisor study uses deterministic
+archetype controls; real language-model outputs can be dropped into the same
+frozen scenarios without changing the metrics. The backtest is a current-basket
+calibration using free adjusted closes, not a point-in-time stock-selection
+test. The cost model covers fixed per-order tranche fees rather than spreads,
+taxes, slippage, or integer-lot constraints. This boundary is deliberate: it
+makes the artifact reproducible and keeps each reported claim auditable.
 
 \section{Conclusion}
 
-As language models enter investment advice, the field needs a way to ask whether
-their advice is trustworthy that does not reduce to a noisy return or a
-misleading agreement score. We offered one: a deterministic, replayable baseline
-whose cost behavior is provable, and an audit protocol that scores any advisor on
-validity, stability, and agreement at once. The protocol's own finding---that
-these axes are independent, so agreement alone certifies nothing---is the kind of
-hidden failure a benchmark exists to expose. The baseline is deliberately
-self-critical: equal weighting matches it, so it makes no performance claim and
-serves purely as the transparent reference a learned advisor must be measured
-against. Dropping real models into the frozen scenarios is the natural next study,
-and the artifact is built to receive them without changing the rules.
+Investment-advice systems need a benchmark that tests the recommendation before
+celebrating the return. This paper provides that benchmark: a deterministic,
+replayable baseline and an audit protocol that measures validity, stability, and
+agreement separately. The protocol exposes a failure hidden by overlap metrics:
+an advisor can agree with the baseline and remain stable while still producing
+an invalid recommendation. The portfolio-fit experiment adds the operational
+layer that ranking alone misses: a better-scoring asset can be the worse
+portfolio action. The result is a reproducible benchmark for investment-advice
+systems, with frozen inputs, executable guardrails, and metrics that real
+language-model advisors can be evaluated against without changing the rules.
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{references}

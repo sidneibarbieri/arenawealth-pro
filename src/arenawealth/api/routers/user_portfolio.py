@@ -155,6 +155,10 @@ class ReviewAdditionResponse(BaseModel):
     name: str
     theme: str
     composite_score: float
+    portfolio_fit_score: float
+    current_theme_weight_pct: float
+    projected_theme_weight_pct: float
+    structural_role: str
     reason: str
 
 
@@ -626,6 +630,10 @@ def review_to_response(review: PortfolioReview) -> PortfolioReviewResponse:
                 name=item.name,
                 theme=item.theme,
                 composite_score=item.composite_score,
+                portfolio_fit_score=item.portfolio_fit_score,
+                current_theme_weight_pct=item.current_theme_weight_pct,
+                projected_theme_weight_pct=item.projected_theme_weight_pct,
+                structural_role=item.structural_role,
                 reason=item.reason,
             )
             for item in review.add_candidates
@@ -814,4 +822,3 @@ async def portfolio_health_check() -> dict[str, Any]:
         "position_count": snapshot.summary.position_count,
         "last_updated": snapshot.last_updated,
     }
-

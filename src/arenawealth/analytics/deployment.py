@@ -6,10 +6,9 @@ This module implements a fee-optimal cash allocation strategy that respects:
 3. Theme diversification: top two picks are from distinct themes.
 4. Determinism: ties broken by ticker for reproducible ordering.
 
-The key insight is Proposition "Sub-tranche fee-worsening": naive proportional
-splits in the range [$625, $1000] incur an extra tranche fee. The fix ensures
-diversification only when fee-neutral, keeping the planner on the optimal
-frontier everywhere it deploys (see CORRECTIONS.md).
+The key fee invariant is sub-tranche fee-worsening: naive proportional splits in
+the range [$625, $1000] incur an extra tranche fee. The fix diversifies only
+when the split is fee-neutral.
 """
 
 from __future__ import annotations
@@ -175,9 +174,9 @@ def is_split_fee_neutral(
 ) -> bool:
     """Check if a multi-order split incurs the same total fee as consolidation.
 
-    By Proposition k-way fee-neutrality, a split is fee-neutral iff the sum
-    of tranche counts equals the single-order tranche count. Splits are only
-    viable when fee-neutral; otherwise, consolidation is cost-efficient.
+    A split is fee-neutral iff the sum of tranche fees equals the single-order
+    fee. Splits are only viable when fee-neutral; otherwise, consolidation is
+    cost-efficient.
 
     Args:
         split_orders: Multi-order split.

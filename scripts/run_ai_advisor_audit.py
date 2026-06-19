@@ -17,11 +17,6 @@ from pathlib import Path
 from statistics import mean
 from typing import Any
 
-import matplotlib
-
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-
 from arenawealth.experiments.ai_advisor import (
     AdvisorRecommendation,
     AdvisorRunSetReport,
@@ -32,17 +27,8 @@ from arenawealth.experiments.ai_advisor import (
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_SCENARIOS = ROOT / "paper" / "data" / "ai_advisor_scenarios.json"
 REFERENCE_OUTPUT = ROOT / "paper" / "data" / "ai_advisor_audit_reference.json"
-FIGURE_OUTPUT = ROOT / "paper" / "figures" / "ai_advisor_audit.png"
 TIKZ_OUTPUT = ROOT / "paper" / "figures" / "ai_advisor_audit.tikz"
 EXPORT_DIR = ROOT / "exports"
-
-CARBON = "#11161c"
-GOLD = "#f5c84c"
-BLUE = "#3ba4ff"
-SUCCESS = "#00c78a"
-MUTED = "#6b6b61"
-PAPER = "#f7f6f2"
-RED = "#a33a3a"
 
 
 def load_suite(path: Path) -> dict[str, Any]:
@@ -194,39 +180,6 @@ def write_markdown(summary: dict[str, Any], path: Path) -> None:
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def figure_advisor_audit(summary: dict[str, Any], path: Path) -> None:
-    labels = sorted(summary["by_advisor"], key=advisor_sort_key)
-    valid = [summary["by_advisor"][label]["mean_valid_rate"] for label in labels]
-    jaccard = [summary["by_advisor"][label]["mean_policy_jaccard"] for label in labels]
-    stable = [summary["by_advisor"][label]["mean_stability"] for label in labels]
-    x_positions = range(len(labels))
-    width = 0.24
-
-    fig, axis = plt.subplots(figsize=(9.5, 3.8), dpi=150)
-    fig.patch.set_facecolor("white")
-    axis.set_facecolor(PAPER)
-    axis.bar([x - width for x in x_positions], valid, width, color=SUCCESS, label="Valid")
-    axis.bar(x_positions, jaccard, width, color=GOLD, label="Policy agreement")
-    axis.bar([x + width for x in x_positions], stable, width, color=BLUE, label="Stability")
-    axis.set_ylim(0, 1.05)
-    axis.set_ylabel("Score")
-    axis.set_title(
-        "Deterministic audit exposes advisor failure modes",
-        color=CARBON,
-        fontweight="bold",
-    )
-    axis.set_xticks(list(x_positions))
-    axis.set_xticklabels([display_label(label) for label in labels], fontsize=8)
-    axis.legend(frameon=False, ncols=3, loc="upper right")
-    axis.grid(True, axis="y", color="#d8d6cd", linewidth=0.5)
-    for spine in ("top", "right"):
-        axis.spines[spine].set_visible(False)
-    axis.tick_params(colors=MUTED)
-    fig.tight_layout()
-    fig.savefig(path, facecolor="white")
-    plt.close(fig)
-
-
 def write_advisor_audit_tikz(summary: dict[str, Any], path: Path) -> None:
     labels = sorted(summary["by_advisor"], key=advisor_sort_key)
     rows = [
@@ -258,7 +211,7 @@ def write_advisor_audit_tikz(summary: dict[str, Any], path: Path) -> None:
 \begin{{axis}}[
   ybar,
   width=\columnwidth,
-  height=0.42\columnwidth,
+  height=0.46\columnwidth,
   ymin=0,
   ymax=1.05,
   bar width=2.6pt,
@@ -272,7 +225,8 @@ def write_advisor_audit_tikz(summary: dict[str, Any], path: Path) -> None:
   grid style={{draw=black!12}},
   axis line style={{draw=black!45}},
   tick style={{draw=black!45}},
-  legend style={{draw=none, fill=none, font=\scriptsize, at={{(0.98,0.98)}}, anchor=north east}},
+  legend style={{draw=none, fill=white, fill opacity=0.85, text opacity=1,
+    font=\scriptsize, at={{(0.98,0.98)}}, anchor=north east}},
   legend columns=3,
 ]
 \addplot+[draw=none, fill=arenaGreen] coordinates {{{coordinates["valid"]}}};
@@ -318,7 +272,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", type=Path)
     parser.add_argument("--reference", action="store_true")
     parser.add_argument("--markdown", type=Path)
-    parser.add_argument("--figure", type=Path, default=FIGURE_OUTPUT)
     parser.add_argument("--tikz", type=Path, default=TIKZ_OUTPUT)
     return parser.parse_args()
 
@@ -336,8 +289,6 @@ def main() -> None:
         REFERENCE_OUTPUT.write_text(json.dumps(summary, indent=2), encoding="utf-8")
     markdown = args.markdown or output.with_suffix(".md")
     write_markdown(summary, markdown)
-    args.figure.parent.mkdir(parents=True, exist_ok=True)
-    figure_advisor_audit(summary, args.figure)
     args.tikz.parent.mkdir(parents=True, exist_ok=True)
     write_advisor_audit_tikz(summary, args.tikz)
     print(
@@ -348,7 +299,6 @@ def main() -> None:
     )
     print(f"Wrote {output}")
     print(f"Wrote {markdown}")
-    print(f"Wrote {args.figure}")
     print(f"Wrote {args.tikz}")
 
 

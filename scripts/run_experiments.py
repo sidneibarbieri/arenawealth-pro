@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Run the exploratory experiment suite and emit figures + JSON.
+"""Run the exploratory experiment suite and emit TikZ figures plus JSON.
 
 This driver is deterministic and offline. It sweeps the production scoring and
 deployment engines, reuses the most recent real price-backtest export when one
 is present, and writes:
 
-  - paper/figures/*.png   figures for the paper
+  - paper/figures/*.tikz   figures for the paper
   - exports/experiments_<stamp>.json   the numeric findings
 
 Usage:
@@ -19,11 +19,6 @@ import json
 from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
-
-import matplotlib
-
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 
 from arenawealth.analytics.fundamentals import DemoFundamentalsProvider
 from arenawealth.analytics.models import Holding
@@ -45,6 +40,7 @@ from arenawealth.experiments.fee_sensitivity import (
     reference_schedules,
     schedule_floors,
 )
+from arenawealth.experiments.portfolio_fit import controlled_portfolio_fit_experiment
 from arenawealth.experiments.robustness import (
     block_bootstrap_sharpe_diff,
     equal_weights,
@@ -81,16 +77,6 @@ def current_weights_from_seed(path: Path) -> dict[str, float]:
             weights[ticker] = float(row["shares"]) * float(row["current_price"])
     return weights
 
-# Arena palette
-CARBON = "#11161c"
-GOLD = "#f5c84c"
-BLUE = "#3ba4ff"
-SUCCESS = "#00c78a"
-MUTED = "#6b6b61"
-PAPER = "#f7f6f2"
-RED = "#a33a3a"
-
-
 def load_holdings(path: Path) -> tuple[Holding, ...]:
     with path.open(encoding="utf-8") as handle:
         rows = list(csv.DictReader(handle))
@@ -122,124 +108,152 @@ def latest_backtest_export() -> dict | None:
     return None
 
 
-def _style_axes(ax) -> None:
-    ax.set_facecolor(PAPER)
-    for spine in ("top", "right"):
-        ax.spines[spine].set_visible(False)
-    ax.tick_params(colors=MUTED)
-    ax.grid(True, color="#d8d6cd", linewidth=0.5, axis="y")
+def _tikz_number(value: float) -> str:
+    return f"{value:.4f}".rstrip("0").rstrip(".")
 
 
-def figure_fee_premium(landscape, path: Path) -> None:
+def _tikz_coordinates(points: list[tuple[float, float]]) -> str:
+    return " ".join(f"({_tikz_number(x)},{_tikz_number(y)})" for x, y in points)
+
+
+def _write_tikz(path: Path, body: str) -> None:
+    path.write_text(body.strip() + "\n", encoding="utf-8")
+
+
+def _axis_style(extra: str = "") -> str:
+    return f"""
+  width=\\columnwidth,
+  height=0.46\\columnwidth,
+  axis line style={{draw=black!45}},
+  tick style={{draw=black!45}},
+  tick label style={{font=\\scriptsize}},
+  label style={{font=\\scriptsize}},
+  legend style={{draw=none, fill=white, fill opacity=0.85, text opacity=1, font=\\scriptsize}},
+  ymajorgrids=true,
+  grid style={{draw=black!12}},
+  {extra}
+""".strip()
+
+
+def figure_fee_premium_tikz(landscape, path: Path) -> None:
     # Premium is only defined where the engine actually deploys (cash >= floor).
     deployed = [p for p in landscape if p.cash >= 250]
-    cash = [p.cash for p in deployed]
-    naive = [p.proportional_premium for p in deployed]
-    engine = [p.engine_premium for p in deployed]
-    fig, ax = plt.subplots(figsize=(7, 3.6), dpi=150)
-    fig.patch.set_facecolor("white")
-    ax.plot(cash, naive, color=RED, linewidth=2, label="Naive proportional split")
-    ax.plot(cash, engine, color=SUCCESS, linewidth=2, label="Fee-aware planner")
-    ax.fill_between(cash, naive, engine, color=GOLD, alpha=0.15)
-    ax.set_xlabel("Cash to deploy (USD)")
-    ax.set_ylabel("Diversification fee premium (USD)")
-    ax.set_title("Subadditive fees penalize naive splitting", color=CARBON, fontweight="bold")
-    ax.legend(frameon=False)
-    _style_axes(ax)
-    fig.tight_layout()
-    fig.savefig(path, facecolor="white")
-    plt.close(fig)
-
-
-def figure_guardrail(landscape, fixed_point: float, path: Path) -> None:
-    pts = [p for p in landscape if p.cash > 0]
-    cash = [p.cash for p in pts]
-    fee_pct = [p.engine_fee_pct for p in pts]
-    fig, ax = plt.subplots(figsize=(7, 3.6), dpi=150)
-    fig.patch.set_facecolor("white")
-    ax.plot(cash, fee_pct, color=BLUE, linewidth=2, label="Engine fee as % of cash")
-    ax.axhline(1.0, color=RED, linestyle="--", linewidth=1, label="1% tolerance")
-    ax.axvline(
-        fixed_point,
-        color=GOLD,
-        linestyle=":",
-        linewidth=1.5,
-        label=f"Guardrail fixed point ${fixed_point:.0f}",
+    naive_points = [(p.cash, p.proportional_premium) for p in deployed]
+    engine_points = [(p.cash, p.engine_premium) for p in deployed]
+    axis_style = _axis_style(
+        "xmin=250, xmax=5000, ymin=0, ymax=3.0, "
+        "xlabel={Cash to deploy (USD)}, ylabel={Premium (USD)}, "
+        "legend pos=north east"
     )
-    ax.set_xlabel("Cash to deploy (USD)")
-    ax.set_ylabel("Fee impact (%)")
-    ax.set_title("The $250 guardrail is the 1% fee fixed point", color=CARBON, fontweight="bold")
-    ax.set_ylim(0, 1.5)
-    ax.legend(frameon=False)
-    _style_axes(ax)
-    fig.tight_layout()
-    fig.savefig(path, facecolor="white")
-    plt.close(fig)
+    naive_coordinates = _tikz_coordinates(naive_points)
+    engine_coordinates = _tikz_coordinates(engine_points)
+    _write_tikz(
+        path,
+        rf"""
+\begin{{tikzpicture}}
+\begin{{axis}}[
+  {axis_style}
+]
+\addplot+[mark=none, very thick, color=red!70!black] coordinates {{{naive_coordinates}}};
+\addlegendentry{{Naive proportional split}}
+\addplot+[mark=none, very thick, color=arenaGreen] coordinates {{{engine_coordinates}}};
+\addlegendentry{{Fee-aware planner}}
+\end{{axis}}
+\end{{tikzpicture}}
+""",
+    )
 
 
-def figure_robustness(
+def rolling_excess_sharpe_points(
     asset_returns: dict[str, tuple[float, ...]],
     weights_equal: dict[str, float],
     weights_current: dict[str, float],
-    path: Path,
     window: int = 252,
     step: int = 21,
-) -> None:
-    """Rolling 1-year excess Sharpe of equal weighting over current weighting."""
+) -> list[tuple[int, float]]:
     returns_equal = fixed_weight_returns(asset_returns, weights_equal)
     returns_current = fixed_weight_returns(asset_returns, weights_current)
     length = len(returns_equal)
     starts = list(range(0, length - window + 1, step))
-    excess = [
-        sharpe_ratio(returns_equal[start : start + window], 252.0)
-        - sharpe_ratio(returns_current[start : start + window], 252.0)
-        for start in starts
-    ]
-    window_index = list(range(1, len(excess) + 1))
-    positive = sum(1 for value in excess if value > 0)
-    fig, ax = plt.subplots(figsize=(7, 3.6), dpi=150)
-    fig.patch.set_facecolor("white")
-    colors = [SUCCESS if value > 0 else RED for value in excess]
-    ax.bar(window_index, excess, color=colors)
-    ax.axhline(0.0, color=CARBON, linewidth=1)
-    ax.set_xlabel("Rolling 1-year window (monthly step)")
-    ax.set_ylabel("Sharpe(equal) - Sharpe(current)")
-    ax.set_title(
-        f"Equal weighting wins {positive}/{len(excess)} rolling windows",
-        color=CARBON,
-        fontweight="bold",
-    )
-    _style_axes(ax)
-    fig.tight_layout()
-    fig.savefig(path, facecolor="white")
-    plt.close(fig)
-
-
-def figure_ablation(ablation_rows, path: Path) -> None:
-    labels = [row.label.replace("_", "\n") for row in ablation_rows]
-    spearman = [row.spearman_vs_baseline for row in ablation_rows]
-    colors = [GOLD if row.label.startswith("baseline") else BLUE for row in ablation_rows]
-    fig, ax = plt.subplots(figsize=(7, 3.6), dpi=150)
-    fig.patch.set_facecolor("white")
-    bars = ax.bar(labels, spearman, color=colors)
-    for bar, row in zip(bars, ablation_rows, strict=True):
-        height = bar.get_height()
-        offset = 0.03 if height >= 0 else -0.08
-        ax.text(
-            bar.get_x() + bar.get_width() / 2,
-            height + offset,
-            f"churn {row.top_k_churn}",
-            ha="center",
-            fontsize=8,
-            color=MUTED,
+    return [
+        (
+            window_number,
+            sharpe_ratio(returns_equal[start : start + window], 252.0)
+            - sharpe_ratio(returns_current[start : start + window], 252.0),
         )
-    ax.set_ylabel("Spearman rank corr. vs baseline")
-    ax.set_title("How each factor reshapes the ranking", color=CARBON, fontweight="bold")
-    ax.set_ylim(min(0, min(spearman)) - 0.1, 1.1)
-    _style_axes(ax)
-    fig.tight_layout()
-    fig.savefig(path, facecolor="white")
-    plt.close(fig)
+        for window_number, start in enumerate(starts, start=1)
+    ]
+
+
+def figure_robustness_tikz(
+    asset_returns: dict[str, tuple[float, ...]],
+    weights_equal: dict[str, float],
+    weights_current: dict[str, float],
+    path: Path,
+) -> None:
+    """Rolling 1-year excess Sharpe of equal weighting over current weighting."""
+    points = rolling_excess_sharpe_points(asset_returns, weights_equal, weights_current)
+    positive_points = [(index, value) for index, value in points if value > 0]
+    negative_points = [(index, value) for index, value in points if value <= 0]
+    axis_style = _axis_style(
+        "ybar, bar width=2.2pt, xmin=0, xmax=54, ymin=-0.35, ymax=0.55, "
+        "xlabel={Rolling 1-year window}, ylabel={Sharpe difference}, "
+        "xtick={1,10,20,30,40,50}, legend pos=south west"
+    )
+    _write_tikz(
+        path,
+        rf"""
+\begin{{tikzpicture}}
+\begin{{axis}}[
+  {axis_style}
+]
+\addplot+[draw=none, fill=arenaGreen] coordinates {{{_tikz_coordinates(positive_points)}}};
+\addlegendentry{{Equal higher}}
+\addplot+[draw=none, fill=red!70!black] coordinates {{{_tikz_coordinates(negative_points)}}};
+\addlegendentry{{Current higher}}
+\addplot+[mark=none, black!70] coordinates {{(0,0) (54,0)}};
+\end{{axis}}
+\end{{tikzpicture}}
+""",
+    )
+
+
+def figure_ablation_tikz(ablation_rows, path: Path) -> None:
+    coordinates = [
+        (index, row.spearman_vs_baseline)
+        for index, row in enumerate(ablation_rows, start=1)
+    ]
+    labels = ",".join(
+        {
+            "baseline_40_35_25": "baseline",
+            "moat_only": "moat",
+            "compounding_only": "comp.",
+            "valuation_only": "value",
+            "equal_thirds": "equal",
+        }.get(row.label, row.label.replace("_", " "))
+        for row in ablation_rows
+    )
+    axis_style = _axis_style(
+        f"ybar, bar width=8pt, xmin=0.4, xmax={len(ablation_rows) + 0.6}, "
+        "ymin=-0.65, ymax=1.1, ylabel={Spearman vs baseline}, "
+        f"xtick={{1,...,{len(ablation_rows)}}}, xticklabels={{{labels}}}, "
+        "xticklabel style={font=\\scriptsize, align=center}"
+    )
+    ablation_coordinates = _tikz_coordinates(coordinates)
+    zero_line_end = _tikz_number(len(ablation_rows) + 0.6)
+    _write_tikz(
+        path,
+        rf"""
+\begin{{tikzpicture}}
+\begin{{axis}}[
+  {axis_style}
+]
+\addplot+[draw=none, fill=arenaBlue] coordinates {{{ablation_coordinates}}};
+\addplot+[mark=none, black!70] coordinates {{(0.4,0) ({zero_line_end},0)}};
+\end{{axis}}
+\end{{tikzpicture}}
+""",
+    )
 
 
 def main() -> None:
@@ -283,15 +297,17 @@ def main() -> None:
             ),
         }
 
+    # Experiment G: isolated asset quality versus portfolio fit
+    portfolio_fit = controlled_portfolio_fit_experiment()
+
     # Figures. The sensitivity sweep and the backtest are reported in prose and
     # the backtest table; their data still feeds the JSON below, but a figure
     # would only restate the closed form and the table, so none is rendered.
-    figure_fee_premium(landscape, FIG_DIR / "fee_premium.png")
-    figure_guardrail(landscape, guardrail.one_percent_fixed_point, FIG_DIR / "guardrail.png")
-    figure_ablation(ablation_rows, FIG_DIR / "ablation.png")
+    figure_fee_premium_tikz(landscape, FIG_DIR / "fee_premium.tikz")
+    figure_ablation_tikz(ablation_rows, FIG_DIR / "ablation.tikz")
     if robustness is not None:
-        figure_robustness(
-            basket_returns, weights_equal, weights_current, FIG_DIR / "robustness.png"
+        figure_robustness_tikz(
+            basket_returns, weights_equal, weights_current, FIG_DIR / "robustness.tikz"
         )
 
     findings = {
@@ -325,6 +341,7 @@ def main() -> None:
             "sensitivity": [asdict(row) for row in sensitivity_rows],
             "top_k_stable": all(not row.top_k_changed for row in sensitivity_rows),
         },
+        "portfolio_fit": asdict(portfolio_fit),
         "backtest": _summarize_backtest(backtest),
     }
     out = EXPORT_DIR / f"experiments_{stamp}.json"
@@ -379,6 +396,13 @@ def _print_summary(findings: dict, out: Path) -> None:
         )
     print(
         f"  top-2 stable under +/-10% weight perturbation: {findings['ablation']['top_k_stable']}"
+    )
+    portfolio_fit = findings["portfolio_fit"]
+    print("== Portfolio fit ==")
+    print(
+        f"  isolated top={portfolio_fit['isolated_top']} "
+        f"portfolio-fit top={portfolio_fit['portfolio_fit_top']} "
+        f"changed={portfolio_fit['ranking_changed']}"
     )
     backtest = findings["backtest"]
     if backtest:

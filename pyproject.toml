@@ -30,7 +30,6 @@ dev = [
     "pytest-cov>=6.0",
     "ruff==0.15.18",  # pinned: lint results must be reproducible across installs
     "mypy>=1.15",
-    "matplotlib>=3.8",
 ]
 quant = [
     "cvxpy>=1.6",

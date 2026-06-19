@@ -11,10 +11,7 @@ from arenawealth.analytics.models import Holding, PositionAnalysis
 
 
 def test_kway_fee_neutrality_characterization():
-    """Proposition (k-way fee-neutrality): a split is fee-neutral iff the leg
-    tranche counts sum to the whole-budget tranche count, and the maximum number
-    of fee-neutral legs equals ceil(budget / T).
-    """
+    """A split is fee-neutral iff leg tranche counts match the whole budget."""
     fee_params = FeeParameters()
     budget = 2500.0
     whole_tranches = math.ceil(budget / fee_params.tranche_size_usd)  # 3
@@ -189,10 +186,7 @@ def test_planner_never_overpays_single_order_fee_across_grid():
 
 
 def test_fee_worsening_band_matches_closed_form():
-    """Proposition (sub-tranche fee-worsening): with score share rho, the planner
-    consolidates exactly on MIN/(1-rho) <= cash <= T, where a naive split would
-    overpay one tranche.
-    """
+    """With score share rho, the planner consolidates the overpay band."""
     # Scores 60/40 -> rho = 0.6; band lower edge = 250 / (1 - 0.6) = 625.
     positions = [
         make_position("A", 60.0, 10.0, "TA"),

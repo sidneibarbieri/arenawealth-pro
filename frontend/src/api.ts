@@ -98,6 +98,10 @@ export interface ReviewAddition {
   name: string;
   theme: string;
   composite_score: number;
+  portfolio_fit_score: number;
+  current_theme_weight_pct: number;
+  projected_theme_weight_pct: number;
+  structural_role: string;
   reason: string;
 }
 
@@ -271,4 +275,3 @@ export async function fetchAuditResults(signal: AbortSignal): Promise<AuditResul
   const response = await fetch('/api/v1/portfolio/audit-results', { signal });
   return parseJsonResponse<AuditResultsResponse>(response, 'Audit results');
 }
-

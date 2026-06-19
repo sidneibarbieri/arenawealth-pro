@@ -31,8 +31,9 @@ def position_analysis(
     composite_score: float,
     valuation_points: float = 60.0,
     weight_pct: float = 5.0,
+    theme: str = "Theme",
 ) -> PositionAnalysis:
-    holding = Holding(ticker, ticker, 1.0, 100.0, 100.0, "Theme", False)
+    holding = Holding(ticker, ticker, 1.0, 100.0, 100.0, theme, False)
     return PositionAnalysis(
         holding=holding,
         live_price=100.0,
@@ -63,11 +64,12 @@ def candidate_analysis(
     ticker: str,
     composite_score: float,
     valuation_points: float = 60.0,
+    theme: str = "Candidate Theme",
 ) -> CandidateAnalysis:
     return CandidateAnalysis(
         ticker=ticker,
         name=f"{ticker} Inc",
-        theme="Candidate Theme",
+        theme=theme,
         live_price=100.0,
         score=score(composite_score, valuation_points),
     )
@@ -81,7 +83,8 @@ def test_review_surfaces_additions_when_portfolio_is_below_target_range():
 
     assert review.additions_needed == 1
     assert [candidate.ticker for candidate in review.add_candidates] == ["CCC", "DDD"]
-    assert review.add_candidates[0].reason == "Portfolio is below the target range."
+    assert review.add_candidates[0].structural_role == "Diversifier"
+    assert review.add_candidates[0].reason.startswith("Portfolio is below the target range.")
 
 
 def test_review_flags_replacement_only_when_score_gap_and_valuation_clear():
@@ -111,3 +114,24 @@ def test_review_flags_overweight_lower_quality_positions_for_trim_watch():
     review = review_portfolio(held, [], target_min_positions=4, target_max_positions=6)
 
     assert [position.ticker for position in review.trim_watch] == ["HEAVY"]
+
+
+def test_review_scores_candidate_fit_against_theme_concentration():
+    held = [
+        position_analysis("AAA", 72.0, weight_pct=12.0, theme="Platforms"),
+        position_analysis("BBB", 70.0, weight_pct=11.0, theme="Platforms"),
+        position_analysis("CCC", 68.0, weight_pct=5.0, theme="Healthcare"),
+    ]
+    candidates = [
+        candidate_analysis("NEW", 82.0, theme="Industrial"),
+        candidate_analysis("MORE", 81.0, theme="Platforms"),
+    ]
+
+    review = review_portfolio(held, candidates, target_min_positions=3, target_max_positions=8)
+
+    diversifier = review.add_candidates[0]
+    concentrated = review.add_candidates[1]
+    assert diversifier.structural_role == "Diversifier"
+    assert diversifier.portfolio_fit_score > concentrated.portfolio_fit_score
+    assert concentrated.structural_role == "Concentration watch"
+    assert concentrated.projected_theme_weight_pct > 20.0

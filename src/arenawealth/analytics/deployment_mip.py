@@ -1,14 +1,8 @@
-"""Mixed Integer Programming solver for optimal cash deployment.
+"""Optional mixed-integer cash deployment planner.
 
-Implements the state-of-art improvement: replaces greedy heuristic with
-exact MIP optimization to maximize deployed cash while respecting all
-concentration, fee, and economic constraints.
-
-This module provides:
-- MIP formulation for multi-order deployment
-- Exact optimality guarantees
-- Deterministic, reproducible solutions
-- Detailed solver metadata and logs
+The default paper policy is the deterministic fee-aware planner in
+`deployment.py`. This module provides a solver-backed comparator for cash
+deployment under the same concentration, fee, and economic constraints.
 """
 
 import time
@@ -46,7 +40,7 @@ def plan_deployment_mip(
     solver_backend: str = "PULP_CBC_CMD",
     max_solve_time_seconds: int = 5,
 ) -> tuple[tuple[Order, ...], MIPDeploymentMetadata]:
-    """Solve optimal deployment using Mixed Integer Programming.
+    """Solve cash deployment with a mixed-integer formulation.
 
     Maximizes deployed cash subject to:
     - Theme concentration caps
@@ -64,7 +58,7 @@ def plan_deployment_mip(
 
     Returns:
         Tuple of (orders, solver_metadata).
-        Deterministic: same input → same output (independent of solver randomness).
+        Same inputs and solver settings should produce the same output.
     """
     if fee_params is None:
         fee_params = FeeParameters()
@@ -85,37 +79,35 @@ def plan_deployment_mip(
             ),
         )
 
-    # Build MIP problem
     prob = pulp.LpProblem("OptimalCashDeployment", pulp.LpMaximize)
 
-    # Decision variables
-    n = len(candidates)
+    candidate_count = len(candidates)
     allocations = [
-        pulp.LpVariable(f"alloc_{i}", lowBound=0, upBound=cash_usd)
-        for i in range(n)
+        pulp.LpVariable(f"alloc_{candidate_index}", lowBound=0, upBound=cash_usd)
+        for candidate_index in range(candidate_count)
     ]
-    is_ordered = [pulp.LpVariable(f"order_{i}", cat=pulp.LpBinary) for i in range(n)]
+    is_ordered = [
+        pulp.LpVariable(f"order_{candidate_index}", cat=pulp.LpBinary)
+        for candidate_index in range(candidate_count)
+    ]
 
-    # Objective: maximize deployed cash
     prob += pulp.lpSum(allocations)
-
-    # Constraint 1: Total allocation ≤ available cash
     prob += pulp.lpSum(allocations) <= cash_usd
 
-    # Constraint 2: If allocation > 0, then is_ordered = 1 (binary activation)
-    for i in range(n):
-        prob += allocations[i] <= cash_usd * is_ordered[i]
+    for candidate_index in range(candidate_count):
+        prob += allocations[candidate_index] <= cash_usd * is_ordered[candidate_index]
 
-    # Constraint 3: Minimum order size (if ordered)
-    for i in range(n):
-        prob += allocations[i] >= MIN_ORDER_AMOUNT * is_ordered[i]
+    for candidate_index in range(candidate_count):
+        prob += (
+            allocations[candidate_index]
+            >= MIN_ORDER_AMOUNT * is_ordered[candidate_index]
+        )
 
-    # Constraint 4: Theme concentration caps
     theme_totals = {}
-    for i, candidate in enumerate(candidates):
+    for candidate_index, candidate in enumerate(candidates):
         if candidate.holding.theme not in theme_totals:
             theme_totals[candidate.holding.theme] = 0
-        theme_totals[candidate.holding.theme] += allocations[i]
+        theme_totals[candidate.holding.theme] += allocations[candidate_index]
 
     portfolio_value = sum(c.market_value for c in candidates if c.market_value)
     theme_cap_fraction = concentration_limits.theme_concentration_cap_pct / 100
@@ -123,13 +115,12 @@ def plan_deployment_mip(
     for theme_total in theme_totals.values():
         prob += theme_total <= max_theme_exposure
 
-    # Constraint 5: Overweight limits (position can't grow > OVERWEIGHT_MULTIPLE)
-    for i, candidate in enumerate(candidates):
+    for candidate_index, candidate in enumerate(candidates):
         if candidate.market_value and candidate.market_value > 0:
             max_position_size = (
                 candidate.market_value * concentration_limits.overweight_multiple
             )
-            prob += allocations[i] <= max_position_size
+            prob += allocations[candidate_index] <= max_position_size
 
     # Solve. msg=0 silences solver output; getSolver forwards it to the backend,
     # which works uniformly across PuLP versions without signature inspection.
@@ -156,16 +147,15 @@ def plan_deployment_mip(
             ),
         )
 
-    # Extract solution
     orders = []
     deployed = 0.0
 
-    for i, candidate in enumerate(candidates):
-        alloc = pulp.value(allocations[i])
-        if alloc and alloc >= fee_params.min_order_amount_usd - 1e-6:
-            order = build_single_order(candidate, alloc, fee_params)
+    for candidate_index, candidate in enumerate(candidates):
+        allocation = pulp.value(allocations[candidate_index])
+        if allocation and allocation >= fee_params.min_order_amount_usd - 1e-6:
+            order = build_single_order(candidate, allocation, fee_params)
             orders.append(order)
-            deployed += alloc
+            deployed += allocation
 
     deployed_pct = 100 * deployed / cash_usd
     explanation = (
@@ -178,7 +168,7 @@ def plan_deployment_mip(
             solver_name=solver_backend,
             status=status_name,
             solve_time_seconds=solve_time,
-            gap_percent=None,  # At optimality, gap is 0
+            gap_percent=None,
             deployed_amount_usd=deployed,
             total_orders=len(orders),
             explanation=explanation,

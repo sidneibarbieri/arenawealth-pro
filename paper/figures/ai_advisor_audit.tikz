@@ -2,7 +2,7 @@
 \begin{axis}[
   ybar,
   width=\columnwidth,
-  height=0.42\columnwidth,
+  height=0.46\columnwidth,
   ymin=0,
   ymax=1.05,
   bar width=2.6pt,
@@ -16,7 +16,8 @@
   grid style={draw=black!12},
   axis line style={draw=black!45},
   tick style={draw=black!45},
-  legend style={draw=none, fill=none, font=\scriptsize, at={(0.98,0.98)}, anchor=north east},
+  legend style={draw=none, fill=white, fill opacity=0.85, text opacity=1,
+    font=\scriptsize, at={(0.98,0.98)}, anchor=north east},
   legend columns=3,
 ]
 \addplot+[draw=none, fill=arenaGreen] coordinates {(1,1.000) (2,1.000) (3,1.000) (4,0.000) (5,0.000) (6,0.000) (7,0.000)};

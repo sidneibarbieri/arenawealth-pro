@@ -127,7 +127,7 @@ breaking constraints, changing hidden assumptions, or losing replayability.
    `src/arenawealth/experiments/ai_advisor.py`. Frozen scenario support now
    lives in `paper/data/ai_advisor_scenarios.json`, with the reference audit in
    `paper/data/ai_advisor_audit_reference.json` and
-   `paper/figures/ai_advisor_audit.png`. This first version deliberately does
+   `paper/figures/ai_advisor_audit.tikz`. This first version deliberately does
    not call an LLM; it evaluates deterministic-policy outputs and synthetic
    failure-mode controls so model access can be optional and future model runs
    use the same measurement surface.

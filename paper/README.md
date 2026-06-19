@@ -9,7 +9,7 @@ Every figure and table is recreated offline from the production engine. Regenera
 them, then build the PDF:
 
 ```bash
-make experiments      # writes figures/*.png and exports/experiments_*.json
+make experiments      # writes figures/*.tikz and exports/experiments_*.json
 make paper            # latexmk -pdf main.tex
 ```
 

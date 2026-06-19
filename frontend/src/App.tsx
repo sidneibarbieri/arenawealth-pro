@@ -597,7 +597,7 @@ function App() {
                     {candidates.provider_mode === 'offline-demo'
                       ? 'Reviewer demo (synthetic)'
                       : 'Live data'}{' '}
-                    · {candidateRows.length} candidates · generated{' '}
+                    · {candidateRows.length} candidates · screened{' '}
                     {formatDateTime(candidates.generated_at)}
                   </span>
                 </div>
@@ -997,8 +997,8 @@ function PortfolioReviewPanel({ review }: PortfolioReviewPanelProps) {
           emptyLabel="No external candidate cleared the current screen."
           items={review.add_candidates.map((candidate) => ({
             key: candidate.ticker,
-            label: `${candidate.ticker} · ${formatNumber(candidate.composite_score)} pts`,
-            detail: candidate.theme,
+            label: `${candidate.ticker} · ${candidate.structural_role}`,
+            detail: `${formatNumber(candidate.portfolio_fit_score)} fit · ${candidate.theme} ${formatPercent(candidate.current_theme_weight_pct)} -> ${formatPercent(candidate.projected_theme_weight_pct)}`,
           }))}
         />
       </div>

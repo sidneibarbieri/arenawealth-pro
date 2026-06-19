@@ -17,7 +17,7 @@ Evidence:
 
 - `src/arenawealth/experiments/fee_landscape.py`
 - `scripts/run_experiments.py`
-- `paper/figures/fee_premium.png`
+- `paper/figures/fee_premium.tikz`
 - regression tests in `tests/unit/test_analytics_deployment.py`
 
 ### F2. The minimum order is a fixed point, not a tuned constant
@@ -29,7 +29,7 @@ too much to fixed fees.
 Evidence:
 
 - `MIN_ORDER_AMOUNT` in `src/arenawealth/analytics/deployment.py`
-- `paper/figures/guardrail.png`
+- `scripts/run_experiments.py` (`fee_sensitivity` JSON block)
 
 ### F3. The fundamentals-weighted basket ranks third of five against allocator baselines
 
@@ -63,7 +63,7 @@ because the ablation uses deterministic demo fundamentals.
 Evidence:
 
 - `src/arenawealth/experiments/ablation.py`
-- `paper/figures/ablation.png`
+- `paper/figures/ablation.tikz`
 
 ### F5. The fixed-cost guardrail is the small-cash analogue of the no-trade region
 
@@ -171,7 +171,7 @@ Evidence:
 - `paper/main.tex` (Section: The Audit Protocol; Table + figure)
 - `paper/data/ai_advisor_scenarios.json`
 - `paper/data/ai_advisor_audit_reference.json`
-- `paper/figures/ai_advisor_audit.png`
+- `paper/figures/ai_advisor_audit.tikz`
 - `scripts/run_ai_advisor_audit.py`
 - tests in `tests/unit/test_ai_advisor_benchmark.py`
 
@@ -210,6 +210,30 @@ Evidence:
 - `paper/bibliography/PDF_INDEX.json` (30 local PDFs indexed)
 - `paper/bibliography/_order.txt` (only `kanuri2016moat.pdf` remains manual)
 - `scripts/collect_advisor_runs.py`
+
+### F13. A high-scoring asset can be portfolio-invalid
+
+The workbench now distinguishes candidate quality from portfolio fit. A candidate
+can score well on moat, compounding, and valuation while worsening concentration
+or adding fee-inefficient orders. The deterministic review layer estimates the
+structural role of each addition candidate (diversifier, theme reinforcement, or
+concentration watch), current theme exposure, projected starter exposure, and a
+portfolio-fit score. This operationalizes a stronger scientific framing: the AI
+or screener proposes candidate programs; the deterministic portfolio layer
+verifies whether they improve the current portfolio under explicit constraints.
+A controlled experiment now makes the failure mode concrete: the isolated rank
+selects a 90-point Platforms candidate, but portfolio fit selects an 84-point
+Industrial candidate because the Platforms addition would move theme exposure
+from 23.0% to 30.7%, above the 20% cap.
+
+Evidence:
+
+- `src/arenawealth/analytics/portfolio_review.py`
+- `src/arenawealth/experiments/portfolio_fit.py`
+- `scripts/run_experiments.py` (`portfolio_fit` JSON block)
+- `tests/unit/test_portfolio_review.py`
+- `tests/unit/test_portfolio_fit_experiment.py`
+- `frontend/src/App.tsx` (portfolio-fit display in the candidate screen)
 
 ## State-of-the-Art Reference Points
 

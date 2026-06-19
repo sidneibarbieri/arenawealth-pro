@@ -64,7 +64,6 @@ dependencies = [
 
 [package.optional-dependencies]
 dev = [
-    { name = "matplotlib" },
     { name = "mypy" },
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -84,7 +83,6 @@ requires-dist = [
     { name = "cvxpy", marker = "extra == 'quant'", specifier = ">=1.6" },
     { name = "fastapi", specifier = ">=0.115" },
     { name = "httpx", specifier = ">=0.28" },
-    { name = "matplotlib", marker = "extra == 'dev'", specifier = ">=3.8" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.15" },
     { name = "polars", specifier = ">=1.0" },
     { name = "psycopg2-binary", marker = "extra == 'postgres'", specifier = ">=2.9" },

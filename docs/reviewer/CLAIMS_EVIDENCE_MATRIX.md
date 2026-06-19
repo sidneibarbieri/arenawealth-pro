@@ -10,6 +10,7 @@
 | Data-source readiness is visible without exposing secrets. | `GET /api/v1/data-sources/health` and app Data Sources Health panel | Supported |
 | The artifact can run free price-history baselines and a rebalancing ablation. | `make price-backtest` | Supported for current-basket price history |
 | The artifact can audit frozen advisor outputs for validity, stability, and policy agreement. | `make ai-advisor-audit` | Supported for offline scenarios and synthetic failure-mode controls |
+| A high-scoring asset can be a poor addition to a specific portfolio. | `make experiments` and the `portfolio_fit` JSON block under `exports/` | Supported by controlled deterministic scenario |
 | SEC fundamentals can be filtered point-in-time by filing date. | `tests/unit/test_sec_facts.py` | Supported as a foundation |
 | The method beats market or advisor baselines. | Current-basket price history is available, but point-in-time selection backtests and factor-adjusted baselines are not complete. | Not supported |
 | The system is ready for regulated commercial advice. | Compliance, licensing, audit, and suitability workflows remain open. | Not supported |
