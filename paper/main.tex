@@ -212,10 +212,13 @@ asserted: a replay test feeds the same input tuple twice and checks that the
 orders, exclusions, and ranked candidates are byte-identical. This is the
 auditability guarantee a compliance reviewer needs: any past recommendation can
 be regenerated and diffed from its logged inputs. Determinism is engineered, not
-incidental: the engine draws no random numbers, ranking ties are broken by ticker
-so the order does not depend on input ordering, and the scoring and sizing
-arithmetic uses ordinary IEEE-754 doubles whose operations are reproducible
-across platforms for these magnitudes.
+incidental: the engine draws no random numbers, and ranking ties break by ticker
+so the order never depends on input ordering. The verdicts do not rest on fragile
+floating-point equality. Fees and the economic floor are integer tranche counts,
+validity and agreement are set memberships, and stability is a ratio of those
+sets, so a low-order bit difference across a math library or CPU cannot flip an
+audit outcome; the replay test pins byte-identical orders, exclusions, and
+rankings on the reference platform.
 
 The composite score is the bounded linear functional
 $s=w_m\,\mathrm{moat}+w_c\,\mathrm{comp}+w_v\,\mathrm{val}$, with sub-scores in
