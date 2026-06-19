@@ -121,11 +121,16 @@ profitability \cite{novyMarx2013}, the quality-minus-junk composite
 cross-section \cite{gu2020machine}; relatedly, firms with a durable competitive
 advantage, a wide economic moat, earn stronger long-run risk-adjusted returns
 \cite{kanuri2016moat}, which is why the baseline scores moat alongside quality
-and compounding. We treat selection as given and do not propose a new factor;
-our scoring reuses such signals only to rank an existing basket. This choice matters for scope. A stock-picking paper must show
-out-of-sample alpha against factor and machine-learning baselines. Our claim is
-orthogonal: the layer that audits \emph{whether advice can be executed}
-replayably and cheaply once a candidate set exists.
+and compounding. We treat selection as given and do not propose a new factor; our
+scoring reuses such established signals only to rank an existing basket. The
+choice of signals is not load-bearing: the audit accepts any deterministic policy
+as its yardstick, and we report that a parameter-free equal-weight allocator
+already matches ours, so substituting momentum, profitability, or low volatility
+would change the baseline without changing the protocol. This scoping matters. A
+stock-picking paper must show out-of-sample alpha against factor and
+machine-learning baselines; our claim is orthogonal, the layer that audits
+\emph{whether advice can be executed} replayably and cheaply once a candidate set
+exists.
 
 Classical theory shows that transaction costs induce a \emph{no-trade region}:
 proportional costs make the optimal policy a band around the target where one
