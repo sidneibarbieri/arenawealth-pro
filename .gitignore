@@ -87,6 +87,7 @@ archive/
 old_arenawealth-pro/
 project-framework/
 /.playwright-mcp/
+/.playwright-cli/
 portfolio-editor-*.png
 
 # Bibliography PDFs: copyrighted, large; track only the catalog and order list

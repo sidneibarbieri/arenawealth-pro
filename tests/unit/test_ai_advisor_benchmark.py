@@ -255,6 +255,12 @@ def test_scenario_bank_has_stable_size_categories_and_manifest() -> None:
     assert len(records) == 120
     assert len({record.scenario_id for record in records}) == 120
     assert manifest_sha256(records) == manifest_sha256(scenario_bank())
+    # Frozen reproducibility anchor: any drift in the bank changes this digest,
+    # so the manifest the paper cites stays checkable without trusting prose.
+    assert (
+        manifest_sha256(records)
+        == "3a9f7562eea88292c8d78996afc5cd1f8454194f6960bcc58626d4717c6a96c7"
+    )
     assert {record.category for record in records} >= {
         "new_cash_deployment",
         "subtranche_cash",
