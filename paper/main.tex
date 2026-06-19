@@ -29,24 +29,26 @@ Replayable Baseline}
 
 \begin{abstract}
 AI systems increasingly produce investment recommendations, yet the usual
-evaluations ask the wrong question. Realized return is noisy and easy to overfit;
-agreement with a reference portfolio can reward advice that cannot be executed.
-We instead treat advice as an operational object. We introduce a deterministic,
-replayable baseline and score any advisor on three axes that a single number
-conflates: validity under portfolio and fee constraints, stability across
-repeated runs, and agreement with the baseline.
+evaluations ask the wrong question. Realized return is noisy and easy to overfit,
+and agreement with a reference portfolio can reward advice that cannot be
+executed. We argue that an AI-generated recommendation should first be audited as
+an executable financial action, and only then judged on return. We make this
+concrete with a deterministic, replayable baseline and a protocol that scores any
+advisor on three properties a single number conflates: validity under portfolio
+and fee constraints, stability across repeated runs, and agreement with the
+baseline.
 
-On frozen scenarios these axes separate cleanly. One control agrees with the
-baseline and never drifts, yet is invalid because it wastes transaction fees;
-another is valid and stable while sharing nothing with the baseline. A cached
-nine-run model pilot shows the same failure mode in real output: perfect policy
-agreement can still hide an invalid cash split. The same verifier exposes
-portfolio-level validity, rejecting a higher-scoring asset when it worsens
-concentration. We make no alpha claim: the baseline is a transparent verifier
-whose cost guardrails follow from the fee schedule, whose decisions replay from
-frozen inputs, and whose current-basket backtest we report against equal-weight,
-risk-parity, minimum-variance, and market baselines. Every figure and table
-regenerates offline from the artifact.
+On frozen scenarios these properties separate cleanly, and agreement is the most
+misleading in isolation. One control agrees with the baseline and never drifts,
+yet wastes transaction fees and is therefore invalid. Another is valid and stable
+while sharing nothing with the baseline. A cached nine-run model pilot shows the
+same failure in real output, where perfect policy agreement still hides an
+invalid cash split. The same verifier exposes portfolio-level validity, rejecting
+a higher-scoring asset when it worsens concentration. We make no alpha claim. The
+baseline is a transparent verifier whose cost guardrails follow from the fee
+schedule, whose decisions replay from frozen inputs, and whose current-basket
+backtest we report against equal-weight, risk-parity, minimum-variance, and
+market baselines. Every figure and table regenerates offline from the artifact.
 \end{abstract}
 
 \begin{CCSXML}
@@ -96,12 +98,16 @@ replayable baseline} on three axes that a single number conflates: operational
 runs, and \emph{agreement} with the baseline. The baseline is a transparent
 quality, moat, and compounding policy whose recommendations are pure functions
 of their inputs, so any run can be replayed and diffed. Its trustworthiness as a
-yardstick rests on reproducibility, not on a claim to beat the market.
+yardstick rests on reproducibility, not on a claim to beat the market. More
+generally, we treat an AI advisor as a candidate generator whose output must
+satisfy an operational contract before its return means anything, and we use
+investment advice as the domain because that contract is explicit and
+machine-checkable.
 
 The paper makes three contributions. First, it defines an audit protocol for
 investment advice that measures validity, stability, and agreement separately,
-and shows why agreement alone is insufficient in both deterministic controls and
-a cached model pilot. Second, it provides the deterministic baseline that makes
+and shows that agreement with a reference can certify an operationally invalid
+action, in both deterministic controls and a cached model pilot. Second, it provides the deterministic baseline that makes
 the audit replayable: the fee model is subadditive, the minimum order follows
 directly from the cost tolerance, and the planner is regression-tested against
 those facts. Third, it calibrates the baseline against allocator baselines
