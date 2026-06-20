@@ -13,10 +13,9 @@
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
 \usetikzlibrary{arrows.meta,positioning,fit,backgrounds,calc}
-\definecolor{arenaGreen}{HTML}{228833}
-\definecolor{arenaGold}{HTML}{CCBB44}
+\definecolor{arenaGreen}{HTML}{3A8159}
 \definecolor{arenaBlue}{HTML}{4477AA}
-\definecolor{arenaRed}{HTML}{CC6677}
+\definecolor{arenaRed}{HTML}{BD5168}
 \definecolor{arenaGray}{HTML}{667085}
 \definecolor{arenaLight}{HTML}{F5F7FA}
 \definecolor{arenaInk}{HTML}{344054}
@@ -687,14 +686,24 @@ rather than an alpha claim.
   \end{tabular}
 \end{table}
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/robustness.pdf}
+  \caption{Rolling one-year excess Sharpe usually favors equal weighting.}
+  \Description{Bar chart of the rolling one-year Sharpe difference between equal
+  and current weighting across 53 windows, mostly positive with a short run of
+  negative bars near windows 41 to 45.}
+  \label{fig:robustness}
+\end{figure}
 
 A single full-sample comparison cannot separate structure from luck, so we probe
 the equal-versus-current result two ways over the same daily-return matrix, using
 fixed-weight (daily-rebalanced) portfolios for a clean Sharpe comparison. First,
 rolling one-year windows stepped monthly: equal weighting has the higher Sharpe in
-$47$ of $53$ windows ($89\%$; Figure~\ref{fig:robustness}), failing only in a
-single 2024--2025 stretch. Second, a circular block bootstrap ($2{,}000$ resamples
-of 21-day blocks, fixed seed) on the full-period Sharpe difference
+$47$ of $53$ windows ($89\%$; Figure~\ref{fig:robustness}). The six negative
+windows are confined to a single 2024--2025 stretch. Second, a circular block
+bootstrap ($2{,}000$ resamples of 21-day blocks, fixed seed) on the full-period
+Sharpe difference
 $\mathrm{Sharpe}(\text{equal})-\mathrm{Sharpe}(\text{current})$ gives a point
 estimate of $+0.076$ with a $95\%$ interval $[-0.008, +0.168]$ and
 $P(\text{equal better})=96\%$. The direction is robust; the magnitude is
@@ -702,18 +711,6 @@ $P(\text{equal better})=96\%$. The direction is robust; the magnitude is
 therefore precise: on this basket, equal weighting is reliably at least as good
 as the tuned weighting, which supports the methodological claim without turning
 the paper into an alpha claim.
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\columnwidth]{figures/robustness.pdf}
-  \caption{Rolling one-year excess Sharpe of equal over current weighting. The
-  difference is positive in $47$ of $53$ windows; the negative band is a single
-  2024--2025 stretch.}
-  \Description{Bar chart of the rolling one-year Sharpe difference between equal
-  and current weighting across 53 windows, mostly positive with a short run of
-  negative bars near windows 41 to 45.}
-  \label{fig:robustness}
-\end{figure}
 
 \section{Implications for AI-Finance Benchmarks}
 
