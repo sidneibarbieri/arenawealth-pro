@@ -652,16 +652,16 @@ solution and risk parity the Maillard fixed-point iteration. Reported estimation
 choices are deliberately plain, since the point is a fair reference, not a tuned
 competitor.
 
-The score-weighted basket beats the SPY benchmark by $+5.12$ pp CAGR and
-$+0.16$ Sharpe, but equal weighting is stronger ($22.8\%$ CAGR, $1.19$ Sharpe).
-The walk-forward risk-parity baseline nearly ties the tuned basket on Sharpe
-($1.11$ for both after rounding) while producing lower return; minimum variance
-buys the shallowest drawdown ($-21.7\%$) at a large return cost. Periodic
-rebalancing \emph{reduced} CAGR to $18.9\%$ from the $20.9\%$ buy-and-hold figure
-despite low explicit cost. The synthetic ablation and the real backtest point the
-same way: on this basket, selection matters more than a tuned fundamentals
-weighting scheme, and the paper's contribution is therefore the audit protocol
-rather than an alpha claim.
+The score-weighted basket beats the SPY benchmark by $+4.96$ pp CAGR and
+$+0.18$ Sharpe, but equal weighting is stronger ($22.8\%$ CAGR, $1.19$ Sharpe).
+The walk-forward risk-parity baseline comes close on Sharpe ($1.11$ versus
+$1.14$ after rounding) while producing lower return; minimum variance buys the
+shallowest drawdown ($-21.7\%$) at a large return cost. Periodic rebalancing
+\emph{reduced} CAGR to $18.8\%$ from the $20.7\%$ buy-and-hold figure despite
+low explicit cost. The synthetic ablation and the real backtest point the same
+way: on this basket, selection matters more than a tuned fundamentals weighting
+scheme, and the paper's contribution is therefore the audit protocol rather than
+an alpha claim.
 
 \begin{table}[t]
   \caption{Current-basket backtest, 2021-01-05 to 2026-06-04 (1360 days), buy
@@ -674,12 +674,12 @@ rather than an alpha claim.
     Strategy & CAGR & Sharpe & Max DD \\
     \midrule
     Equal weight & $22.8\%$ & $\mathbf{1.19}$ & $-27.1\%$ \\
-    Current weight (ours) & $20.9\%$ & $1.11$ & $-29.1\%$ \\
+    Current weight (ours) & $20.7\%$ & $1.14$ & $-26.8\%$ \\
     Risk parity & $18.8\%$ & $1.11$ & $-26.4\%$ \\
     Minimum variance & $14.1\%$ & $0.94$ & $\mathbf{-21.7\%}$ \\
     Benchmark (SPY) & $15.8\%$ & $0.95$ & $-24.5\%$ \\
     \midrule
-    Rebalanced current & $18.9\%$ & $1.06$ & $-30.0\%$ \\
+    Rebalanced current & $18.8\%$ & $1.09$ & $-28.0\%$ \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -687,10 +687,10 @@ rather than an alpha claim.
 \begin{figure}[t]
   \centering
   \includegraphics[width=\columnwidth]{figures/robustness.pdf}
-  \caption{Rolling one-year excess Sharpe usually favors equal weighting.}
+  \caption{Rolling one-year excess Sharpe often favors equal weighting.}
   \Description{Bar chart of the rolling one-year Sharpe difference between equal
-  and current weighting across 53 windows, mostly positive with a short run of
-  negative bars near windows 41 to 45.}
+  and current weighting across 53 windows, positive in most windows but with
+  several negative stretches.}
   \label{fig:robustness}
 \end{figure}
 
@@ -698,17 +698,18 @@ A single full-sample comparison cannot separate structure from luck, so we probe
 the equal-versus-current result two ways over the same daily-return matrix, using
 fixed-weight (daily-rebalanced) portfolios for a clean Sharpe comparison. First,
 rolling one-year windows stepped monthly: equal weighting has the higher Sharpe in
-$47$ of $53$ windows ($89\%$; Figure~\ref{fig:robustness}). The six negative
-windows are confined to a single 2024--2025 stretch. Second, a circular block
+$37$ of $53$ windows ($70\%$; Figure~\ref{fig:robustness}). The negative
+windows are concentrated in a few stretches rather than spread uniformly.
+Second, a circular block
 bootstrap ($2{,}000$ resamples of 21-day blocks, fixed seed) on the full-period
 Sharpe difference
 $\mathrm{Sharpe}(\text{equal})-\mathrm{Sharpe}(\text{current})$ gives a point
-estimate of $+0.076$ with a $95\%$ interval $[-0.008, +0.168]$ and
-$P(\text{equal better})=96\%$. The direction is robust; the magnitude is
-\emph{not} decisive at the $5\%$ level, the interval grazing zero. The finding is
-therefore precise: on this basket, equal weighting is reliably at least as good
-as the tuned weighting, which supports the methodological claim without turning
-the paper into an alpha claim.
+estimate of $+0.053$ with a $95\%$ interval $[-0.024, +0.127]$ and
+$P(\text{equal better})=91\%$. The direction favors equal weighting, but the
+magnitude is \emph{not} decisive at the $5\%$ level. The finding is therefore
+deliberately modest: on this basket, the tuned weighting does not dominate a
+simple equal-weight control, which supports the methodological claim without
+turning the paper into an alpha claim.
 
 \section{Implications for AI-Finance Benchmarks}
 

@@ -37,7 +37,7 @@ import { PortfolioEditor } from './components/PortfolioEditor';
 import { formatDateTime, formatMoney, formatNumber, formatPercent } from './format';
 import { type TableSort, useTableSort } from './useTableSort';
 
-const DEFAULT_CASH = 1511.18;
+const DEFAULT_CASH = 1500.0;
 
 function readInitialCash(): number {
   const cashParameter = new URLSearchParams(window.location.search).get('cash');

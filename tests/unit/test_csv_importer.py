@@ -24,12 +24,12 @@ class TestCsvImporter:
     def test_shares_precision_preserved(self) -> None:
         positions = import_csv(BROKER_CSV)
         lin = positions[0]
-        assert lin.shares == Decimal("34.47335")
+        assert lin.shares == Decimal("50.00000")
 
     def test_cost_basis_correct(self) -> None:
         positions = import_csv(BROKER_CSV)
         lin = positions[0]
-        assert lin.cost_basis_per_share == Decimal("431.36")
+        assert lin.cost_basis_per_share == Decimal("113.64")
 
     def test_all_tickers_present(self) -> None:
         positions = import_csv(BROKER_CSV)

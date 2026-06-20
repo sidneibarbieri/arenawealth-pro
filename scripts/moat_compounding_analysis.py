@@ -3,7 +3,7 @@
 Loads holdings from a CSV, fetches live fundamentals through the analytics
 package, scores each position, and prints a deterministic deployment plan.
 
-    python scripts/moat_compounding_analysis.py --cash 1511.18
+    python scripts/moat_compounding_analysis.py --cash 1500.00
 """
 
 from __future__ import annotations
@@ -156,7 +156,7 @@ def write_snapshot(
 
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Moat and compounding portfolio analysis.")
-    parser.add_argument("--cash", type=float, default=1511.18, help="Cash available to deploy.")
+    parser.add_argument("--cash", type=float, default=1500.00, help="Cash available to deploy.")
     parser.add_argument("--holdings", type=Path, default=HOLDINGS_CSV, help="Holdings CSV path.")
     parser.add_argument(
         "--offline-demo",

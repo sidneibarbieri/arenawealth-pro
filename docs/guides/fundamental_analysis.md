@@ -10,7 +10,7 @@ For reviewer runs without network access:
 
 ```bash
 python scripts/moat_compounding_analysis.py \
-  --cash 1511.18 \
+  --cash 1500.00 \
   --holdings tests/fixtures/seed_portfolio_broker.csv \
   --offline-demo
 ```

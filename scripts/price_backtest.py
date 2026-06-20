@@ -26,6 +26,7 @@ DEFAULT_FIXTURE = Path("tests/fixtures/seed_portfolio_broker.csv")
 DEFAULT_OUTPUT_DIR = Path("exports")
 RETURN_MATRIX_PATH = Path("paper/data/returns_matrix.csv")
 REFERENCE_BACKTEST_PATH = Path("paper/data/price_backtest_reference.json")
+FLOAT_DIGITS = 12
 
 
 def load_return_matrix(path: Path = RETURN_MATRIX_PATH) -> AlignedReturnSeries:
@@ -116,22 +117,37 @@ def result_to_payload(result: BacktestResult) -> dict[str, Any]:
     return {
         "periods": result.periods,
         "rebalances": result.rebalances,
-        "total_return": result.total_return,
-        "cagr": result.cagr,
-        "annualized_volatility": result.annualized_volatility,
-        "sharpe_ratio": result.sharpe_ratio,
-        "max_drawdown": result.max_drawdown,
-        "total_cost": result.total_cost,
+        "total_return": stable_float(result.total_return),
+        "cagr": stable_float(result.cagr),
+        "annualized_volatility": stable_float(result.annualized_volatility),
+        "sharpe_ratio": stable_float(result.sharpe_ratio),
+        "max_drawdown": stable_float(result.max_drawdown),
+        "total_cost": stable_float(result.total_cost),
     }
 
 
 def comparison_to_payload(comparison: BacktestComparison) -> dict[str, Any]:
     return {
-        "excess_total_return": comparison.excess_total_return,
-        "excess_cagr": comparison.excess_cagr,
-        "sharpe_delta": comparison.sharpe_delta,
-        "max_drawdown_delta": comparison.max_drawdown_delta,
+        "excess_total_return": stable_float(comparison.excess_total_return),
+        "excess_cagr": stable_float(comparison.excess_cagr),
+        "sharpe_delta": stable_float(comparison.sharpe_delta),
+        "max_drawdown_delta": stable_float(comparison.max_drawdown_delta),
     }
+
+
+def stable_float(value: float) -> float:
+    """Keep JSON byte-stable across tiny BLAS/Python float-repr differences."""
+    return round(float(value), FLOAT_DIGITS)
+
+
+def stable_payload(value: Any) -> Any:
+    if isinstance(value, float):
+        return stable_float(value)
+    if isinstance(value, dict):
+        return {key: stable_payload(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [stable_payload(item) for item in value]
+    return value
 
 
 def study_to_payload(study: PriceBacktestStudy, generated_utc: str) -> dict[str, Any]:
@@ -174,7 +190,7 @@ def study_to_payload(study: PriceBacktestStudy, generated_utc: str) -> dict[str,
             payload["sota_weights"] = study.sota_weights
         if study.sota_method is not None:
             payload["sota_method"] = study.sota_method
-    return payload
+    return stable_payload(payload)
 
 
 def report_to_payload(study: PriceBacktestStudy, generated_utc: str) -> dict[str, Any]:

@@ -12,9 +12,9 @@ def _lin_position() -> Position:
     return Position(
         ticker="LIN",
         name="Linde plc",
-        shares=Decimal("34.47335"),
-        cost_basis_per_share=Decimal("431.36"),
-        current_price=Decimal("504.40"),
+        shares=Decimal("50.00000"),
+        cost_basis_per_share=Decimal("113.64"),
+        current_price=Decimal("100.00"),
     )
 
 
@@ -22,32 +22,32 @@ def _nvo_position() -> Position:
     return Position(
         ticker="NVO",
         name="Novo Nordisk - ADR",
-        shares=Decimal("201.94608"),
-        cost_basis_per_share=Decimal("56.63"),
-        current_price=Decimal("44.46"),
+        shares=Decimal("50.72464"),
+        cost_basis_per_share=Decimal("123.21"),
+        current_price=Decimal("138.00"),
     )
 
 
 def _full_seed_portfolio() -> Portfolio:
     """All 17 positions from the seed fixture."""
     rows = [
-        ("LIN", "Linde plc", "34.47335", "431.36", "504.40"),
-        ("RELX", "RELX Plc - ADR", "510.60444", "40.44", "32.38"),
-        ("SPGI", "S&P Global Inc", "38.52429", "482.83", "402.79"),
-        ("EQIX", "Equinix Inc", "12.93555", "792.36", "1062.66"),
-        ("ASML", "ASML Holding NV - New York Shares", "8.42225", "772.82", "1520.18"),
-        ("ROP", "Roper Technologies Inc", "44.38372", "432.16", "324.29"),
-        ("MSFT", "Microsoft Corporation", "32.17279", "444.45", "428.13"),
-        ("GOOGL", "Alphabet Inc - Class A", "29.97738", "192.65", "396.86"),
-        ("TSM", "Taiwan Semiconductor Manufacturing - ADR", "24.86184", "217.79", "408.46"),
-        ("AVGO", "Broadcom Inc", "24.22126", "241.16", "427.82"),
-        ("PLD", "Prologis Inc", "60.99324", "110.45", "140.88"),
-        ("TDG", "Transdigm Group Incorporated", "7.26179", "1316.06", "1146.10"),
-        ("NVO", "Novo Nordisk - ADR", "201.94608", "56.63", "44.46"),
-        ("ISRG", "Intuitive Surgical Inc", "16.49494", "482.49", "425.74"),
-        ("UNH", "Unitedhealth Group Inc", "22.51219", "311.89", "392.72"),
-        ("JPM", "JPMorgan Chase & Co.", "21.97601", "261.24", "297.61"),
-        ("LLY", "Lilly(Eli) & Co", "6.0593", "747.26", "999.75"),
+        ("LIN", "Linde plc", "50.00000", "113.64", "100.00"),
+        ("RELX", "RELX Plc - ADR", "59.82906", "108.33", "117.00"),
+        ("SPGI", "S&P Global Inc", "33.58209", "141.05", "134.00"),
+        ("EQIX", "Equinix Inc", "47.68212", "132.46", "151.00"),
+        ("ASML", "ASML Holding NV - New York Shares", "23.80952", "204.88", "168.00"),
+        ("ROP", "Roper Technologies Inc", "69.60784", "96.23", "102.00"),
+        ("MSFT", "Microsoft Corporation", "36.97479", "127.96", "119.00"),
+        ("GOOGL", "Alphabet Inc - Class A", "36.76471", "124.77", "136.00"),
+        ("TSM", "Taiwan Semiconductor Manufacturing - ADR", "33.98693", "137.84", "153.00"),
+        ("AVGO", "Broadcom Inc", "27.05882", "177.08", "170.00"),
+        ("PLD", "Prologis Inc", "73.07692", "100.97", "104.00"),
+        ("TDG", "TransDigm Group Inc", "38.84298", "134.44", "121.00"),
+        ("NVO", "Novo Nordisk - ADR", "50.72464", "123.21", "138.00"),
+        ("ISRG", "Intuitive Surgical Inc", "33.54839", "164.89", "155.00"),
+        ("UNH", "UnitedHealth Group Inc", "38.95349", "163.81", "172.00"),
+        ("JPM", "JPMorgan Chase & Co", "69.81132", "99.07", "106.00"),
+        ("LLY", "Eli Lilly & Co", "35.77236", "135.16", "123.00"),
     ]
     positions = tuple(
         Position(
@@ -59,29 +59,29 @@ def _full_seed_portfolio() -> Portfolio:
         )
         for r in rows
     )
-    return Portfolio(positions=positions, cash_balance_amount=Decimal("190.05"))
+    return Portfolio(positions=positions, cash_balance_amount=Decimal("1500.00"))
 
 
 # -- Position tests ------------------------------------------------------------
 
 
 class TestPositionGainLoss:
-    def test_lin_positive_gain(self) -> None:
+    def test_lin_negative_gain(self) -> None:
         position = _lin_position()
-        assert position.market_value.amount == Decimal("34.47335") * Decimal("504.40")
-        assert position.gain_loss.amount > 0
+        assert position.market_value.amount == Decimal("50.00000") * Decimal("100.00")
+        assert position.gain_loss.amount < 0
 
     def test_lin_gain_pct_matches_seed_reference(self) -> None:
         position = _lin_position()
-        assert abs(position.gain_loss_pct - Decimal("16.93")) < Decimal("0.1")
+        assert abs(position.gain_loss_pct - Decimal("-12.00")) < Decimal("0.1")
 
-    def test_nvo_negative_gain(self) -> None:
+    def test_nvo_positive_gain(self) -> None:
         position = _nvo_position()
-        assert position.gain_loss.amount < 0
+        assert position.gain_loss.amount > 0
 
     def test_nvo_loss_pct_matches_seed_reference(self) -> None:
         position = _nvo_position()
-        assert abs(position.gain_loss_pct - Decimal("-21.49")) < Decimal("0.1")
+        assert abs(position.gain_loss_pct - Decimal("12.00")) < Decimal("0.1")
 
 
 # -- Portfolio tests -----------------------------------------------------------
@@ -91,22 +91,22 @@ class TestPortfolioAggregates:
     def test_total_value_matches_seed_reference(self) -> None:
         """Tolerance covers display rounding before summing."""
         portfolio = _full_seed_portfolio()
-        expected = Decimal("190922.43")
+        expected = Decimal("97000.00")
         assert abs(portfolio.total_value.amount - expected) < Decimal("5.00")
 
     def test_total_assets_matches_seed_reference(self) -> None:
         portfolio = _full_seed_portfolio()
-        expected = Decimal("191112.48")
+        expected = Decimal("98500.00")
         assert abs(portfolio.total_assets.amount - expected) < Decimal("5.00")
 
     def test_total_gain_loss_matches_seed_reference(self) -> None:
         portfolio = _full_seed_portfolio()
-        expected = Decimal("16554.20")
+        expected = Decimal("898.40")
         assert abs(portfolio.total_gain_loss.amount - expected) < Decimal("5.00")
 
     def test_total_gain_loss_pct_matches_seed_reference(self) -> None:
         portfolio = _full_seed_portfolio()
-        expected = Decimal("9.49")
+        expected = Decimal("0.93")
         assert abs(portfolio.total_gain_loss_pct - expected) < Decimal("0.1")
 
     def test_position_count(self) -> None:
@@ -121,11 +121,11 @@ class TestPortfolioAggregates:
 
 
 class TestPortfolioWeights:
-    def test_lin_is_largest_position(self) -> None:
+    def test_pld_is_largest_position(self) -> None:
         portfolio = _full_seed_portfolio()
-        lin_weight = portfolio.weight_pct("LIN")
-        assert lin_weight > Decimal("8")
-        assert lin_weight < Decimal("10")
+        pld_weight = portfolio.weight_pct("PLD")
+        assert pld_weight > Decimal("7")
+        assert pld_weight < Decimal("8")
 
     def test_weights_sum_to_100(self) -> None:
         portfolio = _full_seed_portfolio()
@@ -142,4 +142,4 @@ class TestPortfolioDisplay:
         portfolio = _full_seed_portfolio()
         display = portfolio.total_value.display()
         assert "$" in display
-        assert "190" in display
+        assert "97" in display

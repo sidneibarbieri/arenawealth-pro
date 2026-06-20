@@ -27,8 +27,10 @@ RUN pip install --no-cache-dir -e ".[dev]"
 # Data integrity, tests, lint, then regenerate results from tracked inputs.
 CMD set -e; \
     python scripts/hash_data.py; \
+    python scripts/check_artifact_privacy.py; \
     ruff check src scripts tests; \
     pytest -q; \
+    python scripts/price_backtest.py --holdings tests/fixtures/seed_portfolio_broker.csv --return-matrix paper/data/returns_matrix.csv --reference-output paper/data/price_backtest_reference.json --generated-utc 20260604_170710; \
     python scripts/run_experiments.py; \
     python scripts/run_ai_advisor_audit.py --reference; \
     echo "Reproduction complete: data verified, tests passed, figures regenerated."

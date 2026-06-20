@@ -76,12 +76,12 @@ def test_excludes_overweight_and_picks_top_two_distinct_themes():
         make_position("E", 60.0, 10.0, "TE"),
     ]
 
-    plan = plan_deployment(positions, 1511.18)
+    plan = plan_deployment(positions, 1500.00)
 
     assert "A" in plan.excluded_overweight
     assert tuple(order.ticker for order in plan.orders) == ("B", "C")
     assert plan.total_fee == 5.00
-    assert sum(order.amount for order in plan.orders) == 1511.18
+    assert sum(order.amount for order in plan.orders) == 1500.00
     assert all(order.amount <= 1000.0 for order in plan.orders)
     assert plan.orders[0].amount > plan.orders[1].amount  # higher score gets more
 
@@ -94,7 +94,7 @@ def test_theme_cap_blocks_saturated_theme():
         make_position("D", 60.0, 8.0, "Data"),
     ]
 
-    plan = plan_deployment(positions, 1511.18)
+    plan = plan_deployment(positions, 1500.00)
 
     assert tuple(order.ticker for order in plan.orders) == ("C", "D")
     assert "A" in plan.excluded_theme
@@ -108,7 +108,7 @@ def test_distinct_theme_dedup_under_cap():
         make_position("C", 70.0, 8.0, "Pharma"),
     ]
 
-    plan = plan_deployment(positions, 1511.18)
+    plan = plan_deployment(positions, 1500.00)
 
     assert tuple(order.ticker for order in plan.orders) == ("A", "C")
     assert "B" in plan.excluded_theme
@@ -121,9 +121,9 @@ def test_two_orders_cost_same_as_one():
     ]
     fee_params = FeeParameters()
 
-    plan = plan_deployment(positions, 1511.18, fee_params)
+    plan = plan_deployment(positions, 1500.00, fee_params)
 
-    assert plan.total_fee == compute_order_fee(1511.18, fee_params)
+    assert plan.total_fee == compute_order_fee(1500.00, fee_params)
 
 
 def test_large_cash_uses_fee_neutral_multi_order_plan():

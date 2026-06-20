@@ -61,6 +61,8 @@ PY
     fi
 fi
 
+python3 "${work}/scripts/check_artifact_privacy.py" "${work}"
+
 (cd dist && zip -qr "${name}.zip" "${name}")
 echo "Wrote dist/${name}.zip ($(du -h "dist/${name}.zip" | cut -f1))"
 echo "Snapshot tree at ${work} (drop it into an anonymous repository)."

@@ -6,7 +6,7 @@ from arenawealth.experiments.advisor_prompts import build_prompt, parse_response
 
 SCENARIO = {
     "name": "demo",
-    "cash": 1511.18,
+    "cash": 1500.00,
     "allowed_tickers": ["MA", "ADBE", "ANET"],
     "owned_tickers": ["MSFT", "AAPL"],
     "available_fact_ids": ["fact_a", "fact_b"],
@@ -20,7 +20,7 @@ def test_prompt_lists_constraints_deterministically():
     assert "MA, ADBE, ANET" in prompt
     assert "MSFT, AAPL" in prompt
     assert "at most 3" in prompt
-    assert "1511.18" in prompt
+    assert "1500.00" in prompt
     assert "Do not recommend already-owned tickers" in prompt
 
 

@@ -48,7 +48,7 @@ class SECEDGARProvider:
         self._user_agent = user_agent or os.getenv("SEC_USER_AGENT")
         if not self._user_agent:
             raise SECEDGARError(
-                "SEC_USER_AGENT required (e.g., 'YourName your@email.com')"
+                "SEC_USER_AGENT required (e.g., 'Reviewer reviewer@example.com')"
             )
 
         headers = {

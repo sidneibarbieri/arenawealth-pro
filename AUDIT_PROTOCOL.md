@@ -298,7 +298,7 @@ By publishing negative results (baseline does not beat naive allocation), the pr
 {
   "date": "2026-06-18",
   "holdings": [...],
-  "cash": 1511.18,
+  "cash": 1500.00,
   "universe": [list of eligible tickers],
   "baseline_recommendation": [top-k tickers],
   "constraints": {

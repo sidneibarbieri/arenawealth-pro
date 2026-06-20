@@ -690,7 +690,7 @@ async def get_user_analysis() -> dict[str, Any]:
 
 @router.get("/user/recommendation", response_model=RecommendationResponse)
 async def get_user_recommendation(
-    cash: float = Query(default=1511.18, gt=0),
+    cash: float = Query(default=1500.00, gt=0),
     offline_demo: bool = Query(default=False),
 ) -> RecommendationResponse:
     response = build_recommendation_response(cash, offline_demo)

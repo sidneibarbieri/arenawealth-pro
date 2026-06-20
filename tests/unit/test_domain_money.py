@@ -22,10 +22,10 @@ class TestMoneyArithmetic:
         assert result.amount == Decimal("376.55")
 
     def test_multiply_by_shares(self) -> None:
-        price = Money.usd("504.65")
-        shares = Decimal("34.47335")
+        price = Money.usd("100.00")
+        shares = Decimal("50.00000")
         result = price * shares
-        assert result.amount == Decimal("504.65") * Decimal("34.47335")
+        assert result.amount == Decimal("100.00") * Decimal("50.00000")
 
     def test_negate(self) -> None:
         money = Money.usd("100")

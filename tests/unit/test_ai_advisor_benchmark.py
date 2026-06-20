@@ -227,7 +227,7 @@ def test_below_floor_hold_is_valid_when_amounts_are_required() -> None:
 def test_evaluate_run_set_reports_validity_agreement_and_stability() -> None:
     scenario = AdvisorScenario(
         name="addition",
-        cash=1511.18,
+        cash=1500.00,
         allowed_tickers=("MA", "ADBE", "ANET", "NVDA"),
         owned_tickers=("TSM",),
         policy_tickers=("MA", "ADBE", "ANET"),

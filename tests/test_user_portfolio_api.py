@@ -125,7 +125,7 @@ def test_recommendation_is_replayable_from_same_inputs(api_client: TestClient) -
     candidate list must be byte-identical. This is the auditability guarantee the
     paper relies on.
     """
-    url = "/api/v1/portfolio/user/recommendation?cash=1511.18&offline_demo=true"
+    url = "/api/v1/portfolio/user/recommendation?cash=1500.00&offline_demo=true"
     first = api_client.get(url).json()
     second = api_client.get(url).json()
 

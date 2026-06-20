@@ -27,10 +27,13 @@ figures, cached advisor audit, data hashes, and local paper build:
 ```bash
 make setup
 make verify-data
+make privacy-audit
 make verify
+make price-backtest-reference
 make experiments
 make ai-advisor-audit
 make advisor-run-audit
+make figure-audit
 make paper
 ```
 
@@ -44,7 +47,9 @@ source.
 | Claim surface | Command or file | Expected evidence |
 | --- | --- | --- |
 | Data snapshot integrity | `make verify-data` | SHA-256 hashes match `paper/data/DATA_HASHES.txt` |
+| Privacy/anonymity gate | `make privacy-audit` | Fails on high-confidence author paths, private fixture sentinels, emails, and secret tokens |
 | Implementation safety | `make verify` | Ruff, pytest, frontend build, and ESLint pass |
+| Offline backtest reference | `make price-backtest-reference` | Regenerates `paper/data/price_backtest_reference.json` from the tracked return matrix |
 | Fee and guardrail figures | `make experiments` | Regenerates vector figures and an experiment JSON |
 | Advisor audit benchmark | `make ai-advisor-audit` | Regenerates the offline audit figure and summary |
 | Cached model pilot | `make advisor-run-audit` | Re-evaluates tracked model outputs without API calls |
@@ -66,7 +71,7 @@ ARENAWEALTH_DATABASE_PATH="$PWD/tmp/reviewer-dashboard.db" \
 Open:
 
 ```text
-http://127.0.0.1:5173/?offline_demo=true&cash=1511.18
+http://127.0.0.1:5173/?offline_demo=true&cash=1500.00
 ```
 
 Then click `Analyze`. The expected path is visible in the screenshot above:
@@ -78,7 +83,8 @@ and displays the guardrails that excluded overweight positions.
 
 The reproducible results use only tracked inputs:
 
-- `tests/fixtures/seed_portfolio_broker.csv` - reviewer-safe portfolio fixture.
+- `tests/fixtures/seed_portfolio_broker.csv` - synthetic reviewer-safe
+  portfolio fixture, not a private brokerage export.
 - `paper/data/returns_matrix.csv` - frozen adjusted-return matrix for the
   current-basket study.
 - `paper/data/price_backtest_reference.json` - tracked backtest reference used
@@ -99,6 +105,13 @@ Estimate a planned live run without spending money:
 ```bash
 make advisor-budget
 ```
+
+New experiments should stay isolated until promoted deliberately. `make
+price-backtest` fetches fresh free adjusted closes and writes ignored reports
+under `exports/`; it does not alter the paper's frozen reference. Paid-provider
+advisor runs require `--live`, provider credentials, and an explicit call budget.
+After any promoted data change, rerun `python scripts/hash_data.py --write`,
+`make verify-data`, and `make privacy-audit`.
 
 ## Key Insight
 

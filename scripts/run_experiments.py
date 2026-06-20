@@ -105,10 +105,7 @@ def load_holdings(path: Path) -> tuple[Holding, ...]:
 
 
 def latest_backtest_export() -> dict | None:
-    """Prefer a fresh export; fall back to the tracked reference for offline use."""
-    candidates = sorted(EXPORT_DIR.glob("price_backtest_*.json"))
-    if candidates:
-        return json.loads(candidates[-1].read_text())
+    """Use the tracked reference so local exploratory exports cannot contaminate paper output."""
     reference = ROOT / "paper" / "data" / "price_backtest_reference.json"
     if reference.exists():
         return json.loads(reference.read_text())
@@ -190,8 +187,17 @@ def figure_robustness_pdf(
     ax.set_yticks([-0.1, 0, 0.1, 0.2])
     ax.set_xlabel("Rolling one-year window")
     ax.set_ylabel("Sharpe difference")
-    ax.text(4, 0.207, "equal higher: 47/53", color=GREEN, fontsize=6.5)
-    ax.text(39.5, -0.13, "current higher: 6/53", color=RED, fontsize=6.5)
+    equal_higher = sum(value > 0 for value in y_values)
+    current_higher = sum(value < 0 for value in y_values)
+    total = len(y_values)
+    ax.text(4, 0.207, f"equal higher: {equal_higher}/{total}", color=GREEN, fontsize=6.5)
+    ax.text(
+        39.5,
+        -0.13,
+        f"current higher: {current_higher}/{total}",
+        color=RED,
+        fontsize=6.5,
+    )
     save_pdf(fig, path)
 
 

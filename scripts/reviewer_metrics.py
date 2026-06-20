@@ -95,7 +95,7 @@ def build_payload(timeout_seconds: int) -> dict[str, object]:
                 ".venv/bin/python",
                 "scripts/moat_compounding_analysis.py",
                 "--cash",
-                "1511.18",
+                "1500.00",
                 "--holdings",
                 "tests/fixtures/seed_portfolio_broker.csv",
                 "--offline-demo",

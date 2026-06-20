@@ -3,7 +3,7 @@ PIP ?= .venv/bin/pip
 UVICORN ?= .venv/bin/uvicorn
 UV_CACHE_DIR ?= .uv-cache
 
-.PHONY: setup verify verify-e2e metrics recommendation price-backtest experiments ai-advisor-audit advisor-run-audit bibliography advisor-budget collect-advisor-runs verify-data figure-audit repro-docker configure-env api ui app run paper all package clean
+.PHONY: setup verify verify-e2e metrics recommendation price-backtest price-backtest-reference experiments ai-advisor-audit advisor-run-audit bibliography advisor-budget collect-advisor-runs verify-data privacy-audit figure-audit repro-docker configure-env api ui app run paper all package clean
 
 setup:
 	python3.11 -m venv .venv
@@ -25,10 +25,13 @@ metrics:
 	$(PYTHON) scripts/reviewer_metrics.py
 
 recommendation:
-	$(PYTHON) scripts/moat_compounding_analysis.py --cash 1511.18
+	$(PYTHON) scripts/moat_compounding_analysis.py --cash 1500.00
 
 price-backtest:
 	$(PYTHON) scripts/price_backtest.py --start 2021-01-01 --benchmark SPY
+
+price-backtest-reference:
+	$(PYTHON) scripts/price_backtest.py --holdings tests/fixtures/seed_portfolio_broker.csv --return-matrix paper/data/returns_matrix.csv --reference-output paper/data/price_backtest_reference.json --generated-utc 20260604_170710
 
 experiments:
 	$(PYTHON) scripts/run_experiments.py
@@ -50,6 +53,9 @@ collect-advisor-runs:
 
 verify-data:
 	$(PYTHON) scripts/hash_data.py
+
+privacy-audit:
+	$(PYTHON) scripts/check_artifact_privacy.py
 
 figure-audit:
 	bash scripts/check_figure_vectors.sh
@@ -76,7 +82,7 @@ run:
 paper:
 	cd paper && latexmk -pdf main.tex
 
-all: setup verify experiments ai-advisor-audit advisor-run-audit verify-data paper
+all: setup verify-data privacy-audit verify price-backtest-reference experiments ai-advisor-audit advisor-run-audit verify-data figure-audit paper
 	@echo "Artifact reproduced end-to-end: tests, figures, and PDF are up to date."
 
 package:

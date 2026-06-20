@@ -9,10 +9,15 @@ python3.11 -m venv .venv
 .venv/bin/pip install -e ".[dev]"
 cd frontend && npm install && cd ..
 make verify
+make verify-data
+make privacy-audit
 make metrics
 ```
 
 `make verify` runs Python lint, Python tests, frontend build, and frontend lint.
+`make verify-data` checks the frozen data manifest. `make privacy-audit` fails
+on high-confidence author identity, local paths, private fixture sentinels,
+emails, and secret tokens.
 `make metrics` writes a timestamped JSON report under `exports/`.
 
 To open the local workbench:
@@ -28,7 +33,7 @@ It also clears stale local processes on the configured API and UI ports.
 
 ```bash
 .venv/bin/python scripts/moat_compounding_analysis.py \
-  --cash 1511.18 \
+  --cash 1500.00 \
   --holdings tests/fixtures/seed_portfolio_broker.csv \
   --offline-demo
 ```
@@ -38,13 +43,15 @@ This path is deterministic and does not need API keys.
 ## Free Price Backtest
 
 ```bash
+make price-backtest-reference
 make price-backtest
 ```
 
-This path uses free adjusted closes and writes a JSON report under `exports/`.
-It compares the current basket against `SPY`, equal-weight holdings, and a
-rebalancing ablation with transaction costs. It is useful for checking risk and
-benchmark behavior of the current basket. It does not claim point-in-time
+`make price-backtest-reference` regenerates the paper's frozen offline JSON from
+`paper/data/returns_matrix.csv`. `make price-backtest` fetches fresh free
+adjusted closes and writes an exploratory JSON report under ignored `exports/`.
+Both compare the current basket against `SPY`, equal-weight holdings, and a
+rebalancing ablation with transaction costs. Neither claims point-in-time
 stock-selection performance.
 
 ## Deterministic Experiments
