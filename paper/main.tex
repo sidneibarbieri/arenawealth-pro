@@ -47,9 +47,9 @@ On frozen scenarios these properties separate cleanly, and agreement is the most
 misleading in isolation. Across a 120-scenario bank, the advisor that agrees most
 with the baseline (0.94) is admissible in only 0.58 of its runs, so agreement
 certifies an operationally invalid action in 42\% of them. A separate control is
-valid and stable yet shares nothing with the baseline. A cached nine-run model
-pilot shows the same failure in real output, where perfect policy agreement still
-hides an invalid cash split. The same verifier exposes portfolio-level validity, rejecting
+valid and stable yet shares nothing with the baseline. On real output, three
+models that all agree perfectly with the baseline are separated by validity
+alone: a cached model hides an invalid cash split that two frontier models avoid. The same verifier exposes portfolio-level validity, rejecting
 a higher-scoring asset when it worsens concentration. We make no alpha claim. The
 baseline is a transparent verifier whose cost guardrails follow from the fee
 schedule, whose decisions replay from frozen inputs, and whose current-basket
@@ -382,32 +382,33 @@ deterministic policy holds both terms at $1.0$. Set overlap alone would certify
 the diversifier as perfectly stable, so the amount-aware term is what exposes the
 sizing drift that set overlap cannot see.
 
-The same audit can score real model output once the responses are frozen. We
-therefore include a small cached pilot: three scenarios, three repeated runs per
-scenario, collected as single-message JSON-only calls at temperature $0.7$, with
-a 500-token output cap, no tools, and no retry loop. Each record stores the
-provider, deployment label, prompt, prompt hash, raw response, parsed output,
-usage metadata, and collection timestamp, and the records are part of the
-artifact's data-hash manifest. This is not a provider comparison; it tests
-whether the protocol catches operational failures in real output. It does
-(Table~\ref{tab:model-pilot}). The model agrees with the baseline on all three
-scenarios, yet one run in the sub-tranche cash scenario splits \$900 into two
-\$450 orders and pays an avoidable extra fee. A top-$k$ agreement score would
-certify that run. The deterministic verifier rejects it.
+The same audit scores real model output once the responses are frozen. We run
+three real models over the frozen scenarios, a cached model and two current
+frontier models (GPT-5.5 and Opus-4.8), with three repeated runs each as
+single-message JSON-only calls, a 500-token cap, no tools, and no retry loop. The
+frontier models sample at their default temperature and the cached model at
+$0.7$. Each record stores the provider, model label, prompt, prompt hash, raw
+response, parsed output, usage, and timestamp, and the records are part of the
+artifact's data-hash manifest. All three models agree perfectly with the baseline,
+yet the audit separates them on validity (Table~\ref{tab:model-pilot}). The cached
+model splits \$900 of sub-tranche cash into two orders in one run and pays an
+avoidable fee. Both frontier models size the single admissible order and pass. A
+top-$k$ agreement score certifies all three equally. The deterministic verifier
+does not.
 
 \begin{table}[t]
-  \caption{Cached model pilot over the frozen audit scenarios. Agreement alone
-  misses the invalid sub-tranche split; amount-aware stability exposes the
-  sizing drift.}
+  \caption{Three real models on the frozen scenarios, nine runs each. All agree
+  perfectly with the baseline, yet validity separates them: the cached model
+  splits sub-tranche cash, while the two frontier models size it correctly.}
   \label{tab:model-pilot}
   \small
-  \begin{tabular}{lcccc}
+  \begin{tabular}{lccc}
     \toprule
-    Scenario & Valid & Agree & Set $S$ & Amt. $S_w$ \\
+    Real model & Valid & Agree & Set $S$ \\
     \midrule
-    New position & $3/3$ & $1.00$ & $1.00$ & -- \\
-    Sub-tranche cash & $2/3$ & $1.00$ & $0.67$ & $0.67$ \\
-    Owned/fact & $3/3$ & $1.00$ & $1.00$ & -- \\
+    Cached & $8/9$ & $1.00$ & $0.89$ \\
+    GPT-5.5 & $9/9$ & $1.00$ & $1.00$ \\
+    Opus-4.8 & $9/9$ & $1.00$ & $1.00$ \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -725,10 +726,10 @@ framework can dominate the model backbone. Our protocol therefore evaluates the
 the action is frozen, validity, stability, and agreement are measurable without
 rerunning the model or depending on a live provider.
 
-The cached pilot illustrates why this matters. The model's ticker choices agree
-with the baseline in every scenario. If the benchmark stopped at top-$k$
-overlap, the pilot would look perfect. The amount-aware audit instead observes
-the order as an executable object and catches the sub-tranche split that pays an
+The pilot illustrates why this matters. Every model's ticker choices agree with
+the baseline in every scenario. If the benchmark stopped at top-$k$ overlap, all
+three would look perfect. The amount-aware audit instead observes the order as an
+executable object and catches the cached model's sub-tranche split that pays an
 avoidable fee. This is not a subtle return-estimation issue; it is a deterministic
 validity error available before any price path is realized. For financial
 recommendation systems, that ordering is essential: first establish that an
@@ -809,9 +810,9 @@ requirements themselves rather than proxies for them: an advisor that learns
 never to overrun cash or split sub-tranche orders has, by that fact, learned to
 act admissibly. What the audit cannot certify is return, so it is a necessary
 pre-filter on executability, not a substitute for outcome evaluation. The
-cached model pilot is deliberately small, but it shows why that contract matters:
-the model matches the baseline tickers and still violates the fee rule in one
-sub-tranche cash run. The backtest is a current-basket calibration on free
+model pilot is deliberately small, but it shows why that contract matters: a
+cached model matches the baseline tickers yet still violates the fee rule in one
+sub-tranche run that the two frontier models avoid. The backtest is a current-basket calibration on free
 adjusted closes, not a point-in-time selection test, and the cost model covers
 fixed per-order tranche fees rather than spreads, taxes, slippage, or integer
 lots. These boundaries are what make the artifact reproducible and every claim

@@ -119,7 +119,7 @@ class OpenAIChatClient:
                 "model": self.model,
                 "messages": [{"role": "user", "content": prompt}],
                 "temperature": temperature,
-                "max_tokens": ADVISOR_MAX_OUTPUT_TOKENS,
+                "max_completion_tokens": ADVISOR_MAX_OUTPUT_TOKENS,
             },
             timeout=60.0,
         )
