@@ -798,7 +798,13 @@ portfolio action.
 
 The protocol carries an explicit interpretation contract. It scores process:
 advice must be executable, repeatable, grounded in the frozen scenario, and
-compatible with portfolio constraints before its return means anything. The
+compatible with portfolio constraints before its return means anything. A
+process metric usually invites Goodhart's law, that optimizing the measure
+corrupts it, but here validity, stability, and grounding are the operational
+requirements themselves rather than proxies for them: an advisor that learns
+never to overrun cash or split sub-tranche orders has, by that fact, learned to
+act admissibly. What the audit cannot certify is return, so it is a necessary
+pre-filter on executability, not a substitute for outcome evaluation. The
 cached model pilot is deliberately small, but it shows why that contract matters:
 the model matches the baseline tickers and still violates the fee rule in one
 sub-tranche cash run. The backtest is a current-basket calibration on free
