@@ -200,12 +200,25 @@ see. Finance trustworthiness benchmarks now probe truthfulness, safety,
 fairness, privacy, and transparency rather than a single task score
 \cite{hu2025fintrust}; yet even models that pass those safety checks show gaps in
 fiduciary alignment and disclosure, and the checks grade single-turn responses,
-not whether the resulting trade is admissible. The gap is operational. LLM risk assessments
+not whether the resulting trade is admissible. Standardized financial-LLM
+benchmarks reinforce the point: PIXIU with its FLARE suite \cite{xie2023pixiu}
+and the broader FinBen \cite{xie2024finben} grade dozens of tasks from sentiment
+to stock-movement and even trading, yet score accuracy on text, not whether a
+recommended action is admissible and executable. The gap is operational. LLM risk assessments
 shift with irrelevant demographic attributes \cite{chawla2025riskadvice},
 investment analyses carry latent, confirmation-seeking bias \cite{lee2025bias},
 and recommenders show product preferences that survive debiasing
 \cite{zhi2025productbias}, while surveys flag interpretability and
-generalizability as open problems \cite{elalami2025mlfinance}. What no prior
+generalizability as open problems \cite{elalami2025mlfinance}. This stance has a
+lineage outside finance. Holistic evaluation replaced a single accuracy number
+with parallel desiderata \cite{liang2023helm}, and behavioral testing replaced
+aggregate metrics with capability-specific unit tests on model output
+\cite{ribeiro2020checklist}. Our protocol is behavioral testing specialized to a
+financial action: each validity check is a capability test, and the failure
+taxonomy is its test matrix, run deterministically against a frozen scenario. The
+ungrounded-fact check is the verifiable end of faithfulness evaluation, which
+hallucination research still treats as largely open \cite{ji2023hallucination}.
+What no prior
 benchmark supplies is a compact, replayable test that places a learned advisor
 against a transparent baseline and measures, together, whether its advice is
 operationally \emph{valid}, \emph{stable} across runs, and how far it
