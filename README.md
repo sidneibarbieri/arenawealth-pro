@@ -48,6 +48,7 @@ source.
 | Fee and guardrail figures | `make experiments` | Regenerates vector figures and an experiment JSON |
 | Advisor audit benchmark | `make ai-advisor-audit` | Regenerates the offline audit figure and summary |
 | Cached model pilot | `make advisor-run-audit` | Re-evaluates tracked model outputs without API calls |
+| Figure vector quality | `make figure-audit` | Confirms generated figures contain no raster images and embed fonts |
 | Typeset paper | `make paper` | Builds `paper/main.pdf` locally |
 
 ## Dashboard Smoke Test

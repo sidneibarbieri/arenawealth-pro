@@ -3,7 +3,7 @@ PIP ?= .venv/bin/pip
 UVICORN ?= .venv/bin/uvicorn
 UV_CACHE_DIR ?= .uv-cache
 
-.PHONY: setup verify verify-e2e metrics recommendation price-backtest experiments ai-advisor-audit advisor-run-audit bibliography advisor-budget collect-advisor-runs verify-data repro-docker configure-env api ui app run paper all package clean
+.PHONY: setup verify verify-e2e metrics recommendation price-backtest experiments ai-advisor-audit advisor-run-audit bibliography advisor-budget collect-advisor-runs verify-data figure-audit repro-docker configure-env api ui app run paper all package clean
 
 setup:
 	python3.11 -m venv .venv
@@ -50,6 +50,9 @@ collect-advisor-runs:
 
 verify-data:
 	$(PYTHON) scripts/hash_data.py
+
+figure-audit:
+	bash scripts/check_figure_vectors.sh
 
 repro-docker:
 	docker build -f Dockerfile.repro -t arenawealth-repro .
