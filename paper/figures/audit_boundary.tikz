@@ -45,7 +45,7 @@
 
 % panels
 \node[panel, minimum width=1.94cm, minimum height=2.30cm] at (.97,0) {};
-\node[panel, minimum width=3.46cm, minimum height=2.30cm] (contract) at (5.42,0) {};
+\node[panel, minimum width=3.14cm, minimum height=2.30cm] (contract) at (5.42,0) {};
 \node[panel, minimum width=1.96cm, minimum height=2.30cm] at (8.34,0) {};
 
 \node[header] at (.97,1.27) {frozen evidence};
