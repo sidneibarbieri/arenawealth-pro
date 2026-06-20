@@ -44,11 +44,12 @@ and fee constraints, stability across repeated runs, and agreement with the
 baseline.
 
 On frozen scenarios these properties separate cleanly, and agreement is the most
-misleading in isolation. One control agrees with the baseline and never drifts,
-yet wastes transaction fees and is therefore invalid. Another is valid and stable
-while sharing nothing with the baseline. A cached nine-run model pilot shows the
-same failure in real output, where perfect policy agreement still hides an
-invalid cash split. The same verifier exposes portfolio-level validity, rejecting
+misleading in isolation. Across a 120-scenario bank, the advisor that agrees most
+with the baseline (0.94) is admissible in only 0.58 of its runs, so agreement
+certifies an operationally invalid action in 42\% of them. A separate control is
+valid and stable yet shares nothing with the baseline. A cached nine-run model
+pilot shows the same failure in real output, where perfect policy agreement still
+hides an invalid cash split. The same verifier exposes portfolio-level validity, rejecting
 a higher-scoring asset when it worsens concentration. We make no alpha claim. The
 baseline is a transparent verifier whose cost guardrails follow from the fee
 schedule, whose decisions replay from frozen inputs, and whose current-basket
@@ -115,7 +116,9 @@ investment advice: an audit protocol that measures validity, stability, and
 agreement separately, and shows that agreement with a reference can certify an
 operationally invalid action, in both deterministic controls and a cached model
 pilot. Second, it provides the deterministic baseline that makes the audit
-replayable: the fee model is subadditive, the minimum order follows
+replayable\footnote{Anonymous reproducibility artifact:
+\url{https://anonymous.4open.science/r/deterministic-replay-audit/}. Released
+publicly after the double-blind review.}: the fee model is subadditive, the minimum order follows
 directly from the cost tolerance, and the planner is regression-tested against
 those facts. Third, it calibrates the baseline against allocator baselines
 instead of treating the policy as a performance claim. The current basket beats
