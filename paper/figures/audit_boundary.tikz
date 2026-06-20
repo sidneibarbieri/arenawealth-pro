@@ -18,9 +18,9 @@
     draw=arenaInk!42,
     fill=white,
     line width=.45pt,
-    align=left,
-    inner xsep=4pt,
-    inner ysep=3pt,
+    align=center,
+    inner xsep=3pt,
+    inner ysep=2.4pt,
     font=\sffamily\scriptsize
   },
   bluecard/.style={card, draw=arenaBlue!62, fill=arenaBlue!6},
@@ -34,56 +34,59 @@
     font=\sffamily\tiny,
     align=left,
     inner xsep=3pt,
-    inner ysep=1.8pt
+    inner ysep=1.9pt
   },
   arrow/.style={-{Stealth[length=3.3pt,width=4.1pt]}, draw=arenaInk!72, line width=.55pt},
   faintarrow/.style={-{Stealth[length=3pt,width=3.7pt]}, draw=arenaGray!55, line width=.45pt},
   note/.style={font=\sffamily\tiny, text=arenaGray!90!black, align=center}
 ]
 
-\path[use as bounding box] (-.05,-1.22) rectangle (7.55,1.55);
+\path[use as bounding box] (-.08,-1.46) rectangle (9.42,1.74);
 
-\node[panel, minimum width=1.74cm, minimum height=2.30cm] at (.88,.08) {};
-\node[panel, minimum width=3.18cm, minimum height=2.30cm] at (3.78,.08) {};
-\node[panel, minimum width=1.48cm, minimum height=2.30cm] at (6.74,.08) {};
+% panels
+\node[panel, minimum width=1.94cm, minimum height=2.58cm] at (.97,0) {};
+\node[panel, minimum width=3.46cm, minimum height=2.58cm] (contract) at (5.42,0) {};
+\node[panel, minimum width=1.96cm, minimum height=2.58cm] at (8.32,0) {};
 
-\node[header] at (.88,1.31) {frozen evidence};
-\node[header] at (3.78,1.31) {deterministic contract};
-\node[header] at (6.74,1.31) {review artifact};
+\node[header] at (.97,1.52) {frozen evidence};
+\node[header] at (5.42,1.52) {deterministic contract};
+\node[header] at (8.32,1.52) {review artifact};
 
-\node[bluecard, text width=1.34cm] (scenario) at (.88,.57)
-  {$\sigma$ scenario\\[-1pt]\scriptsize cash, holdings\\universe, facts};
-\node[bluecard, text width=1.34cm] (reply) at (.88,-.47)
-  {$r$ reply\\[-1pt]\scriptsize tickers, dollars\\citations};
+% inputs
+\node[bluecard, text width=1.50cm] (scenario) at (.97,.56)
+  {$\sigma$ scenario\\[1pt]{\tiny cash, holdings,\\universe, facts}};
+\node[bluecard, text width=1.50cm] (reply) at (.97,-.58)
+  {$r$ reply\\[1pt]{\tiny tickers, dollars,\\citations}};
 
-\node[greencard, text width=.92cm, align=center] (parse) at (2.25,.05)
-  {$a=\mathrm{parse}(r)$\\[-1pt]\scriptsize typed action};
+% parse, centered in the gap between the two left panels
+\node[greencard, text width=1.18cm] (parse) at (2.85,0)
+  {parse $r{\to}a$\\[1pt]{\tiny typed action}};
 
-\node[header, text=arenaGreen!55!black] at (3.85,.91)
-  {$C(\sigma,a)$: pass iff all rows hold};
-\node[rule, text width=2.06cm] (admissible) at (3.86,.48)
+% contract content
+\node[header, text=arenaGreen!50!black] at (5.42,.93)
+  {$C(\sigma,a)$ holds iff every row holds};
+\node[rule, text width=2.64cm] (admissible) at (5.42,.46)
   {\textbf{Admissible:} universe, cap, cash};
-\node[rule, text width=2.06cm, draw=arenaRed!60!black, fill=arenaRed!6] (economic) at (3.86,.05)
+\node[rule, text width=2.64cm, draw=arenaRed!55!black, fill=arenaRed!6] (economic) at (5.42,.04)
   {\textbf{Economic:} floor, split, fee};
-\node[rule, text width=2.06cm] (grounded) at (3.86,-.38)
+\node[rule, text width=2.64cm] (grounded) at (5.42,-.38)
   {\textbf{Grounded:} facts, replay hash};
-\node[note] at (3.86,-.86) {decided before returns};
+\node[note] at (5.42,-.85) {decided before any return};
 
-\coordinate (contractin) at (2.92,.05);
-\coordinate (contractout) at (4.98,.05);
+% outputs
+\node[greencard, text width=1.46cm] (pass) at (8.32,.62)
+  {PASS\\[1pt]{\tiny executable orders}};
+\node[redcard, text width=1.46cm] (fail) at (8.32,-.18)
+  {FAIL\\[1pt]{\tiny typed violation}};
+\node[card, text width=1.46cm] (metrics) at (8.32,-.92)
+  {$V,\,S,\,S_w,\,A$\\[1pt]{\tiny audit metrics}};
 
-\node[greencard, text width=1.12cm, align=center] (pass) at (6.74,.64)
-  {PASS\\[-1pt]\scriptsize executable\\orders};
-\node[redcard, text width=1.12cm, align=center] (fail) at (6.74,-.13)
-  {FAIL\\[-1pt]\scriptsize typed\\violation};
-\node[card, text width=1.12cm, align=center] (metrics) at (6.74,-.78)
-  {$V,S,S_w,A$\\[-1pt]\scriptsize metrics};
-
-\draw[arrow] (scenario.east) -- (parse.west);
-\draw[arrow] (reply.east) -- (parse.west);
-\draw[arrow] (parse.east) -- (contractin);
-\draw[arrow] (contractout) -- (pass.west);
-\draw[arrow] (contractout) -- (fail.west);
+% flow: inputs -> parse -> contract edge -> verdicts -> metrics
+\draw[arrow] (scenario.east) -- (parse.north west);
+\draw[arrow] (reply.east) -- (parse.south west);
+\draw[arrow] (parse.east) -- (contract.west);
+\draw[arrow] (contract.east) -- (pass.west);
+\draw[arrow] (contract.east) -- (fail.west);
 \draw[faintarrow] (pass.south) -- (metrics.north);
 \draw[faintarrow] (fail.south) -- (metrics.north);
 \end{tikzpicture}
