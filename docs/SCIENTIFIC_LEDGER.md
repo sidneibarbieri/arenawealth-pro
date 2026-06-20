@@ -17,7 +17,7 @@ Evidence:
 
 - `src/arenawealth/experiments/fee_landscape.py`
 - `scripts/run_experiments.py`
-- `paper/figures/fee_premium.tikz`
+- `paper/figures/fee_premium.pdf`
 - regression tests in `tests/unit/test_analytics_deployment.py`
 
 ### F2. The minimum order is a fixed point, not a tuned constant
@@ -64,7 +64,7 @@ because the ablation uses deterministic demo fundamentals.
 Evidence:
 
 - `src/arenawealth/experiments/ablation.py`
-- `paper/figures/ablation.tikz`
+- `paper/figures/ablation.pdf`
 
 ### F5. The fixed-cost guardrail is the small-cash analogue of the no-trade region
 
@@ -192,7 +192,7 @@ Evidence:
 - `paper/main.tex` (Section: The Audit Protocol; Table + figure)
 - `paper/data/ai_advisor_scenarios.json`
 - `paper/data/ai_advisor_audit_reference.json`
-- `paper/figures/ai_advisor_audit.tikz`
+- `paper/figures/ai_advisor_audit.pdf`
 - `scripts/run_ai_advisor_audit.py`
 - tests in `tests/unit/test_ai_advisor_benchmark.py`
 
@@ -212,7 +212,7 @@ Evidence:
 - `paper/main.tex` (Related Work)
 - `paper/references.bib` (`gu2020machine`, `liu2004transaction`,
   `garleanu2013dynamic`, `dacunto2019robo`)
-- `paper/figures/ai_advisor_audit.tikz`
+- `paper/figures/ai_advisor_audit.pdf`
 
 ### F13. AI advice can be treated as a candidate program with a deterministic verifier
 

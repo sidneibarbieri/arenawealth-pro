@@ -235,7 +235,7 @@ recommendation is a pure function of the tuple
 \]
 Referential transparency is what makes the rest of this paper possible. Every
 quantitative result below is backed by an offline driver in the reviewer path:
-\texttt{run\_experiments.py} for the experiment JSON and generated TikZ figures,
+\texttt{run\_experiments.py} for the experiment JSON and generated figures,
 \texttt{run\_ai\_advisor\_audit.py} for the advisor-audit panel, and
 \texttt{collect\_advisor\_runs.py} for the cached pilot audit. No result
 depends on live data or hidden state. The purity is enforced, not merely
@@ -334,9 +334,9 @@ their operational quality.
 
 \begin{figure}[t]
   \centering
-  \input{figures/ai_advisor_audit.tikz}
+  \includegraphics[width=\columnwidth]{figures/ai_advisor_audit.pdf}
   \caption{The archetype controls separate validity, agreement, and stability.}
-  \Description{Grouped bar chart of validity, agreement, and stability across
+  \Description{Heat-map matrix of validity, agreement, and stability across
   seven advisor archetypes, showing that high agreement does not coincide with
   high validity.}
   \label{fig:audit}
@@ -530,7 +530,7 @@ tranche boundary (Figure~\ref{fig:premium}).
 
 \begin{figure}[t]
   \centering
-  \input{figures/fee_premium.tikz}
+  \includegraphics[width=\columnwidth]{figures/fee_premium.pdf}
   \caption{Naive splitting pays recurring fee premiums; the fee-aware planner
   stays on the zero-premium frontier.}
   \Description{Line chart showing naive split fee premiums above zero in
@@ -618,12 +618,12 @@ claim about specific securities.)
 
 \begin{figure}[t]
   \centering
-  \input{figures/ablation.tikz}
+  \includegraphics[width=\columnwidth]{figures/ablation.pdf}
   \caption{Each factor reshapes the ranking differently; equal weighting tracks
   the tuned baseline.}
-  \Description{Bar chart comparing Spearman rank correlation and top-two churn
-  across moat-only, compounding-only, valuation-only, equal-thirds, and baseline
-  weighting schemes.}
+  \Description{Horizontal bar chart comparing Spearman rank correlation against
+  the baseline across moat-only, compounding-only, valuation-only, equal-thirds,
+  and baseline weighting schemes.}
   \label{fig:ablation}
 \end{figure}
 
@@ -691,7 +691,7 @@ the paper into an alpha claim.
 
 \begin{figure}[t]
   \centering
-  \input{figures/robustness.tikz}
+  \includegraphics[width=\columnwidth]{figures/robustness.pdf}
   \caption{Rolling one-year excess Sharpe of equal over current weighting. The
   difference is positive in $47$ of $53$ windows; the negative band is a single
   2024--2025 stretch.}

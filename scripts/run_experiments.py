@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Run the exploratory experiment suite and emit TikZ figures plus JSON.
+"""Run the exploratory experiment suite and emit vector figures plus JSON.
 
 This driver is deterministic and offline. It sweeps the production scoring and
 deployment engines, reuses the most recent real price-backtest export when one
 is present, and writes:
 
-  - paper/figures/*.tikz   figures for the paper
+  - paper/figures/*.pdf   empirical figures for the paper
   - exports/experiments_<stamp>.json   the numeric findings
 
 Usage:
@@ -19,6 +19,8 @@ import json
 from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
+
+from paper_plot_style import BLUE, GREEN, INK, RED, clean_axes, new_figure, save_pdf
 
 from arenawealth.analytics.fundamentals import DemoFundamentalsProvider
 from arenawealth.analytics.models import Holding
@@ -113,67 +115,27 @@ def latest_backtest_export() -> dict | None:
     return None
 
 
-def _tikz_number(value: float) -> str:
-    return f"{value:.4f}".rstrip("0").rstrip(".")
-
-
-def _tikz_coordinates(points: list[tuple[float, float]]) -> str:
-    return " ".join(f"({_tikz_number(x)},{_tikz_number(y)})" for x, y in points)
-
-
-def _write_tikz(path: Path, body: str) -> None:
-    path.write_text(body.strip() + "\n", encoding="utf-8")
-
-
-def _axis_style(extra: str = "") -> str:
-    return f"""
-  width=\\columnwidth,
-  height=0.52\\columnwidth,
-  clip=false,
-  axis line style={{draw=arenaInk!45}},
-  tick style={{draw=arenaInk!45}},
-  tick label style={{font=\\scriptsize}},
-  label style={{font=\\scriptsize}},
-  title style={{font=\\scriptsize\\bfseries, align=center}},
-  ymajorgrids=true,
-  grid style={{draw=arenaGray!18}},
-  {extra}
-""".strip()
-
-
-def figure_fee_premium_tikz(landscape, path: Path) -> None:
+def figure_fee_premium_pdf(landscape, path: Path) -> None:
     # Premium is only defined where the engine actually deploys (cash >= floor).
     deployed = [p for p in landscape if p.cash >= 250]
-    naive_points = [(p.cash, p.proportional_premium) for p in deployed]
-    engine_points = [(p.cash, p.engine_premium) for p in deployed]
-    axis_style = _axis_style(
-        "xmin=250, xmax=5000, ymin=0, ymax=3.0, "
-        "xlabel={Cash to deploy (USD)}, ylabel={Extra fee vs single order (USD)}, "
-        "xtick={1000,2000,3000,4000,5000}, ytick={0,2.5}, "
-        "axis x line*=bottom, axis y line*=left, "
-        "enlarge x limits=false"
-    )
-    naive_coordinates = _tikz_coordinates(naive_points)
-    engine_coordinates = _tikz_coordinates(engine_points)
-    _write_tikz(
-        path,
-        rf"""
-\begin{{tikzpicture}}
-\begin{{axis}}[
-  {axis_style}
-]
-\addplot+[const plot, mark=none, line width=.9pt, color=arenaRed!90!black]
-  coordinates {{{naive_coordinates}}};
-\addplot+[mark=none, line width=1.15pt, color=arenaGreen!80!black]
-  coordinates {{{engine_coordinates}}};
-\node[anchor=west, font=\scriptsize, text=arenaRed!70!black]
-  at (axis cs:1040,2.62) {{naive split: +\$2.50 bands}};
-\node[anchor=east, font=\scriptsize, text=arenaGreen!45!black]
-  at (axis cs:4920,.28) {{fee-aware: zero premium}};
-\end{{axis}}
-\end{{tikzpicture}}
-""",
-    )
+    cash = [p.cash for p in deployed]
+    naive = [p.proportional_premium for p in deployed]
+    aware = [p.engine_premium for p in deployed]
+
+    fig, ax = new_figure(1.58)
+    clean_axes(ax)
+    ax.fill_between(cash, 0, naive, step="post", color=RED, alpha=0.16, linewidth=0)
+    ax.step(cash, naive, where="post", color=RED, linewidth=1.25)
+    ax.plot(cash, aware, color=GREEN, linewidth=1.45)
+    ax.set_xlim(250, 5000)
+    ax.set_ylim(-0.08, 2.85)
+    ax.set_xticks([1000, 2000, 3000, 4000, 5000])
+    ax.set_yticks([0, 2.5])
+    ax.set_xlabel("Cash to deploy (USD)")
+    ax.set_ylabel("Extra fee (USD)")
+    ax.text(1180, 2.58, "naive split: +$2.50 bands", color=RED, fontsize=6.5)
+    ax.text(4950, 0.24, "fee-aware: zero premium", color=GREEN, ha="right", fontsize=6.5)
+    save_pdf(fig, path)
 
 
 def rolling_excess_sharpe_points(
@@ -197,7 +159,7 @@ def rolling_excess_sharpe_points(
     ]
 
 
-def figure_robustness_tikz(
+def figure_robustness_pdf(
     asset_returns: dict[str, tuple[float, ...]],
     weights_equal: dict[str, float],
     weights_current: dict[str, float],
@@ -205,43 +167,27 @@ def figure_robustness_tikz(
 ) -> None:
     """Rolling 1-year excess Sharpe of equal weighting over current weighting."""
     points = rolling_excess_sharpe_points(asset_returns, weights_equal, weights_current)
-    positive_points = [(index, value) for index, value in points if value > 0]
-    negative_points = [(index, value) for index, value in points if value <= 0]
-    axis_style = _axis_style(
-        "ybar, bar width=2.5pt, xmin=0, xmax=54, ymin=-0.35, ymax=0.55, "
-        "xlabel={Rolling 1-year window}, ylabel={Sharpe difference}, "
-        "xtick={1,10,20,30,40,50}, ytick={-0.2,0,0.2,0.4}, "
-        "axis x line*=bottom, axis y line*=left"
-    )
-    _write_tikz(
-        path,
-        rf"""
-\begin{{tikzpicture}}
-\begin{{axis}}[
-  {axis_style}
-]
-\addplot+[draw=none, fill=arenaGreen!85!black]
-  coordinates {{{_tikz_coordinates(positive_points)}}};
-\addplot+[draw=none, fill=arenaRed!90!black]
-  coordinates {{{_tikz_coordinates(negative_points)}}};
-\addplot+[mark=none, arenaInk!70, line width=.45pt] coordinates {{(0,0) (54,0)}};
-\node[anchor=west, font=\scriptsize, text=arenaGreen!45!black]
-  at (axis cs:4,.34) {{equal higher: 47/53}};
-\node[anchor=west, font=\scriptsize, text=arenaRed!65!black]
-  at (axis cs:40,-.24) {{current higher: 6/53}};
-\end{{axis}}
-\end{{tikzpicture}}
-""",
-    )
+    x_values = [index for index, _ in points]
+    y_values = [value for _, value in points]
+    colors = [GREEN if value > 0 else RED for value in y_values]
+
+    fig, ax = new_figure(1.55)
+    clean_axes(ax)
+    ax.bar(x_values, y_values, width=0.72, color=colors, edgecolor="none")
+    ax.axhline(0, color=INK, linewidth=0.65)
+    ax.set_xlim(0, 54)
+    ax.set_ylim(-0.16, 0.25)
+    ax.set_xticks([1, 10, 20, 30, 40, 50])
+    ax.set_yticks([-0.1, 0, 0.1, 0.2])
+    ax.set_xlabel("Rolling one-year window")
+    ax.set_ylabel("Sharpe difference")
+    ax.text(4, 0.207, "equal higher: 47/53", color=GREEN, fontsize=6.5)
+    ax.text(39.5, -0.13, "current higher: 6/53", color=RED, fontsize=6.5)
+    save_pdf(fig, path)
 
 
-def figure_ablation_tikz(ablation_rows, path: Path) -> None:
-    coordinates = [
-        (row.spearman_vs_baseline, index) for index, row in enumerate(ablation_rows, start=1)
-    ]
-    positive_coordinates = [(x, y) for x, y in coordinates if x >= 0]
-    negative_coordinates = [(x, y) for x, y in coordinates if x < 0]
-    labels = ",".join(
+def figure_ablation_pdf(ablation_rows, path: Path) -> None:
+    labels = [
         {
             "baseline_40_35_25": "baseline",
             "moat_only": "moat only",
@@ -250,34 +196,26 @@ def figure_ablation_tikz(ablation_rows, path: Path) -> None:
             "equal_thirds": "equal",
         }.get(row.label, row.label.replace("_", " "))
         for row in ablation_rows
-    )
-    axis_style = _axis_style(
-        f"xbar, bar width=5.5pt, xmin=-0.65, xmax=1.08, ymin=0.4, "
-        f"ymax={len(ablation_rows) + 0.6}, xlabel={{Spearman rank correlation}}, "
-        f"ytick={{1,...,{len(ablation_rows)}}}, yticklabels={{{labels}}}, "
-        "yticklabel style={font=\\scriptsize, align=right}, y dir=reverse, "
-        "xmajorgrids=true, ymajorgrids=false, xtick={-0.5,0,0.5,1.0}, "
-        "axis x line*=bottom, axis y line*=left"
-    )
-    _write_tikz(
-        path,
-        rf"""
-\begin{{tikzpicture}}
-\begin{{axis}}[
-  {axis_style}
-]
-\addplot+[draw=none, fill=arenaBlue!86]
-  coordinates {{{_tikz_coordinates(positive_coordinates)}}};
-\addplot+[draw=none, fill=arenaRed!80]
-  coordinates {{{_tikz_coordinates(negative_coordinates)}}};
-\addplot+[mark=none, arenaInk!70, line width=.45pt]
-  coordinates {{(0,0.4) (0,{len(ablation_rows) + 0.6})}};
-\node[anchor=west, font=\scriptsize, text=arenaBlue!55!black]
-  at (axis cs:.58,{len(ablation_rows) + .25}) {{equal tracks baseline}};
-\end{{axis}}
-\end{{tikzpicture}}
-""",
-    )
+    ]
+    values = [row.spearman_vs_baseline for row in ablation_rows]
+    colors = [BLUE if value >= 0 else RED for value in values]
+    y_pos = list(range(len(labels)))
+
+    fig, ax = new_figure(1.58)
+    clean_axes(ax, grid_axis="x")
+    ax.barh(y_pos, values, height=0.46, color=colors, edgecolor="none")
+    ax.axvline(0, color=INK, linewidth=0.65)
+    ax.set_yticks(y_pos, labels)
+    ax.invert_yaxis()
+    ax.set_xlim(-0.62, 1.08)
+    ax.set_xticks([-0.5, 0, 0.5, 1.0])
+    ax.set_xlabel("Spearman rank correlation vs. baseline")
+    for y, value in zip(y_pos, values, strict=True):
+        if value < 0:
+            ax.text(value / 2, y, f"{value:.2f}", va="center", ha="center", fontsize=6.5)
+        else:
+            ax.text(min(value + 0.025, 1.03), y, f"{value:.2f}", va="center", fontsize=6.5)
+    save_pdf(fig, path)
 
 
 def main() -> None:
@@ -333,11 +271,11 @@ def main() -> None:
     # Figures. The sensitivity sweep and the backtest are reported in prose and
     # the backtest table; their data still feeds the JSON below, but a figure
     # would only restate the closed form and the table, so none is rendered.
-    figure_fee_premium_tikz(landscape, FIG_DIR / "fee_premium.tikz")
-    figure_ablation_tikz(ablation_rows, FIG_DIR / "ablation.tikz")
+    figure_fee_premium_pdf(landscape, FIG_DIR / "fee_premium.pdf")
+    figure_ablation_pdf(ablation_rows, FIG_DIR / "ablation.pdf")
     if robustness is not None:
-        figure_robustness_tikz(
-            basket_returns, weights_equal, weights_current, FIG_DIR / "robustness.tikz"
+        figure_robustness_pdf(
+            basket_returns, weights_equal, weights_current, FIG_DIR / "robustness.pdf"
         )
 
     findings = {

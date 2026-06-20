@@ -2,95 +2,88 @@
   x=1cm,
   y=1cm,
   >=Stealth,
-  zone/.style={
-    rounded corners=3pt,
-    draw=arenaGray!40,
-    fill=arenaLight,
-    line width=.45pt
-  },
-  zonelabel/.style={
+  header/.style={
     font=\sffamily\tiny\bfseries,
-    text=arenaGray!90!black,
+    text=arenaGray!88!black,
     align=center
+  },
+  panel/.style={
+    rounded corners=3pt,
+    draw=arenaInk!20,
+    fill=arenaLight,
+    line width=.35pt
   },
   card/.style={
     rounded corners=2pt,
-    draw=arenaInk!50,
+    draw=arenaInk!42,
     fill=white,
     line width=.45pt,
-    align=center,
+    align=left,
     inner xsep=4pt,
     inner ysep=3pt,
     font=\sffamily\scriptsize
   },
-  inputcard/.style={card, draw=arenaBlue!75, fill=arenaBlue!7},
-  typedcard/.style={card, draw=arenaGreen!70!black, fill=arenaGreen!7},
-  verdictcard/.style={card, draw=arenaInk!55, fill=white},
-  rulechip/.style={
-    rounded corners=1.3pt,
-    draw=arenaInk!32,
+  bluecard/.style={card, draw=arenaBlue!62, fill=arenaBlue!6},
+  greencard/.style={card, draw=arenaGreen!68!black, fill=arenaGreen!6},
+  redcard/.style={card, draw=arenaRed!75!black, fill=arenaRed!6},
+  rule/.style={
+    rounded corners=1.5pt,
+    draw=arenaInk!24,
     fill=white,
-    line width=.35pt,
+    line width=.32pt,
     font=\sffamily\tiny,
-    inner xsep=2.6pt,
-    inner ysep=1.6pt
+    align=left,
+    inner xsep=3pt,
+    inner ysep=1.8pt
   },
-  riskchip/.style={
-    rulechip,
-    draw=arenaRed!80!black,
-    fill=arenaRed!7,
-    text=arenaRed!45!black
-  },
-  flow/.style={-{Stealth[length=3.3pt,width=4pt]}, draw=arenaInk!70, line width=.55pt},
-  softflow/.style={flow, dashed, draw=arenaGray!75},
+  arrow/.style={-{Stealth[length=3.3pt,width=4.1pt]}, draw=arenaInk!72, line width=.55pt},
+  faintarrow/.style={-{Stealth[length=3pt,width=3.7pt]}, draw=arenaGray!55, line width=.45pt},
   note/.style={font=\sffamily\tiny, text=arenaGray!90!black, align=center}
 ]
 
-\path[use as bounding box] (-.15,-1.8) rectangle (7.45,1.9);
+\path[use as bounding box] (-.05,-1.22) rectangle (7.55,1.55);
 
-\begin{scope}[on background layer]
-  \node[zone, fit={(-.05,-1.35) (1.65,1.45)}] (zinput) {};
-  \node[zone, fit={(2.0,-1.35) (5.25,1.45)}] (zcontract) {};
-  \node[zone, fit={(5.6,-1.35) (7.35,1.45)}] (zout) {};
-\end{scope}
+\node[panel, minimum width=1.74cm, minimum height=2.30cm] at (.88,.08) {};
+\node[panel, minimum width=3.18cm, minimum height=2.30cm] at (3.78,.08) {};
+\node[panel, minimum width=1.48cm, minimum height=2.30cm] at (6.74,.08) {};
 
-\node[zonelabel] at (.8,1.62) {frozen evidence};
-\node[zonelabel] at (3.62,1.62) {deterministic audit boundary};
-\node[zonelabel] at (6.48,1.62) {reviewer evidence};
+\node[header] at (.88,1.31) {frozen evidence};
+\node[header] at (3.78,1.31) {deterministic contract};
+\node[header] at (6.74,1.31) {review artifact};
 
-\node[inputcard, text width=1.35cm] (scenario) at (.8,.65)
-  {Scenario\\snapshot\\\scriptsize holdings, cash, facts};
-\node[inputcard, text width=1.35cm] (advisor) at (.8,-.55)
-  {Advisor\\text\\\scriptsize tickers, amounts, claims};
+\node[bluecard, text width=1.34cm] (scenario) at (.88,.57)
+  {$\sigma$ scenario\\[-1pt]\scriptsize cash, holdings\\universe, facts};
+\node[bluecard, text width=1.34cm] (reply) at (.88,-.47)
+  {$r$ reply\\[-1pt]\scriptsize tickers, dollars\\citations};
 
-\node[typedcard, text width=1.25cm] (action) at (2.45,.05)
-  {Typed\\action\\list};
-\node[typedcard, text width=1.35cm, minimum height=2.35cm] (contract) at (3.85,.05)
-  {};
-\node[zonelabel, text=arenaGreen!45!black] at (3.85,.95) {contract};
+\node[greencard, text width=.92cm, align=center] (parse) at (2.25,.05)
+  {$a=\mathrm{parse}(r)$\\[-1pt]\scriptsize typed action};
 
-\node[rulechip] at (3.85,.62) {universe};
-\node[rulechip] at (3.85,.32) {cash};
-\node[rulechip] at (3.85,.02) {floor};
-\node[riskchip] at (3.85,-.28) {split};
-\node[rulechip] at (3.85,-.58) {cap};
-\node[riskchip] at (3.85,-.88) {facts};
+\node[header, text=arenaGreen!55!black] at (3.85,.91)
+  {$C(\sigma,a)$: pass iff all rows hold};
+\node[rule, text width=2.06cm] (admissible) at (3.86,.48)
+  {\textbf{Admissible:} universe, cap, cash};
+\node[rule, text width=2.06cm, draw=arenaRed!60!black, fill=arenaRed!6] (economic) at (3.86,.05)
+  {\textbf{Economic:} floor, split, fee};
+\node[rule, text width=2.06cm] (grounded) at (3.86,-.38)
+  {\textbf{Grounded:} facts, replay hash};
+\node[note] at (3.86,-.86) {decided before returns};
 
-\node[verdictcard, text width=1.35cm] (orders) at (6.48,.65)
-  {Admissible\\orders};
-\node[verdictcard, text width=1.35cm] (trace) at (6.48,-.25)
-  {Typed\\violation\\trace};
-\node[verdictcard, text width=1.35cm] (metrics) at (6.48,-1.02)
-  {Audit\\metrics\\\scriptsize $V,S,S_w,A$};
+\coordinate (contractin) at (2.92,.05);
+\coordinate (contractout) at (4.98,.05);
 
-\draw[flow] (scenario.east) -- (action.west);
-\draw[flow] (advisor.east) -- (action.west);
-\draw[flow] (action.east) -- (contract.west);
-\draw[flow] (contract.east) -- (orders.west);
-\draw[flow] (contract.east) -- (trace.west);
-\draw[flow] (trace.south) -- (metrics.north);
+\node[greencard, text width=1.12cm, align=center] (pass) at (6.74,.64)
+  {PASS\\[-1pt]\scriptsize executable\\orders};
+\node[redcard, text width=1.12cm, align=center] (fail) at (6.74,-.13)
+  {FAIL\\[-1pt]\scriptsize typed\\violation};
+\node[card, text width=1.12cm, align=center] (metrics) at (6.74,-.78)
+  {$V,S,S_w,A$\\[-1pt]\scriptsize metrics};
 
-\node[note] at (.8,-1.55) {model proposes};
-\node[note] at (3.85,-1.55) {contract decides before returns};
-\node[note] at (6.48,-1.55) {records replay};
+\draw[arrow] (scenario.east) -- (parse.west);
+\draw[arrow] (reply.east) -- (parse.west);
+\draw[arrow] (parse.east) -- (contractin);
+\draw[arrow] (contractout) -- (pass.west);
+\draw[arrow] (contractout) -- (fail.west);
+\draw[faintarrow] (pass.south) -- (metrics.north);
+\draw[faintarrow] (fail.south) -- (metrics.north);
 \end{tikzpicture}

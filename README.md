@@ -45,7 +45,7 @@ source.
 | --- | --- | --- |
 | Data snapshot integrity | `make verify-data` | SHA-256 hashes match `paper/data/DATA_HASHES.txt` |
 | Implementation safety | `make verify` | Ruff, pytest, frontend build, and ESLint pass |
-| Fee and guardrail figures | `make experiments` | Regenerates `paper/figures/*.tikz` and an experiment JSON |
+| Fee and guardrail figures | `make experiments` | Regenerates vector figures and an experiment JSON |
 | Advisor audit benchmark | `make ai-advisor-audit` | Regenerates the offline audit figure and summary |
 | Cached model pilot | `make advisor-run-audit` | Re-evaluates tracked model outputs without API calls |
 | Typeset paper | `make paper` | Builds `paper/main.pdf` locally |

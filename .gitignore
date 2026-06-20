@@ -53,6 +53,7 @@ academic_*_report_*.md
 *.fls
 *.synctex.gz
 paper/**/*.pdf
+!paper/figures/*.pdf
 paper/.Rhistory
 paper/_fig_preview.tex
 

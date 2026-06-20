@@ -17,6 +17,10 @@ from pathlib import Path
 from statistics import mean
 from typing import Any
 
+from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.patches import Rectangle
+from paper_plot_style import BLUE, INK, LIGHT, RED, new_figure, save_pdf
+
 from arenawealth.experiments.ai_advisor import (
     AdvisorRecommendation,
     AdvisorRunSetReport,
@@ -27,7 +31,7 @@ from arenawealth.experiments.ai_advisor import (
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_SCENARIOS = ROOT / "paper" / "data" / "ai_advisor_scenarios.json"
 REFERENCE_OUTPUT = ROOT / "paper" / "data" / "ai_advisor_audit_reference.json"
-TIKZ_OUTPUT = ROOT / "paper" / "figures" / "ai_advisor_audit.tikz"
+FIGURE_OUTPUT = ROOT / "paper" / "figures" / "ai_advisor_audit.pdf"
 EXPORT_DIR = ROOT / "exports"
 
 
@@ -170,67 +174,53 @@ def write_markdown(summary: dict[str, Any], path: Path) -> None:
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def write_advisor_audit_tikz(summary: dict[str, Any], path: Path) -> None:
+def write_advisor_audit_pdf(summary: dict[str, Any], path: Path) -> None:
     labels = sorted(summary["by_advisor"], key=advisor_sort_key)
-    rows = [
+    rows: list[tuple[str, float, float, float]] = [
         (
-            display_label(label).replace("\n", "\\\\"),
+            display_label(label),
             summary["by_advisor"][label]["mean_valid_rate"],
             summary["by_advisor"][label]["mean_policy_jaccard"],
             summary["by_advisor"][label]["mean_stability"],
         )
         for label in labels
     ]
-    coordinates = {
-        "valid": " ".join(
-            f"({index + 1},{valid:.3f})" for index, (_, valid, _, _) in enumerate(rows)
-        ),
-        "agreement": " ".join(
-            f"({index + 1},{agreement:.3f})" for index, (_, _, agreement, _) in enumerate(rows)
-        ),
-        "stability": " ".join(
-            f"({index + 1},{stability:.3f})" for index, (_, _, _, stability) in enumerate(rows)
-        ),
-        "labels": ",".join(label for label, *_ in rows),
-    }
-    path.write_text(
-        rf"""\begin{{tikzpicture}}
-\begin{{axis}}[
-  ybar,
-  width=\columnwidth,
-  height=0.52\columnwidth,
-  clip=false,
-  ymin=0,
-  ymax=1.05,
-  bar width=3.1pt,
-  enlarge x limits=0.10,
-  ylabel={{Score}},
-  symbolic x coords={{1,2,3,4,5,6,7}},
-  xtick={{1,2,3,4,5,6,7}},
-  xticklabels={{{coordinates["labels"]}}},
-  x tick label style={{font=\scriptsize, align=center}},
-  ymajorgrids=true,
-  grid style={{draw=arenaGray!18}},
-  axis line style={{draw=arenaInk!45}},
-  tick style={{draw=arenaInk!45}},
-  tick label style={{font=\scriptsize}},
-  label style={{font=\scriptsize}},
-  legend style={{draw=none, fill=none, font=\scriptsize,
-    at={{(0.5,1.16)}}, anchor=south}},
-  legend image code/.code={{\draw[#1, draw=none] (0cm,-0.05cm) rectangle (.14cm,.07cm);}},
-  legend columns=3,
-  /tikz/every even column/.append style={{column sep=5pt}},
-]
-\addplot+[draw=none, fill=arenaGreen!85!black] coordinates {{{coordinates["valid"]}}};
-\addplot+[draw=none, fill=arenaGold!95!black] coordinates {{{coordinates["agreement"]}}};
-\addplot+[draw=none, fill=arenaBlue!90] coordinates {{{coordinates["stability"]}}};
-\legend{{Valid,Agreement,Stability}}
-\end{{axis}}
-\end{{tikzpicture}}
-""",
-        encoding="utf-8",
-    )
-
+    matrix = [
+        [valid for _, valid, _, _ in rows],
+        [agreement for _, _, agreement, _ in rows],
+        [stability for _, _, _, stability in rows],
+    ]
+    cmap = LinearSegmentedColormap.from_list("arena_score", [LIGHT, BLUE])
+    fig, ax = new_figure(1.62)
+    ax.imshow(matrix, cmap=cmap, vmin=0, vmax=1, aspect="auto")
+    ax.set_xticks(range(len(rows)), [label for label, *_ in rows], rotation=0)
+    ax.set_yticks(range(3), ["Validity", "Agreement", "Stability"])
+    ax.tick_params(length=0, pad=2)
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+    ax.set_xticks([x - 0.5 for x in range(1, len(rows))], minor=True)
+    ax.set_yticks([0.5, 1.5], minor=True)
+    ax.grid(which="minor", color="white", linewidth=1.1)
+    ax.tick_params(which="minor", bottom=False, left=False)
+    for row_index, values in enumerate(matrix):
+        for col_index, value in enumerate(values):
+            color = "white" if value >= 0.72 else INK
+            label = "1" if value == 1 else "0" if value == 0 else f"{value:.2f}"
+            ax.text(
+                col_index,
+                row_index,
+                label,
+                ha="center",
+                va="center",
+                color=color,
+                fontsize=6.5,
+            )
+    # The key reviewer objection: high agreement can coexist with invalidity.
+    ax.add_patch(Rectangle((2.5, -0.5), 1, 1, fill=False, edgecolor=RED, linewidth=1.0))
+    ax.text(3, -0.82, "agreement=1, invalid", ha="center", va="bottom", fontsize=6.5, color=RED)
+    ax.set_xlim(-0.5, len(rows) - 0.5)
+    ax.set_ylim(2.5, -1.0)
+    save_pdf(fig, path)
 
 def advisor_sort_key(label: str) -> tuple[int, str]:
     order = {
@@ -252,7 +242,7 @@ def display_label(label: str) -> str:
         "drifting_advisor": "drift",
         "naive_diversifier": "naive\nsplit",
         "popularity_chaser": "popular",
-        "underdeploying_advisor": "underdeploy",
+        "underdeploying_advisor": "under\ndeploy",
         "valid_but_low_agreement": "valid\nlow-agree",
     }
     return names.get(label, label.replace("_", "\n"))
@@ -264,7 +254,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", type=Path)
     parser.add_argument("--reference", action="store_true")
     parser.add_argument("--markdown", type=Path)
-    parser.add_argument("--tikz", type=Path, default=TIKZ_OUTPUT)
+    parser.add_argument("--figure", type=Path, default=FIGURE_OUTPUT)
     return parser.parse_args()
 
 
@@ -281,8 +271,8 @@ def main() -> None:
         REFERENCE_OUTPUT.write_text(json.dumps(summary, indent=2), encoding="utf-8")
     markdown = args.markdown or output.with_suffix(".md")
     write_markdown(summary, markdown)
-    args.tikz.parent.mkdir(parents=True, exist_ok=True)
-    write_advisor_audit_tikz(summary, args.tikz)
+    args.figure.parent.mkdir(parents=True, exist_ok=True)
+    write_advisor_audit_pdf(summary, args.figure)
     print(
         "AI advisor audit: "
         f"valid={summary['overall']['mean_valid_rate']:.3f} "
@@ -291,7 +281,7 @@ def main() -> None:
     )
     print(f"Wrote {output}")
     print(f"Wrote {markdown}")
-    print(f"Wrote {args.tikz}")
+    print(f"Wrote {args.figure}")
 
 
 if __name__ == "__main__":
