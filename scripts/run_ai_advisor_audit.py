@@ -192,7 +192,19 @@ def write_advisor_audit_pdf(summary: dict[str, Any], path: Path) -> None:
     ]
     cmap = LinearSegmentedColormap.from_list("arena_score", [LIGHT, BLUE])
     fig, ax = new_figure(1.62)
-    ax.imshow(matrix, cmap=cmap, vmin=0, vmax=1, aspect="auto")
+    # Draw cells as vector patches rather than imshow, so the heatmap stays
+    # resolution-independent and never pixelates when the PDF is zoomed.
+    for row_index, values in enumerate(matrix):
+        for col_index, value in enumerate(values):
+            ax.add_patch(
+                Rectangle(
+                    (col_index - 0.5, row_index - 0.5),
+                    1,
+                    1,
+                    facecolor=cmap(value),
+                    edgecolor="none",
+                )
+            )
     ax.set_xticks(range(len(rows)), [label for label, *_ in rows], rotation=0)
     ax.set_yticks(range(3), ["Validity", "Agreement", "Stability"])
     ax.tick_params(length=0, pad=2)
