@@ -134,7 +134,16 @@ def figure_fee_premium_pdf(landscape, path: Path) -> None:
     ax.set_xlabel("Cash to deploy (USD)")
     ax.set_ylabel("Extra fee (USD)")
     ax.text(1180, 2.58, "naive split: +$2.50 bands", color=RED, fontsize=6.5)
-    ax.text(4950, 0.24, "fee-aware: zero premium", color=GREEN, ha="right", fontsize=6.5)
+    ax.text(
+        4940,
+        0.18,
+        "fee-aware:\nzero premium",
+        color=GREEN,
+        ha="right",
+        va="bottom",
+        linespacing=0.95,
+        fontsize=6.5,
+    )
     save_pdf(fig, path)
 
 
@@ -212,9 +221,24 @@ def figure_ablation_pdf(ablation_rows, path: Path) -> None:
     ax.set_xlabel("Spearman rank correlation vs. baseline")
     for y, value in zip(y_pos, values, strict=True):
         if value < 0:
-            ax.text(value / 2, y, f"{value:.2f}", va="center", ha="center", fontsize=6.5)
+            ax.text(
+                value / 2,
+                y,
+                f"{value:.2f}",
+                va="center",
+                ha="center",
+                color="white",
+                fontsize=6.5,
+            )
         else:
-            ax.text(min(value + 0.025, 1.03), y, f"{value:.2f}", va="center", fontsize=6.5)
+            ax.text(
+                min(value + 0.025, 1.03),
+                y,
+                f"{value:.2f}",
+                va="center",
+                color=INK,
+                fontsize=6.5,
+            )
     save_pdf(fig, path)
 
 
