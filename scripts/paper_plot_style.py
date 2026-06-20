@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from pathlib import Path
 
 import matplotlib
@@ -18,6 +19,12 @@ LIGHT = "#F5F7FA"
 BLUE = "#466A8D"
 GREEN = "#3D7157"
 RED = "#A14C5D"
+
+PDF_METADATA = {
+    "Creator": "ArenaWealth deterministic figure pipeline",
+    "CreationDate": datetime(2026, 1, 1, tzinfo=UTC),
+    "ModDate": datetime(2026, 1, 1, tzinfo=UTC),
+}
 
 
 def apply_paper_style() -> None:
@@ -63,5 +70,11 @@ def clean_axes(ax: plt.Axes, *, grid_axis: str = "y") -> None:
 
 def save_pdf(fig: plt.Figure, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(path, format="pdf", bbox_inches="tight", pad_inches=0.04)
+    fig.savefig(
+        path,
+        format="pdf",
+        bbox_inches="tight",
+        pad_inches=0.04,
+        metadata=PDF_METADATA,
+    )
     plt.close(fig)
