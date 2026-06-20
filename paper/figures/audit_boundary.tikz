@@ -36,57 +36,66 @@
     inner xsep=3pt,
     inner ysep=1.9pt
   },
-  arrow/.style={-{Stealth[length=3.3pt,width=4.1pt]}, draw=arenaInk!72, line width=.55pt},
-  faintarrow/.style={-{Stealth[length=3pt,width=3.7pt]}, draw=arenaGray!55, line width=.45pt},
+  wire/.style={draw=arenaInk!70, line width=.5pt},
+  arrow/.style={wire, -{Stealth[length=3.2pt,width=4pt]}},
   note/.style={font=\sffamily\tiny, text=arenaGray!90!black, align=center}
 ]
 
-\path[use as bounding box] (-.08,-1.46) rectangle (9.42,1.74);
+\path[use as bounding box] (-.08,-1.44) rectangle (9.34,1.62);
 
 % panels
-\node[panel, minimum width=1.94cm, minimum height=2.58cm] at (.97,0) {};
-\node[panel, minimum width=3.46cm, minimum height=2.58cm] (contract) at (5.42,0) {};
-\node[panel, minimum width=1.96cm, minimum height=2.58cm] at (8.32,0) {};
+\node[panel, minimum width=1.94cm, minimum height=2.30cm] at (.97,0) {};
+\node[panel, minimum width=3.46cm, minimum height=2.30cm] (contract) at (5.42,0) {};
+\node[panel, minimum width=1.96cm, minimum height=2.30cm] at (8.34,0) {};
 
-\node[header] at (.97,1.52) {frozen evidence};
-\node[header] at (5.42,1.52) {deterministic contract};
-\node[header] at (8.32,1.52) {review artifact};
+\node[header] at (.97,1.27) {frozen evidence};
+\node[header] at (5.42,1.27) {deterministic contract};
+\node[header] at (8.34,1.27) {review artifact};
 
 % inputs
-\node[bluecard, text width=1.50cm] (scenario) at (.97,.56)
+\node[bluecard, text width=1.46cm] (scenario) at (.97,.48)
   {$\sigma$ scenario\\[1pt]{\tiny cash, holdings,\\universe, facts}};
-\node[bluecard, text width=1.50cm] (reply) at (.97,-.58)
+\node[bluecard, text width=1.46cm] (reply) at (.97,-.48)
   {$r$ reply\\[1pt]{\tiny tickers, dollars,\\citations}};
 
-% parse, centered in the gap between the two left panels
-\node[greencard, text width=1.18cm] (parse) at (2.85,0)
+% parse
+\node[greencard, text width=1.12cm] (parse) at (2.85,0)
   {parse $r{\to}a$\\[1pt]{\tiny typed action}};
 
 % contract content
-\node[header, text=arenaGreen!50!black] at (5.42,.93)
+\node[header, text=arenaGreen!50!black] at (5.42,.84)
   {$C(\sigma,a)$ holds iff every row holds};
-\node[rule, text width=2.64cm] (admissible) at (5.42,.46)
+\node[rule, text width=2.64cm] (admissible) at (5.42,.38)
   {\textbf{Admissible:} universe, cap, cash};
-\node[rule, text width=2.64cm, draw=arenaRed!55!black, fill=arenaRed!6] (economic) at (5.42,.04)
+\node[rule, text width=2.64cm, draw=arenaRed!55!black, fill=arenaRed!6] (economic) at (5.42,0)
   {\textbf{Economic:} floor, split, fee};
 \node[rule, text width=2.64cm] (grounded) at (5.42,-.38)
   {\textbf{Grounded:} facts, replay hash};
-\node[note] at (5.42,-.85) {decided before any return};
+\node[note] at (5.42,-.84) {decided before any return};
 
 % outputs
-\node[greencard, text width=1.46cm] (pass) at (8.32,.62)
+\node[greencard, text width=1.46cm] (pass) at (8.34,.72)
   {PASS\\[1pt]{\tiny executable orders}};
-\node[redcard, text width=1.46cm] (fail) at (8.32,-.18)
+\node[redcard, text width=1.46cm] (fail) at (8.34,0)
   {FAIL\\[1pt]{\tiny typed violation}};
-\node[card, text width=1.46cm] (metrics) at (8.32,-.92)
+\node[card, text width=1.46cm] (metrics) at (8.34,-.72)
   {$V,\,S,\,S_w,\,A$\\[1pt]{\tiny audit metrics}};
 
-% flow: inputs -> parse -> contract edge -> verdicts -> metrics
-\draw[arrow] (scenario.east) -- (parse.north west);
-\draw[arrow] (reply.east) -- (parse.south west);
+% input merge bus: scenario + reply -> junction -> parse
+\coordinate (inbus) at (2.02,0);
+\draw[wire] (scenario.east) -- (2.02,.48);
+\draw[wire] (reply.east) -- (2.02,-.48);
+\draw[wire] (2.02,.48) -- (2.02,-.48);
+\draw[arrow] (inbus) -- (parse.west);
+
+% parse -> contract
 \draw[arrow] (parse.east) -- (contract.west);
-\draw[arrow] (contract.east) -- (pass.west);
-\draw[arrow] (contract.east) -- (fail.west);
-\draw[faintarrow] (pass.south) -- (metrics.north);
-\draw[faintarrow] (fail.south) -- (metrics.north);
+
+% output branch bus: contract -> junction -> PASS / FAIL / metrics
+\coordinate (outbus) at (7.32,0);
+\draw[wire] (contract.east) -- (7.32,0);
+\draw[wire] (7.32,.72) -- (7.32,-.72);
+\draw[arrow] (7.32,.72) -- (pass.west);
+\draw[arrow] (7.32,0) -- (fail.west);
+\draw[arrow] (7.32,-.72) -- (metrics.west);
 \end{tikzpicture}
