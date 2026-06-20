@@ -15,9 +15,9 @@ INK = "#344054"
 MUTED = "#667085"
 GRID = "#D0D5DD"
 LIGHT = "#F5F7FA"
-BLUE = "#4477AA"
-GREEN = "#3A8159"
-RED = "#BD5168"
+BLUE = "#466A8D"
+GREEN = "#3D7157"
+RED = "#A14C5D"
 
 
 def apply_paper_style() -> None:
