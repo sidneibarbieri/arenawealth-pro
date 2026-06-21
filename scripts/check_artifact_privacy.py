@@ -33,6 +33,10 @@ SKIP_SUFFIXES = {
     ".pyc",
     ".sqlite",
     ".sqlite3",
+    # Vendored upstream LaTeX template (acmart.cls, ACM-Reference-Format.bst): public
+    # ACM files we do not author, carrying upstream maintainer/permissions emails.
+    ".cls",
+    ".bst",
 }
 MAX_BYTES = 8 * 1024 * 1024
 
