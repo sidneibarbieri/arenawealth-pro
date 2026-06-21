@@ -90,7 +90,7 @@ reproducibility, transaction costs}
 
 \section{Introduction}
 
-Language models now produce investment recommendations, and recent work
+Large language models (LLMs) now produce investment recommendations, and recent work
 evaluates them by realized return or by agreement with a reference portfolio
 \cite{oh2025alpha, spadea2025flarko}. Both yardsticks are unsafe. Return is
 noisy and invites overfitting; agreement rewards an advisor for matching a
@@ -653,7 +653,8 @@ solution and risk parity the Maillard fixed-point iteration. Reported estimation
 choices are deliberately plain, since the point is a fair reference, not a tuned
 competitor.
 
-The score-weighted basket beats the SPY benchmark by $+4.96$ pp CAGR and
+The score-weighted basket beats the SPY benchmark by $+4.96$ pp compound annual
+growth (CAGR) and
 $+0.18$ Sharpe, but equal weighting is stronger ($22.8\%$ CAGR, $1.19$ Sharpe).
 The walk-forward risk-parity baseline comes close on Sharpe ($1.11$ versus
 $1.14$ after rounding) while producing lower return; minimum variance buys the
