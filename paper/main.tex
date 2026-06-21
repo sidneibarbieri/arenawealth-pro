@@ -411,9 +411,9 @@ catch appear in the deterministic controls and the 120-scenario bank below.
   \end{tabular}
 \end{table}
 
-The pilot is intentionally small, so the artifact now includes a larger offline
-scenario bank to test whether the same separation appears in scale. The bank
-contains 120 frozen scenarios, ten variants each of twelve categories:
+The pilot covers three scenarios; the offline scenario bank tests the same
+separation at scale. The bank contains 120 frozen scenarios, ten variants each
+of twelve categories:
 new-cash deployment, sub-tranche cash, already-owned assets, fee-sensitive
 orders, insufficient cash, out-of-universe tickers, hallucinated or stale facts,
 drawdown cases, rebalance-versus-hold, fractional-share constraints, and
@@ -447,8 +447,12 @@ cash.
 \end{table}
 
 Table~\ref{tab:scenario-bank} turns the pilot failure into a benchmark result.
-The agreement-only splitter has higher agreement than the contract and perfect
-set stability, yet 42\% of its runs are agreement-only false positives. The
+The agreement-only false-positive rate (Agr.-FP) is the fraction of runs that
+reproduce the baseline's funded top-$k$ set yet violate a constraint. The
+agreement-only splitter has
+higher agreement than the contract and perfect set stability, yet its Agr.-FP is
+$0.42$, so a top-$k$ benchmark would pass an invalid action in nearly half of its
+runs. The
 failure taxonomy is likewise operational: 300 cash overruns, 200 ungrounded
 facts, 150 fee-worsening splits, 150 too-many-recommendation violations, 100
 below-floor orders, and 30 malformed amount outputs. These are deterministic
@@ -607,9 +611,8 @@ the planner matches both references exactly. It deploys the same cash as the MIP
 oracle and pays the fee lower bound, so the measured deployment gap and fee
 premium are both zero. The MIP can deploy more only once a concentration limit
 binds and the heuristic stops, which lies outside the recurring small-cash
-setting this planner targets. The takeaway is deliberately narrow: for the
-fee-quantized cash deployments studied here, the planner's cost behavior is
-measured against exact references rather than asserted.
+setting this planner targets. For the fee-quantized cash deployments studied
+here, the planner's cost is established against exact references, not asserted.
 
 \section{Calibrating the Baseline}
 \label{sec:weighting}
@@ -710,10 +713,10 @@ Sharpe difference
 $\mathrm{Sharpe}(\text{equal})-\mathrm{Sharpe}(\text{current})$ gives a point
 estimate of $+0.053$ with a $95\%$ interval $[-0.024, +0.127]$ and
 $P(\text{equal better})=91\%$. The direction favors equal weighting, but the
-magnitude is \emph{not} decisive at the $5\%$ level. The finding is therefore
-deliberately modest: on this basket, the tuned weighting does not dominate a
-simple equal-weight control, which supports the methodological claim without
-turning the paper into an alpha claim.
+magnitude is \emph{not} decisive at the $5\%$ level. On this basket the tuned
+weighting does not dominate a simple equal-weight control. That result is the
+point: the contribution is the audit protocol, and the factor weighting is a
+replaceable input to it.
 
 \section{Implications for AI-Finance Benchmarks}
 
@@ -753,9 +756,9 @@ changed experiment. That discipline is what lets the paper report negative
 results, such as equal weighting outperforming the tuned basket, without
 weakening the contribution.
 
-The resulting benchmark is intentionally narrow: it does not claim that a model
-or basket beats the market. Its delta is an operational boundary that current
-return and overlap benchmarks lack. Any advisor can be placed behind the same
+The benchmark makes one claim and makes it exactly: whether an action is
+admissible, grounded, stable, and reproducible before any return is computed. Its
+delta is the operational boundary that return and overlap benchmarks lack. Any advisor can be placed behind the same
 interface and asked: given these dated facts, this portfolio, and this cost
 model, did it emit a valid, stable, grounded, portfolio-admissible action? That
 question is small enough to answer exactly and important enough to ask before
@@ -766,18 +769,17 @@ larger performance claims.
 
 The contribution is a testable way to evaluate investment advice. The protocol
 scores any advisor on validity, stability, and agreement against a deterministic
-baseline, and the frozen controls show that these axes are independent. A
-recommendation can match the baseline and repeat across runs while still being
-invalid. A return-only or overlap-only benchmark misses that failure.
+baseline, and a return-only or overlap-only benchmark misses the failures that
+separation exposes.
 
-The controls also fix what kind of evidence the benchmark provides. A constructed
-advisor is an existence proof that the three axes are separable: it shows an
-action can agree with the baseline yet be invalid, the case a single conflated
-score cannot represent. It is not a claim about how often real advisors fail;
-the frontier pilot probes that from the other side, certifying valid behavior
-when it occurs. The distinction is general for action-level benchmarks: a control
-witnesses separability, and reporting it as such rather than as a failure rate is
-what keeps the audit honest under an adversarial reading.
+The controls establish a precise result: validity, stability, and agreement are
+separable. A constructed advisor that agrees with the baseline yet violates a
+constraint is an existence proof that the three axes measure different things,
+which a single conflated score cannot represent. The bank quantifies that
+separation at scale, and the frontier pilot shows the same contract certifies
+valid behavior when it occurs. Separability is the property an action-level
+benchmark must report, and it is established by construction rather than estimated
+as a failure rate.
 
 The protocol also separates idea generation from portfolio verification. A
 learned advisor may propose plausible tickers; the portfolio layer decides
@@ -819,8 +821,8 @@ requirements themselves rather than proxies for them: an advisor that learns
 never to overrun cash or split sub-tranche orders has, by that fact, learned to
 act admissibly. What the audit cannot certify is return, so it is a necessary
 pre-filter on executability, not a substitute for outcome evaluation. The
-model pilot is deliberately small, but it shows the contract certifies real
-frontier output rather than only flagging failures. The failure modes it catches
+model pilot covers two frontier systems and shows the contract certifies real
+output, not only failures. The failure modes it catches
 appear in the controls and the bank, where agreement stays high as validity falls. The backtest is a current-basket calibration on free
 adjusted closes, not a point-in-time selection test, and the cost model covers
 fixed per-order tranche fees rather than spreads, taxes, slippage, or integer
