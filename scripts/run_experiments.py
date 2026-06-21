@@ -175,7 +175,7 @@ def figure_robustness_pdf(
     points = rolling_excess_sharpe_points(asset_returns, weights_equal, weights_current)
     x_values = [index for index, _ in points]
     y_values = [value for _, value in points]
-    colors = [GREEN if value > 0 else RED for value in y_values]
+    colors = [BLUE if value > 0 else RED for value in y_values]
 
     fig, ax = new_figure(1.55)
     clean_axes(ax)
@@ -190,7 +190,7 @@ def figure_robustness_pdf(
     equal_higher = sum(value > 0 for value in y_values)
     current_higher = sum(value < 0 for value in y_values)
     total = len(y_values)
-    ax.text(4, 0.207, f"equal higher: {equal_higher}/{total}", color=GREEN, fontsize=6.5)
+    ax.text(4, 0.207, f"equal higher: {equal_higher}/{total}", color=BLUE, fontsize=6.5)
     ax.text(
         39.5,
         -0.13,

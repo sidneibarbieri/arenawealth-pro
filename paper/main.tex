@@ -21,8 +21,7 @@
 \definecolor{arenaLight}{HTML}{F5F7FA}
 \definecolor{arenaInk}{HTML}{344054}
 
-\title{Auditing AI Investment Recommendations Against a Deterministic,
-Replayable Baseline}
+\title{Auditing AI Investment Recommendations as Executable Actions}
 
 \author{Anonymous Author(s)}
 \affiliation{%
@@ -389,27 +388,12 @@ over the frozen scenarios, as single-message JSON-only calls with a 500-token
 cap, no tools, and no retry loop, sampled at their default temperature. Each
 record stores the provider, model label, prompt, prompt hash, raw response,
 parsed output, usage, and timestamp, and the records are in the artifact's
-data-hash manifest. Both models satisfy every constraint on every run, with
-perfect agreement and stability (Table~\ref{tab:model-pilot}). On the sub-tranche
+data-hash manifest. Both GPT-5.5 and Opus-4.8 satisfy every constraint on all
+nine runs each, with agreement and set stability of $1.00$. On the sub-tranche
 scenario each returns a single \$900 order and cites the fee rule rather than
 splitting. This is protocol validation rather than a model comparison: the audit
 certifies valid behavior when it occurs, and the failure modes it is built to
 catch appear in the deterministic controls and the 120-scenario bank below.
-
-\begin{table}[t]
-  \caption{Two current frontier models audited on the frozen scenarios, nine runs
-  each. Both pass every constraint, with perfect agreement and stability.}
-  \label{tab:model-pilot}
-  \small
-  \begin{tabular}{lccc}
-    \toprule
-    Frontier model & Valid & Agree & Set $S$ \\
-    \midrule
-    GPT-5.5 & $9/9$ & $1.00$ & $1.00$ \\
-    Opus-4.8 & $9/9$ & $1.00$ & $1.00$ \\
-    \bottomrule
-  \end{tabular}
-\end{table}
 
 The pilot covers three scenarios; the offline scenario bank tests the same
 separation at scale. The bank contains 120 frozen scenarios, ten variants each
