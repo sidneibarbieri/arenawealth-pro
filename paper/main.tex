@@ -350,12 +350,12 @@ their operational quality.
 For an advisor that returns ticker sets $r_1,\dots,r_n$ over repeated runs of a
 scenario with baseline top-$k$ set $b$, the metrics are:
 \[
-  \begin{aligned}
-  V &= \tfrac1n\!\sum_j \mathbf{1}[\,\mathrm{viol}(r_j)=\varnothing\,],\\
-  S &= \binom{n}{2}^{-1}\!\!\sum_{i<j}\! J(r_i,r_j),\\
-  S_w &= 1 - \binom{n}{2}^{-1}\!\!\sum_{i<j}\! \mathrm{TV}(w_i,w_j),\\
-  A &= \tfrac1n\!\sum_j \tfrac{|r_j\cap b|}{k}.
-  \end{aligned}
+  \begin{array}{r@{\;=\;}l@{\qquad}r@{\;=\;}l}
+  V & \tfrac1n\sum_j \mathbf{1}[\mathrm{viol}(r_j)=\varnothing] &
+  S & \dbinom{n}{2}^{-1}\!\sum_{i<j} J(r_i,r_j) \\[1.8ex]
+  S_w & 1 - \dbinom{n}{2}^{-1}\!\sum_{i<j} \mathrm{TV}(w_i,w_j) &
+  A & \tfrac1n\sum_j \dfrac{|r_j\cap b|}{k}
+  \end{array}
 \]
 
 \begin{figure}[t]
@@ -457,7 +457,10 @@ failure taxonomy is likewise operational: 300 cash overruns, 200 ungrounded
 facts, 150 fee-worsening splits, 150 too-many-recommendation violations, 100
 below-floor orders, and 30 malformed amount outputs. These are deterministic
 violations of the scenario contract, not judgments by another model, and the
-scenario manifest is hashed by the experiment driver.
+scenario manifest is hashed by the experiment driver. The bank is balanced by
+construction, ten variants for each of the twelve categories, and because the
+manifest is hashed, adding or removing a scenario is a versioned change to the
+benchmark rather than a silent edit.
 
 \section{Deterministic Verification}
 \label{sec:portfolio-verification}
@@ -856,7 +859,10 @@ an invalid recommendation. The portfolio-fit experiment adds the operational
 layer that ranking alone misses: a better-scoring asset can be the worse
 portfolio action. The result is a reproducible benchmark for investment-advice
 systems, with frozen inputs, executable guardrails, and metrics that real
-language-model advisors can be evaluated against without changing the rules.
+language-model advisors can be evaluated against without changing the rules. The
+release is a usable standard: a deterministic baseline, the audit protocol, a
+120-scenario bank, and 3,000 replayable audited outputs, against which any
+advisor runs on identical terms.
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{references}
