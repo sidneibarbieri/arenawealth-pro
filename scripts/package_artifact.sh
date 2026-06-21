@@ -38,35 +38,17 @@ rm -f "${work}/scripts/package_artifact.sh"
 # Bibliography curation notes are development input, not part of the runtime artifact.
 rm -rf "${work}/paper/bibliography"
 
-# Replace the manuscript author block with the anonymous block (double-blind safe):
-# the repo keeps real authors for camera-ready, the published artifact must not.
-python3 - "${work}/paper/main.tex" <<'PY'
-import re
-import sys
-from pathlib import Path
-
-path = Path(sys.argv[1])
-text = path.read_text(encoding="utf-8")
-anonymous = (
-    "\\author{Anonymous Author(s)}\n"
-    "\\affiliation{%\n"
-    "  \\institution{Anonymous Institution}\n"
-    "  \\city{Anonymous}\n"
-    "  \\country{Anonymous}\n"
-    "}\n"
-    "\\email{anonymous@example.com}"
-)
-new, count = re.subn(
-    r"%%% AUTHOR-BLOCK-START.*?%%% AUTHOR-BLOCK-END",
-    lambda _match: anonymous,
-    text,
-    flags=re.DOTALL,
-)
-if count != 1:
-    sys.exit(f"expected exactly one author block, found {count}")
-path.write_text(new, encoding="utf-8")
-print("anonymized manuscript author block")
-PY
+# The manuscript is the separately-submitted paper. It is referenced by the
+# artifact through its anonymous URL but never published with it, so drop the LaTeX
+# sources, the vendored template, and the paper README. Keep paper/figures (the
+# experiment output figures) and paper/data (frozen inputs) so the experiments still
+# reproduce.
+rm -f "${work}/paper/main.tex" \
+      "${work}/paper/references.bib" \
+      "${work}/paper/acmart.cls" \
+      "${work}/paper/ACM-Reference-Format.bst" \
+      "${work}/paper/README.md"
+echo "removed the manuscript from the artifact (experiments only)"
 
 # Anonymize the author identity wherever it appears.
 if [ -n "${author}" ] && [ "${author}" != "Anonymous" ] && [ "${author}" != "Anonymous Authors" ]; then
