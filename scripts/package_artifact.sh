@@ -35,6 +35,9 @@ git archive --format=tar HEAD | tar -x -C "${work}"
 # Remove this packager; reviewers receive the frozen artifact, not release tooling.
 rm -f "${work}/scripts/package_artifact.sh"
 
+# Bibliography curation notes are development input, not part of the runtime artifact.
+rm -rf "${work}/paper/bibliography"
+
 # Anonymize the author identity wherever it appears.
 if [ -n "${author}" ] && [ "${author}" != "Anonymous" ] && [ "${author}" != "Anonymous Authors" ]; then
     python3 - "${work}" "${author}" <<'PY'

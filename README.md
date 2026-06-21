@@ -7,8 +7,6 @@ before a recommendation earns any return statistic, is it executable, stable
 across repeated runs, grounded in the frozen scenario, and consistent with the
 portfolio's fee and concentration constraints?
 
-![ArenaWealth reviewer dashboard](docs/assets/dashboard-reviewer.png)
-
 The dashboard is optional, but it shows the same contract the paper studies:
 tracked input source, deterministic reviewer mode, proposed orders, guardrails,
 and a decision log. Orders are proposed only; no trade is placed.

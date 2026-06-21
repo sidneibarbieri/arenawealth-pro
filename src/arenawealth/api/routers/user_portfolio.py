@@ -375,6 +375,8 @@ def fetch_live_quotes(tickers: list[str]) -> dict[str, LiveQuote]:
     try:
         fresh = fetch_remote_quotes(missing)
     except Exception:
+        # yfinance scrapes Yahoo and has a wide, undocumented failure surface, so
+        # any fetch failure degrades to cached quotes and re-raises when none exist.
         stale = read_cached_quotes(missing, max_age=None)
         if stale:
             return {**cached, **stale}
@@ -804,7 +806,7 @@ async def get_audit_results() -> dict[str, Any]:
     try:
         with open(ref_path, encoding="utf-8") as f:
             return json.load(f)
-    except Exception as e:
+    except (OSError, json.JSONDecodeError) as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to read audit results: {e!s}"
