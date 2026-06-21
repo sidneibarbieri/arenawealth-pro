@@ -770,6 +770,15 @@ baseline, and the frozen controls show that these axes are independent. A
 recommendation can match the baseline and repeat across runs while still being
 invalid. A return-only or overlap-only benchmark misses that failure.
 
+The controls also fix what kind of evidence the benchmark provides. A constructed
+advisor is an existence proof that the three axes are separable: it shows an
+action can agree with the baseline yet be invalid, the case a single conflated
+score cannot represent. It is not a claim about how often real advisors fail;
+the frontier pilot probes that from the other side, certifying valid behavior
+when it occurs. The distinction is general for action-level benchmarks: a control
+witnesses separability, and reporting it as such rather than as a failure rate is
+what keeps the audit honest under an adversarial reading.
+
 The protocol also separates idea generation from portfolio verification. A
 learned advisor may propose plausible tickers; the portfolio layer decides
 whether each candidate is admissible for a particular portfolio. In
