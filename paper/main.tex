@@ -347,16 +347,6 @@ valid-but-disagreeing control: fully valid and stable, but with zero agreement.
 An overlap-only benchmark would rank the first above the second, which reverses
 their operational quality.
 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\columnwidth]{figures/ai_advisor_audit.pdf}
-  \caption{The archetype controls separate validity, agreement, and stability.}
-  \Description{Heat-map matrix of validity, agreement, and stability across
-  seven advisor archetypes, showing that high agreement does not coincide with
-  high validity.}
-  \label{fig:audit}
-\end{figure}
-
 For an advisor that returns ticker sets $r_1,\dots,r_n$ over repeated runs of a
 scenario with baseline top-$k$ set $b$, the metrics are:
 \[
@@ -367,6 +357,16 @@ scenario with baseline top-$k$ set $b$, the metrics are:
   A &= \tfrac1n\!\sum_j \tfrac{|r_j\cap b|}{k}.
   \end{aligned}
 \]
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/ai_advisor_audit.pdf}
+  \caption{The archetype controls separate validity, agreement, and stability.}
+  \Description{Heat-map matrix of validity, agreement, and stability across
+  seven advisor archetypes, showing that high agreement does not coincide with
+  high validity.}
+  \label{fig:audit}
+\end{figure}
 where $J$ is the Jaccard overlap and $\mathrm{viol}$ the constraint set of
 $r_j$, $w_j$ normalizes run $j$'s dollar amounts to weights, and
 $\mathrm{TV}$ is total-variation distance. The sizing stability $S_w\in[0,1]$
@@ -611,12 +611,15 @@ setting this planner targets. The takeaway is deliberately narrow: for the
 fee-quantized cash deployments studied here, the planner's cost behavior is
 measured against exact references rather than asserted.
 
-\section{Experimental Findings}
+\section{Calibrating the Baseline}
 \label{sec:weighting}
 
-Because the composite score is linear, the ranking it induces is directly
-ablatable: zeroing a weight isolates a factor, and the score can be recomposed
-from per-position sub-scores without re-fetching data.
+The baseline is the audit's yardstick, so this section calibrates the yardstick
+itself rather than any advisor: it shows that the factor weighting is not
+load-bearing and that the baseline is a fair, reproducible reference. Because the
+composite score is linear, the ranking it induces is directly ablatable: zeroing
+a weight isolates a factor, and the score can be recomposed from per-position
+sub-scores without re-fetching data.
 
 On a fixed, deterministic basket we recomposed the ranking under single-factor
 and equal weights and measured Spearman correlation to the baseline ordering and

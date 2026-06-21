@@ -133,12 +133,12 @@ def figure_fee_premium_pdf(landscape, path: Path) -> None:
     ax.text(1180, 2.58, "naive split: +$2.50 bands", color=RED, fontsize=6.5)
     ax.text(
         4940,
-        0.18,
+        0.52,
         "fee-aware:\nzero premium",
         color=GREEN,
         ha="right",
         va="bottom",
-        linespacing=0.95,
+        linespacing=1.0,
         fontsize=6.5,
     )
     save_pdf(fig, path)
