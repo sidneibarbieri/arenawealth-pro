@@ -38,6 +38,36 @@ rm -f "${work}/scripts/package_artifact.sh"
 # Bibliography curation notes are development input, not part of the runtime artifact.
 rm -rf "${work}/paper/bibliography"
 
+# Replace the manuscript author block with the anonymous block (double-blind safe):
+# the repo keeps real authors for camera-ready, the published artifact must not.
+python3 - "${work}/paper/main.tex" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+text = path.read_text(encoding="utf-8")
+anonymous = (
+    "\\author{Anonymous Author(s)}\n"
+    "\\affiliation{%\n"
+    "  \\institution{Anonymous Institution}\n"
+    "  \\city{Anonymous}\n"
+    "  \\country{Anonymous}\n"
+    "}\n"
+    "\\email{anonymous@example.com}"
+)
+new, count = re.subn(
+    r"%%% AUTHOR-BLOCK-START.*?%%% AUTHOR-BLOCK-END",
+    lambda _match: anonymous,
+    text,
+    flags=re.DOTALL,
+)
+if count != 1:
+    sys.exit(f"expected exactly one author block, found {count}")
+path.write_text(new, encoding="utf-8")
+print("anonymized manuscript author block")
+PY
+
 # Anonymize the author identity wherever it appears.
 if [ -n "${author}" ] && [ "${author}" != "Anonymous" ] && [ "${author}" != "Anonymous Authors" ]; then
     python3 - "${work}" "${author}" <<'PY'

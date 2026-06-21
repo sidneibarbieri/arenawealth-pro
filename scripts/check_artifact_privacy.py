@@ -90,6 +90,21 @@ TEXT_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
 EMAIL_PATTERN = re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.IGNORECASE)
 ALLOWED_EMAILS = {"anonymous@example.com", "reviewer@example.com", "user@example.com"}
 
+# paper/main.tex carries the real author block for camera-ready. The acmart
+# "anonymous" option blanks it in the PDF, and package_artifact.sh strips it from
+# the published artifact, so author identity is expected in this one file and skipped
+# here. Every other file is still scanned for author identity, and main.tex is still
+# scanned for keys, local paths, and private sentinels.
+SUBMISSION_SOURCE = "paper/main.tex"
+AUTHOR_IDENTITY_LABELS = frozenset({"personal name", "personal handle"})
+
+
+def is_submission_source(path: Path, root: Path) -> bool:
+    try:
+        return path.relative_to(root).as_posix() == SUBMISSION_SOURCE
+    except ValueError:
+        return False
+
 
 def should_skip(path: Path, root: Path) -> bool:
     try:
@@ -135,19 +150,22 @@ def compact(value: str, limit: int = 96) -> str:
     return value[: limit - 3] + "..."
 
 
-def scan_text(path: Path, text: str) -> list[Finding]:
+def scan_text(path: Path, text: str, allow_author_block: bool = False) -> list[Finding]:
     findings: list[Finding] = []
     for label, pattern in TEXT_PATTERNS:
+        if allow_author_block and label in AUTHOR_IDENTITY_LABELS:
+            continue
         for match in pattern.finditer(text):
             findings.append(
                 Finding(path, label, line_number(text, match.start()), compact(match.group(0)))
             )
-    for match in EMAIL_PATTERN.finditer(text):
-        email = match.group(0).lower()
-        if email not in ALLOWED_EMAILS:
-            findings.append(
-                Finding(path, "non-anonymous email", line_number(text, match.start()), email)
-            )
+    if not allow_author_block:
+        for match in EMAIL_PATTERN.finditer(text):
+            email = match.group(0).lower()
+            if email not in ALLOWED_EMAILS:
+                findings.append(
+                    Finding(path, "non-anonymous email", line_number(text, match.start()), email)
+                )
     return findings
 
 
@@ -162,10 +180,11 @@ def scan_binary(path: Path, content: bytes) -> list[Finding]:
     return findings
 
 
-def scan_file(path: Path) -> list[Finding]:
+def scan_file(path: Path, root: Path) -> list[Finding]:
     content = path.read_bytes()
+    allow_author_block = is_submission_source(path, root)
     try:
-        return scan_text(path, content.decode("utf-8"))
+        return scan_text(path, content.decode("utf-8"), allow_author_block)
     except UnicodeDecodeError:
         return scan_binary(path, content)
 
@@ -177,7 +196,7 @@ def main() -> int:
     root = arguments.root.resolve()
     findings: list[Finding] = []
     for path in files_to_scan(root):
-        findings.extend(scan_file(path))
+        findings.extend(scan_file(path, root))
     if findings:
         print("PRIVACY AUDIT FAILED:", file=sys.stderr)
         for finding in findings:
