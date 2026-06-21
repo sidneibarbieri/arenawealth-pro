@@ -142,11 +142,9 @@ scoring reuses such established signals only to rank an existing basket. The
 choice of signals is not load-bearing: the audit accepts any deterministic policy
 as its yardstick, and we report that a parameter-free equal-weight allocator
 already matches ours, so substituting momentum, profitability, or low volatility
-would change the baseline without changing the protocol. This scoping matters. A
-stock-picking paper must show out-of-sample alpha against factor and
-machine-learning baselines; our claim is orthogonal, the layer that audits
-\emph{whether advice can be executed} replayably and cheaply once a candidate set
-exists.
+would change the baseline without changing the protocol. Our claim is orthogonal
+to stock-picking: it is the layer that audits \emph{whether advice can be
+executed} replayably and cheaply once a candidate set exists.
 
 Classical theory shows that transaction costs induce a \emph{no-trade region}:
 proportional costs make the optimal policy a band around the target where one
@@ -214,8 +212,12 @@ generalizability as open problems \cite{elalami2025mlfinance}. This stance has a
 lineage outside finance. Holistic evaluation replaced a single accuracy number
 with parallel desiderata \cite{liang2023helm}, and behavioral testing replaced
 aggregate metrics with capability-specific unit tests on model output
-\cite{ribeiro2020checklist}. Our protocol is behavioral testing specialized to a
-financial action: each validity check is a capability test, and the failure
+\cite{ribeiro2020checklist}. More recently, agent benchmarks moved the unit of
+evaluation from a correct answer to a correct action, scoring whether a system's
+output solves a task in interactive environments \cite{liu2024agentbench} or
+resolves a real software issue \cite{jimenez2024swebench}. Financial-LLM
+evaluation has not made this move. Our protocol is behavioral testing specialized
+to a financial action: each validity check is a capability test, and the failure
 taxonomy is its test matrix, run deterministically against a frozen scenario. The
 ungrounded-fact check is the verifiable end of faithfulness evaluation, which
 hallucination research still treats as largely open \cite{ji2023hallucination}.
@@ -316,10 +318,9 @@ concentration breach, and the fact-hallucination control triggers the ungrounded
 fact.
 
 \begin{table}[t]
-  \caption{Deterministic failure taxonomy. Every category is flagged by an exact
-  test on the advisor's output and the frozen scenario, so a violation names its
-  own cause without a model in the loop. Here $a_i$ is the dollar amount of leg
-  $i$, $T$ the fee tranche, and $c/\tau$ the economic floor.}
+  \caption{Deterministic failure taxonomy: each category is an exact test on
+  advisor output and the frozen scenario ($a_i$ is leg $i$'s amount, $T$ the fee
+  tranche, $c/\tau$ the economic floor).}
   \label{tab:taxonomy}
   \begin{tabular}{ll}
     \toprule
@@ -397,8 +398,7 @@ catch appear in the deterministic controls and the 120-scenario bank below.
 
 \begin{table}[t]
   \caption{Two current frontier models audited on the frozen scenarios, nine runs
-  each. Both satisfy every constraint with perfect agreement and stability: the
-  protocol certifies valid behavior, it does not only flag failures.}
+  each. Both pass every constraint, with perfect agreement and stability.}
   \label{tab:model-pilot}
   \small
   \begin{tabular}{lccc}
@@ -576,8 +576,7 @@ directly. The guardrail is the fee schedule made explicit, not a tuned threshold
 
 \begin{table}[t]
   \caption{The economic floor $c/\tau$ follows from the fee schedule at a $1\%$
-  cost tolerance; it is set, not tuned. Flat per-ticket fees and the tranche fee
-  obey the same rule, and zero commission collapses the floor to \$0.}
+  cost tolerance, set rather than tuned.}
   \label{tab:schedules}
   \begin{tabular}{lrrr}
     \toprule
@@ -666,10 +665,9 @@ scheme, and the paper's contribution is therefore the audit protocol rather than
 an alpha claim.
 
 \begin{table}[t]
-  \caption{Current-basket backtest, 2021-01-05 to 2026-06-04 (1360 days), buy
-  and hold unless noted. Allocator baselines are walk-forward, rolling-covariance
-  strategies with shrinkage and turnover cost; this is a current-basket
-  calibration, not a point-in-time stock-selection test.}
+  \caption{Current-basket backtest, 2021-01-05 to 2026-06-04 (1360 days), buy and
+  hold unless noted. Allocator baselines are walk-forward with shrinkage and
+  turnover cost.}
   \label{tab:backtest}
   \begin{tabular}{lrrr}
     \toprule
