@@ -30,7 +30,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from arenawealth.experiments.advisor_prompts import build_prompt, parse_response
+from arenawealth.experiments.advisor_prompts import PROMPT_ARMS, build_prompt, parse_response
 from arenawealth.experiments.ai_advisor import (
     AdvisorRecommendation,
     AdvisorScenario,
@@ -77,12 +77,14 @@ def cache_path(
     model: str,
     scenario_name: str,
     run_index: int,
+    arm: str = "policy",
     cache_root: Path = CACHE_ROOT,
 ) -> Path:
     return (
         cache_root
         / safe_slug(provider)
         / safe_slug(model)
+        / safe_slug(arm)
         / f"{safe_slug(scenario_name)}__run{run_index}.json"
     )
 
@@ -114,15 +116,16 @@ def collect_run(
     model: str,
     run_index: int,
     temperature: float,
+    arm: str,
     live: bool,
     budget: CallBudget,
     cache_root: Path,
     client: AdvisorLLMClient | None,
 ) -> dict:
     """Return the cached run if present; otherwise request it when live."""
-    prompt = build_prompt(scenario)
+    prompt = build_prompt(scenario, arm)
     current_prompt_hash = prompt_hash(prompt)
-    path = cache_path(provider, model, scenario["name"], run_index, cache_root)
+    path = cache_path(provider, model, scenario["name"], run_index, arm, cache_root)
     if path.exists():
         cached = json.loads(path.read_text(encoding="utf-8"))
         if cached.get("prompt_hash") == current_prompt_hash:
@@ -132,6 +135,7 @@ def collect_run(
             "status": "would_call",
             "provider": provider,
             "model": model,
+            "arm": arm,
             "scenario": scenario["name"],
             "run_index": run_index,
             "prompt_hash": current_prompt_hash,
@@ -144,6 +148,7 @@ def collect_run(
         "status": "collected",
         "provider": provider,
         "model": model,
+        "arm": arm,
         "scenario": scenario["name"],
         "run_index": run_index,
         "temperature": temperature,
@@ -208,6 +213,7 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--runs", type=int, default=3, help="Repeated runs per scenario.")
     parser.add_argument("--max-calls", type=int, default=10, help="Hard cap on live API calls.")
     parser.add_argument("--temperature", type=float, default=0.7)
+    parser.add_argument("--arm", choices=PROMPT_ARMS, default="policy", help="Prompt arm.")
     parser.add_argument("--live", action="store_true", help="Make real API calls; off by default.")
     parser.add_argument("--scenarios", type=Path, default=SCENARIOS_PATH)
     parser.add_argument("--cache-root", type=Path, default=CACHE_ROOT)
@@ -236,6 +242,7 @@ def main() -> None:
                 model,
                 index,
                 arguments.temperature,
+                arguments.arm,
                 arguments.live,
                 budget,
                 arguments.cache_root,
@@ -258,6 +265,7 @@ def main() -> None:
         arguments.cache_root
         / safe_slug(arguments.provider)
         / safe_slug(model)
+        / safe_slug(arguments.arm)
         / "audit_summary.json"
     )
     summary_path.parent.mkdir(parents=True, exist_ok=True)

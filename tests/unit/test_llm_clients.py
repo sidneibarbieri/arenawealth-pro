@@ -60,9 +60,16 @@ def test_anthropic_text_extracts_text_blocks():
 
 
 def test_cache_path_separates_provider_and_model(tmp_path):
-    path = cache_path("azure", "chat/test", "quality additions", 2, tmp_path)
+    path = cache_path("azure", "chat/test", "quality additions", 2, "policy", tmp_path)
 
-    assert path == tmp_path / "azure" / "chat_test" / "quality_additions__run2.json"
+    assert path == tmp_path / "azure" / "chat_test" / "policy" / "quality_additions__run2.json"
+
+
+def test_cache_path_separates_prompt_arms(tmp_path):
+    bare = cache_path("azure", "chat", "s", 1, "bare", tmp_path)
+    scaffold = cache_path("azure", "chat", "s", 1, "scaffold", tmp_path)
+
+    assert bare != scaffold
 
 
 def test_model_label_defaults_from_provider_env(monkeypatch):
