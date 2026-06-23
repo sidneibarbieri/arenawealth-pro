@@ -69,3 +69,39 @@ def test_parse_missing_tickers_raises():
 def test_parse_no_json_raises():
     with pytest.raises(ValueError):
         parse_response("I cannot help with that.")
+
+
+def test_prompt_arms_form_a_hierarchy():
+    bare = build_prompt(SCENARIO, arm="bare")
+    policy = build_prompt(SCENARIO, arm="policy")
+    scaffold = build_prompt(SCENARIO, arm="scaffold")
+    for prompt in (bare, policy, scaffold):
+        assert "Allowed universe: MA, ADBE, ANET" in prompt
+        assert "Reply with one JSON object" in prompt
+    assert "Do not recommend already-owned tickers" not in bare
+    assert "Fee arithmetic" not in bare
+    assert "Do not recommend already-owned tickers" in policy
+    assert "Fee arithmetic" not in policy
+    assert "Do not recommend already-owned tickers" in scaffold
+    assert "Fee arithmetic" in scaffold
+
+
+def test_scaffold_precomputes_fee_and_floor():
+    prompt = build_prompt(SCENARIO, arm="scaffold")
+    assert "USD 5.00" in prompt  # one order of 1500 spans two 1000-tranches
+    assert "250.00" in prompt  # economic floor c/tau
+    assert "2.50" in prompt  # fee per tranche
+
+
+def test_prompts_are_deterministic_per_arm():
+    for arm in ("bare", "policy", "scaffold"):
+        assert build_prompt(SCENARIO, arm=arm) == build_prompt(SCENARIO, arm=arm)
+
+
+def test_unknown_arm_raises():
+    with pytest.raises(ValueError):
+        build_prompt(SCENARIO, arm="zero_shot")
+
+
+def test_default_arm_is_policy():
+    assert build_prompt(SCENARIO) == build_prompt(SCENARIO, arm="policy")
