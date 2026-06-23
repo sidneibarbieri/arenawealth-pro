@@ -72,10 +72,10 @@ def main() -> None:
 
     # 1. Reproduce the shipped numbers as a faithfulness check.
     print("Faithfulness check (production defaults cap=20, penalty x3, bonus 12):")
-    for r in rows:
+    for row in rows:
         print(
-            f"  {r.name:10s} projected_theme={r.projected_theme_pct:5.1f}%  "
-            f"fit={fit_score(r, 20.0, 3.0, 12.0):5.1f}  composite={r.composite:.0f}"
+            f"  {row.name:10s} projected_theme={row.projected_theme_pct:5.1f}%  "
+            f"fit={fit_score(row, 20.0, 3.0, 12.0):5.1f}  composite={row.composite:.0f}"
         )
     print(f"  isolated-rank top = {isolated_top};  "
           f"portfolio-fit top = {decision(rows, 20.0, 3.0, 12.0)}\n")

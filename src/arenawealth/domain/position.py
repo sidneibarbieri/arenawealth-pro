@@ -1,4 +1,4 @@
-"""A single holding in a portfolio — ticker, shares, cost basis, and current price."""
+"""A single holding in a portfolio - ticker, shares, cost basis, and current price."""
 
 from __future__ import annotations
 

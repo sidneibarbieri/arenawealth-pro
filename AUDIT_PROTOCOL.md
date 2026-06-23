@@ -248,7 +248,7 @@ Where each sub-score is in [0, 100] and all factors are bounded to established f
 - **Compounding** (0.35 weight): Revenue growth, margin sustainability
 - **Valuation** (0.25 weight): Price-to-book, free cash flow yield
 
-### Backtest Results (2021–2026)
+### Backtest Results (2021-2026)
 
 The baseline is **not claimed to beat the market**. On a 5-year backtest against:
 
@@ -330,9 +330,9 @@ uv run python src/arenawealth/experiments/run_experiments.py --export-scenarios 
 
 ## References
 
-- **Paper**: "Auditing AI Investment Recommendations Against a Deterministic, Replayable Baseline" (Section "The Audit Protocol", lines 185–250)
-- **Fee theory**: Paper Section "The Fee Structure as an Object of Study" (lines 272–393)
-- **Baseline calibration**: Paper Section "Weighting: Honest Calibration" (lines ~400–500)
+- **Paper**: "Auditing AI Investment Recommendations Against a Deterministic, Replayable Baseline" (Section "The Audit Protocol", lines 185-250)
+- **Fee theory**: Paper Section "The Fee Structure as an Object of Study" (lines 272-393)
+- **Baseline calibration**: Paper Section "Weighting: Honest Calibration" (lines ~400-500)
 - **Related work**: DeMiguel et al. (2009), Asness et al. (2019), Chen et al. (2025 StockBench)
 
 ---

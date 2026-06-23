@@ -1,4 +1,4 @@
-"""Tests for Money value object — currency safety and arithmetic precision."""
+"""Tests for Money value object - currency safety and arithmetic precision."""
 
 from decimal import Decimal
 

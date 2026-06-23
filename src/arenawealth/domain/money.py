@@ -1,4 +1,4 @@
-"""Immutable monetary value with currency — the fundamental unit of financial calculation.
+"""Immutable monetary value with currency - the fundamental unit of financial calculation.
 
 All financial arithmetic goes through Money to prevent currency-mixing bugs at the type level.
 """

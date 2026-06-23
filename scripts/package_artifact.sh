@@ -41,6 +41,11 @@ rm -rf "${work}/paper/bibliography"
 # Maintainer-only release/history-scrub runbook: not part of the reviewer artifact.
 rm -f "${work}/docs/PUBLIC_RELEASE.md"
 
+# Development-only notes (research ledger, literature map, product/brand/process
+# docs) and the local change log: helpful while building, not for reviewers.
+rm -rf "${work}/docs/dev"
+rm -f "${work}/CORRECTIONS.md"
+
 # The manuscript is the separately-submitted paper. It is referenced by the
 # artifact through its anonymous URL but never published with it, so drop the LaTeX
 # sources, the vendored template, and the paper README. Keep paper/figures (the

@@ -1,4 +1,4 @@
-"""CSV portfolio importer — flexible column mapping for any broker export.
+"""CSV portfolio importer - flexible column mapping for any broker export.
 
 Handles the common case: a user exports positions from a broker as CSV. Column
 names are mapped via aliases so the user does not need to rename anything.

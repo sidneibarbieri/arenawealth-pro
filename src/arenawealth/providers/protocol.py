@@ -1,4 +1,4 @@
-"""Provider protocol — the contract every market data source must satisfy.
+"""Provider protocol - the contract every market data source must satisfy.
 
 Providers are pluggable: Yahoo (tier 0, no key), Finnhub (tier 1), etc.
 The fallback chain tries providers in order until one succeeds.

@@ -1,4 +1,4 @@
-"""Shared fixtures — isolated SQLite per test that hits the REST API."""
+"""Shared fixtures - isolated SQLite per test that hits the REST API."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Yahoo Finance provider — tier 0, no API key required.
+"""Yahoo Finance provider - tier 0, no API key required.
 
 This is the default fallback that ensures the product works without any
 credential setup. Uses yfinance library which scrapes Yahoo Finance.

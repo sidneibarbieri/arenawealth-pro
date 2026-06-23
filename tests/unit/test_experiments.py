@@ -47,7 +47,7 @@ def make_analysis(ticker: str, moat: float, comp: float, val: float) -> Position
     )
 
 
-# ---- fee landscape ----
+# fee landscape
 
 
 def test_guardrail_fixed_point_is_250():
@@ -77,7 +77,7 @@ def test_engine_consolidates_subtranche_cash():
     assert fee == 2.50
 
 
-# ---- ablation ----
+# ablation
 
 
 def test_recompose_matches_baseline_weights():

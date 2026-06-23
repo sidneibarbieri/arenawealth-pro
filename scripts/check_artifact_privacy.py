@@ -33,8 +33,8 @@ SKIP_SUFFIXES = {
     ".pyc",
     ".sqlite",
     ".sqlite3",
-    # Vendored upstream LaTeX template (acmart.cls, ACM-Reference-Format.bst): public
-    # ACM files we do not author, carrying upstream maintainer/permissions emails.
+    # Vendored upstream typesetting template files we do not author, which carry
+    # upstream maintainer and permissions emails.
     ".cls",
     ".bst",
 }
@@ -94,8 +94,8 @@ TEXT_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
 EMAIL_PATTERN = re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.IGNORECASE)
 ALLOWED_EMAILS = {"anonymous@example.com", "reviewer@example.com", "user@example.com"}
 
-# paper/main.tex carries the real author block for camera-ready. The acmart
-# "anonymous" option blanks it in the PDF, and package_artifact.sh strips it from
+# paper/main.tex carries the real author block for the non-anonymous build. The
+# template "anonymous" option blanks it in the PDF, and package_artifact.sh strips it from
 # the published artifact, so author identity is expected in this one file and skipped
 # here. Every other file is still scanned for author identity, and main.tex is still
 # scanned for keys, local paths, and private sentinels.

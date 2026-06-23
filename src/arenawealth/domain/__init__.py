@@ -1,4 +1,4 @@
-"""Domain models — pure business logic, zero infrastructure dependencies."""
+"""Domain models - pure business logic, zero infrastructure dependencies."""
 
 from arenawealth.domain.money import Money
 from arenawealth.domain.portfolio import Portfolio

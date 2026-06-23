@@ -1,4 +1,4 @@
-"""API models — DTOs for request/response serialization."""
+"""API models - DTOs for request/response serialization."""
 
 from __future__ import annotations
 

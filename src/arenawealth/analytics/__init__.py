@@ -1,4 +1,4 @@
-"""Analytics — moat and compounding scoring with deterministic deployment."""
+"""Analytics - moat and compounding scoring with deterministic deployment."""
 
 from arenawealth.analytics.backtest import (
     BacktestComparison,

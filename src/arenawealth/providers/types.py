@@ -1,4 +1,4 @@
-"""Shared types for provider results — DTOs that cross the provider boundary."""
+"""Shared types for provider results - DTOs that cross the provider boundary."""
 
 from __future__ import annotations
 

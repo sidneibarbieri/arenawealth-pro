@@ -1097,7 +1097,7 @@ function PositionRow({ position }: PositionRowProps) {
       <td className="numeric">{formatNumber(position.shares)}</td>
       <td className="numeric">{formatMoney(position.current_price)}</td>
       <td className={`numeric ${dayClass}`}>
-        {dayChange === null ? '—' : formatPercent(dayChange)}
+        {dayChange === null ? '-' : formatPercent(dayChange)}
       </td>
       <td className="numeric">{formatMoney(position.market_value)}</td>
       <td className="numeric">{formatPercent(weight)}</td>

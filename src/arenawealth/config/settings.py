@@ -1,7 +1,7 @@
 """Application settings loaded from environment or ~/.arenawealth/credentials.env.
 
 Uses pydantic-settings pattern: environment variables override .env file values.
-All keys are optional — the product works without any of them.
+All keys are optional - the product works without any of them.
 """
 
 from __future__ import annotations

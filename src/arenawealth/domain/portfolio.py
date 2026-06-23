@@ -1,4 +1,4 @@
-"""Portfolio — an ordered collection of Positions with aggregate analytics."""
+"""Portfolio - an ordered collection of Positions with aggregate analytics."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ class Portfolio(BaseModel, frozen=True):
     """Immutable portfolio snapshot.
 
     Positions are stored in insertion order. All aggregate values (total_value,
-    total_gain_loss, weight_pct) are derived — no stored state to desync.
+    total_gain_loss, weight_pct) are derived - no stored state to desync.
     """
 
     positions: tuple[Position, ...] = Field(default=())

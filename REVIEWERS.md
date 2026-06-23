@@ -25,19 +25,19 @@ make all
 
 This runs, in order:
 
-1. `setup` — virtualenv and dependencies (`pip install -e ".[dev]"`) plus frontend.
-2. `verify-data` — SHA-256 check of frozen tracked inputs.
-3. `privacy-audit` — high-confidence scan for author identity, local paths,
+1. `setup` - virtualenv and dependencies (`pip install -e ".[dev]"`) plus frontend.
+2. `verify-data` - SHA-256 check of frozen tracked inputs.
+3. `privacy-audit` - high-confidence scan for author identity, local paths,
    private fixture sentinels, emails, and secret tokens.
-4. `verify` — lint and the full test suite (no network, isolated SQLite).
-5. `price-backtest-reference` — regenerate the offline backtest reference from
+4. `verify` - lint and the full test suite (no network, isolated SQLite).
+5. `price-backtest-reference` - regenerate the offline backtest reference from
    `paper/data/returns_matrix.csv`.
-6. `experiments` — regenerate every paper figure under `paper/figures/` and the
+6. `experiments` - regenerate every paper figure under `paper/figures/` and the
    JSON report under `exports/` from the engine and the tracked return matrix.
-7. `ai-advisor-audit` and `advisor-run-audit` — replay frozen advisor scenarios
+7. `ai-advisor-audit` and `advisor-run-audit` - replay frozen advisor scenarios
    and cached provider outputs without API calls.
-8. `figure-audit` — verify generated PDF figures are vector and font-embedded.
-9. `paper` — compile `paper/main.pdf` with `latexmk` (requires a TeX install).
+8. `figure-audit` - verify generated PDF figures are vector and font-embedded.
+9. `paper` - compile `paper/main.pdf` with `latexmk` (requires a TeX install).
 
 Host reproduction:
 

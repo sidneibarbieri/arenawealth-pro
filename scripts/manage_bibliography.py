@@ -230,9 +230,9 @@ def write_catalog(papers: list[Paper]) -> None:
         "",
         "## Status legend",
         "",
-        "- `have` — local PDF exists.",
-        "- `open-missing` — marked open, but the PDF is not present locally.",
-        "- `manual` — requires manual, licensed, or author-copy download.",
+        "- `have` - local PDF exists.",
+        "- `open-missing` - marked open, but the PDF is not present locally.",
+        "- `manual` - requires manual, licensed, or author-copy download.",
         "",
     ]
 
