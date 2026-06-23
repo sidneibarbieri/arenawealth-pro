@@ -333,6 +333,9 @@ Pre-trade validation already runs inside robo-advisors and portfolio systems, bu
 
 Investment-advice systems need a benchmark that tests the recommendation before celebrating the return. This paper provides a benchmark: a deterministic, replayable baseline and an audit protocol that separately measures validity, stability, and agreement. The protocol exposes a failure hidden by overlap metrics: an advisor can agree with the baseline and remain stable while still producing an invalid recommendation. The portfolio-fit experiment adds the operational layer that ranking alone misses: a better-scoring asset can be the worst portfolio action. The result is a reproducible benchmark for investment-advice systems, with frozen inputs, executable guardrails, and metrics that real language-model advisors can be evaluated against without changing the rules. The release is a usable standard: a deterministic baseline, the audit protocol, a 120-scenario bank, and 3,000 replayable audited outputs, against which any advisor runs on identical terms.
 
+\section*{LLM usage considerations}
+The authors used Grammarly and ChatGPT for grammar checking, limited editorial revision, and minor formatting assistance for figures and illustrations. All scientific claims, analyses, experiments, visual representations, and conclusions were produced and verified by the authors.
+
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{references}
 
