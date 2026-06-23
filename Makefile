@@ -3,7 +3,7 @@ PIP ?= .venv/bin/pip
 UVICORN ?= .venv/bin/uvicorn
 UV_CACHE_DIR ?= .uv-cache
 
-.PHONY: setup verify verify-e2e metrics recommendation price-backtest price-backtest-reference experiments ai-advisor-audit advisor-run-audit bibliography advisor-budget collect-advisor-runs advisor-experiment verify-data privacy-audit figure-audit repro-docker configure-env api ui app run paper all package clean
+.PHONY: setup verify verify-e2e metrics recommendation price-backtest price-backtest-reference experiments ai-advisor-audit advisor-run-audit bibliography advisor-budget collect-advisor-runs advisor-experiment review-dashboard verify-data privacy-audit figure-audit repro-docker configure-env api ui app run paper all package clean
 
 setup:
 	python3.11 -m venv .venv
@@ -53,6 +53,9 @@ collect-advisor-runs:
 
 advisor-experiment:
 	$(PYTHON) scripts/run_advisor_experiment.py
+
+review-dashboard:
+	$(PYTHON) scripts/build_review_dashboard.py
 
 verify-data:
 	$(PYTHON) scripts/hash_data.py
