@@ -95,7 +95,9 @@ function App() {
     async function loadPortfolio() {
       setIsPortfolioLoading(true);
       setPortfolioError(null);
-      const payload = await fetchPortfolio(!offlineDemo, controller.signal);
+      // The portfolio valuation stays deterministic so its value does not jump when
+      // the reviewer-mode toggle changes. The toggle governs recommendations only.
+      const payload = await fetchPortfolio(false, controller.signal);
       setPortfolio(payload);
       setIsPortfolioLoading(false);
     }
@@ -109,7 +111,7 @@ function App() {
     });
 
     return () => controller.abort();
-  }, [offlineDemo, refreshIndex]);
+  }, [refreshIndex]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -414,9 +416,9 @@ function App() {
               </div>
 
               <p className="mode-hint">
-                Live data drives real recommendations. Reviewer mode swaps in synthetic,
-                reproducible fundamentals for offline demos, so its picks differ and are not
-                actionable.
+                The portfolio valuation stays fixed. Live mode drives real recommendations;
+                reviewer mode swaps in synthetic, reproducible fundamentals for offline demos,
+                so only the recommended picks differ and are not actionable.
               </p>
 
               {isRecommendationLoading && <div className="loading-row">Running analysis...</div>}
