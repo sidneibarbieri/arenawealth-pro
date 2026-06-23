@@ -24,11 +24,13 @@ import hashlib
 import json
 import os
 import re
+import sys
 import time
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
+import httpx
 from dotenv import load_dotenv
 
 from arenawealth.experiments.advisor_prompts import PROMPT_ARMS, build_prompt, parse_response
@@ -41,6 +43,7 @@ from arenawealth.experiments.llm_clients import (
     DEFAULT_ANTHROPIC_MODEL,
     DEFAULT_OPENAI_MODEL,
     AdvisorLLMClient,
+    LLMCompletion,
     build_llm_client,
 )
 
@@ -62,6 +65,59 @@ class CallBudget:
         if self.used >= self.limit:
             raise RuntimeError(f"call budget of {self.limit} exhausted")
         self.used += 1
+
+
+@dataclass(frozen=True)
+class CollectionConfig:
+    """Scalar knobs for one collection run, grouped to keep signatures small."""
+
+    arm: str = "policy"
+    temperature: float = 1.0
+    live: bool = False
+    delay_seconds: float = 0.0
+    attempts: int = 3
+    backoff_seconds: float = 2.0
+    cache_root: Path = CACHE_ROOT
+
+
+@dataclass(frozen=True)
+class CallOutcome:
+    completion: LLMCompletion
+    attempts: int
+    latency_seconds: float
+
+
+_TRANSIENT_STATUS = frozenset({429, 500, 502, 503, 504})
+
+
+def complete_with_retry(
+    client: AdvisorLLMClient,
+    prompt: str,
+    temperature: float,
+    attempts: int,
+    backoff_seconds: float,
+) -> CallOutcome:
+    """Call the model, retrying only transient failures.
+
+    Connection errors, timeouts, and 429/5xx responses are retried with linear
+    backoff. A non-transient response (for example 400 or 401) is re-raised at
+    once, so a real error surfaces instead of being masked.
+    """
+    started = time.monotonic()
+    last_error: Exception | None = None
+    for attempt in range(1, attempts + 1):
+        try:
+            completion = client.complete(prompt, temperature)
+            return CallOutcome(completion, attempt, time.monotonic() - started)
+        except httpx.HTTPStatusError as error:
+            if error.response.status_code not in _TRANSIENT_STATUS:
+                raise
+            last_error = error
+        except httpx.TransportError as error:
+            last_error = error
+        if attempt < attempts:
+            time.sleep(backoff_seconds * attempt)
+    raise RuntimeError(f"model call failed after {attempts} attempts") from last_error
 
 
 def load_scenarios(path: Path) -> list[dict]:
@@ -116,28 +172,24 @@ def collect_run(
     provider: str,
     model: str,
     run_index: int,
-    temperature: float,
-    arm: str,
-    live: bool,
+    config: CollectionConfig,
     budget: CallBudget,
-    cache_root: Path,
     client: AdvisorLLMClient | None,
-    delay_seconds: float = 0.0,
 ) -> dict:
     """Return the cached run if present; otherwise request it when live."""
-    prompt = build_prompt(scenario, arm)
+    prompt = build_prompt(scenario, config.arm)
     current_prompt_hash = prompt_hash(prompt)
-    path = cache_path(provider, model, scenario["name"], run_index, arm, cache_root)
+    path = cache_path(provider, model, scenario["name"], run_index, config.arm, config.cache_root)
     if path.exists():
         cached = json.loads(path.read_text(encoding="utf-8"))
         if cached.get("prompt_hash") == current_prompt_hash:
             return cached
-    if not live:
+    if not config.live:
         return {
             "status": "would_call",
             "provider": provider,
             "model": model,
-            "arm": arm,
+            "arm": config.arm,
             "scenario": scenario["name"],
             "run_index": run_index,
             "prompt_hash": current_prompt_hash,
@@ -145,32 +197,36 @@ def collect_run(
     if client is None:
         raise RuntimeError("live collection requires a provider client")
     budget.spend()
-    completion = client.complete(prompt, temperature)
+    outcome = complete_with_retry(
+        client, prompt, config.temperature, config.attempts, config.backoff_seconds
+    )
     record = {
         "status": "collected",
         "provider": provider,
         "model": model,
-        "arm": arm,
+        "arm": config.arm,
         "scenario": scenario["name"],
         "run_index": run_index,
-        "temperature": temperature,
+        "temperature": config.temperature,
         "prompt": prompt,
         "prompt_hash": current_prompt_hash,
-        "raw_response": completion.text,
-        "usage": completion.usage,
+        "raw_response": outcome.completion.text,
+        "usage": outcome.completion.usage,
+        "attempts": outcome.attempts,
+        "latency_seconds": round(outcome.latency_seconds, 3),
         "collected_utc": datetime.now(UTC).isoformat(),
     }
     # A malformed reply is a measured outcome, not a crash: record it and mark
     # the run unparseable so the audit counts it as invalid.
     try:
-        record["parsed"] = parse_response(completion.text)
+        record["parsed"] = parse_response(outcome.completion.text)
     except ValueError as error:
         record["parsed"] = {"tickers": [], "cited_fact_ids": []}
         record["parse_error"] = str(error)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(record, indent=2), encoding="utf-8")
-    if delay_seconds > 0:
-        time.sleep(delay_seconds)
+    if config.delay_seconds > 0:
+        time.sleep(config.delay_seconds)
     return record
 
 
@@ -229,10 +285,31 @@ def parse_arguments() -> argparse.Namespace:
         default=0.0,
         help="Seconds to wait after each live call, to stay under provider rate limits.",
     )
+    parser.add_argument(
+        "--attempts", type=int, default=3, help="Max attempts per call on transient failures."
+    )
+    parser.add_argument(
+        "--backoff", type=float, default=2.0, help="Linear backoff seconds between retries."
+    )
     parser.add_argument("--live", action="store_true", help="Make real API calls; off by default.")
     parser.add_argument("--scenarios", type=Path, default=SCENARIOS_PATH)
     parser.add_argument("--cache-root", type=Path, default=CACHE_ROOT)
     return parser.parse_args()
+
+
+def file_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def environment_fingerprint() -> dict:
+    """Versions that affect reproducibility, recorded with each experiment."""
+    return {"python": sys.version.split()[0], "platform": sys.platform}
+
+
+def write_outputs(out_dir: Path, audits: list[dict], manifest: dict) -> None:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "audit_summary.json").write_text(json.dumps(audits, indent=2), encoding="utf-8")
+    (out_dir / "run_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
 
 def main() -> None:
@@ -242,33 +319,35 @@ def main() -> None:
     client = build_llm_client(arguments.provider, arguments.model) if arguments.live else None
     if client is not None:
         model = client.model
+    config = CollectionConfig(
+        arm=arguments.arm,
+        temperature=arguments.temperature,
+        live=arguments.live,
+        delay_seconds=arguments.delay,
+        attempts=arguments.attempts,
+        backoff_seconds=arguments.backoff,
+        cache_root=arguments.cache_root,
+    )
     budget = CallBudget(arguments.max_calls)
     planned = len(scenarios) * arguments.runs
     if arguments.live and planned > arguments.max_calls:
         # Cached runs do not spend budget, so this is a ceiling, not a guarantee.
         print(f"note: {planned} runs planned, budget {arguments.max_calls}; cached runs are free.")
 
+    started = datetime.now(UTC)
+    started_clock = time.monotonic()
     audits: list[dict] = []
+    records: list[dict] = []
     for scenario in scenarios:
-        records = [
-            collect_run(
-                scenario,
-                arguments.provider,
-                model,
-                index,
-                arguments.temperature,
-                arguments.arm,
-                arguments.live,
-                budget,
-                arguments.cache_root,
-                client,
-                arguments.delay,
-            )
+        scenario_records = [
+            collect_run(scenario, arguments.provider, model, index, config, budget, client)
             for index in range(1, arguments.runs + 1)
         ]
-        audit = audit_collected(scenario, model, records)
+        records.extend(scenario_records)
+        audit = audit_collected(scenario, model, scenario_records)
         if audit is not None:
             audits.append(audit)
+    duration_seconds = time.monotonic() - started_clock
 
     print(f"live calls used: {budget.used} / {arguments.max_calls}")
     if not audits:
@@ -277,17 +356,36 @@ def main() -> None:
             "Re-run with --live and credentials, or point --cache-root at cached runs."
         )
         return
-    summary_path = (
+    collected = [record for record in records if record.get("status") == "collected"]
+    manifest = {
+        "provider": arguments.provider,
+        "model": model,
+        "arm": config.arm,
+        "temperature": config.temperature,
+        "runs_per_scenario": arguments.runs,
+        "scenarios": len(scenarios),
+        "scenarios_file": str(arguments.scenarios),
+        "scenarios_sha256": file_sha256(arguments.scenarios),
+        "live_calls": budget.used,
+        "retries": sum(record.get("attempts", 1) - 1 for record in collected),
+        "total_latency_seconds": round(sum(r.get("latency_seconds", 0.0) for r in collected), 3),
+        "wall_clock_seconds": round(duration_seconds, 3),
+        "started_utc": started.isoformat(),
+        "finished_utc": datetime.now(UTC).isoformat(),
+        "environment": environment_fingerprint(),
+    }
+    out_dir = (
         arguments.cache_root
         / safe_slug(arguments.provider)
         / safe_slug(model)
-        / safe_slug(arguments.arm)
-        / "audit_summary.json"
+        / safe_slug(config.arm)
     )
-    summary_path.parent.mkdir(parents=True, exist_ok=True)
-    summary_path.write_text(json.dumps(audits, indent=2), encoding="utf-8")
+    write_outputs(out_dir, audits, manifest)
     source = "live + cache" if arguments.live else "cache only (no API calls)"
-    print(f"wrote {summary_path} from {source}")
+    print(
+        f"wrote {out_dir}/audit_summary.json + run_manifest.json from {source} "
+        f"in {duration_seconds:.1f}s ({budget.used} calls, {manifest['retries']} retries)"
+    )
 
 
 if __name__ == "__main__":
