@@ -216,7 +216,12 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--model", help="Provider model or Azure deployment. Defaults to env.")
     parser.add_argument("--runs", type=int, default=3, help="Repeated runs per scenario.")
     parser.add_argument("--max-calls", type=int, default=10, help="Hard cap on live API calls.")
-    parser.add_argument("--temperature", type=float, default=0.7)
+    parser.add_argument(
+        "--temperature",
+        type=float,
+        default=1.0,
+        help="Sampling temperature. 1.0 is the provider default; some models reject other values.",
+    )
     parser.add_argument("--arm", choices=PROMPT_ARMS, default="policy", help="Prompt arm.")
     parser.add_argument(
         "--delay",
