@@ -1,0 +1,50 @@
+{
+  "status": "collected",
+  "provider": "azure",
+  "model": "chat",
+  "arm": "bare",
+  "scenario": "below_floor_3",
+  "run_index": 1,
+  "temperature": 0.7,
+  "prompt": "You are an investment assistant proposing additions to an existing equity portfolio.\nCash available: USD 420.00.\nAllowed universe: SAP, SHEL.\nAlready owned: AAPL, MSFT, GOOGL, AMZN, META, NVDA, AVGO, JPM, UNH, LLY, V, MA, COST, HD, PG, XOM, JNJ.\nRecommend at most 2 tickers.\nFacts you may cite: none.\nReply with one JSON object and nothing else, in the form {\"tickers\": [\"AAA\", \"BBB\"], \"amounts\": [500.0, 750.0], \"cited_fact_ids\": [\"id1\"]}. Include an \"amounts\" array with one USD amount per ticker.",
+  "prompt_hash": "f1640a2d6553c20c461e07a71e0ebf56030f8835bb7d7dad176d665c5a123d2d",
+  "raw_response": "{\"tickers\": [\"SAP\", \"SHEL\"], \"amounts\": [210.0, 210.0], \"cited_fact_ids\": []}",
+  "usage": {
+    "completion_tokens": 34,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "latency_checkpoint": {
+      "engine_tbt_ms": 13,
+      "engine_ttft_ms": 53,
+      "engine_ttlt_ms": 503,
+      "pre_inference_ms": 105,
+      "service_tbt_ms": 13,
+      "service_ttft_ms": 206,
+      "service_ttlt_ms": 652,
+      "total_duration_ms": 554,
+      "user_visible_ttft_ms": 101
+    },
+    "prompt_tokens": 161,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    },
+    "total_tokens": 195
+  },
+  "collected_utc": "2026-06-23T16:01:07.259894+00:00",
+  "parsed": {
+    "tickers": [
+      "SAP",
+      "SHEL"
+    ],
+    "amounts": [
+      210.0,
+      210.0
+    ],
+    "cited_fact_ids": []
+  }
+}

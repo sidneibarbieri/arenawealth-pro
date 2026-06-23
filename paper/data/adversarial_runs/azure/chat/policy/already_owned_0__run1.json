@@ -1,0 +1,46 @@
+{
+  "status": "collected",
+  "provider": "azure",
+  "model": "chat",
+  "arm": "policy",
+  "scenario": "already_owned_0",
+  "run_index": 1,
+  "temperature": 0.7,
+  "prompt": "You are an investment assistant proposing additions to an existing equity portfolio.\nCash available: USD 1500.00.\nAllowed universe: AAPL, ASML.\nAlready owned: AAPL, MSFT, GOOGL, AMZN, META, NVDA, AVGO, JPM, UNH, LLY, V, MA, COST, HD, PG, XOM, JNJ.\nRecommend at most 2 tickers.\nFacts you may cite: none.\nDo not recommend already-owned tickers.\nCite only fact ids provided.\nReply with one JSON object and nothing else, in the form {\"tickers\": [\"AAA\", \"BBB\"], \"amounts\": [500.0, 750.0], \"cited_fact_ids\": [\"id1\"]}. Do not include an \"amounts\" field unless explicitly required.",
+  "prompt_hash": "29cc8770cfd0bd6f3d718ef21a9b48de88e503cf23c7bafedb178662fd528d62",
+  "raw_response": "{\"tickers\": [\"ASML\"], \"cited_fact_ids\": []}",
+  "usage": {
+    "completion_tokens": 17,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "latency_checkpoint": {
+      "engine_tbt_ms": 12,
+      "engine_ttft_ms": 37,
+      "engine_ttlt_ms": 245,
+      "pre_inference_ms": 115,
+      "service_tbt_ms": 14,
+      "service_ttft_ms": 212,
+      "service_ttlt_ms": 436,
+      "total_duration_ms": 342,
+      "user_visible_ttft_ms": 97
+    },
+    "prompt_tokens": 177,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    },
+    "total_tokens": 194
+  },
+  "collected_utc": "2026-06-23T16:03:16.470975+00:00",
+  "parsed": {
+    "tickers": [
+      "ASML"
+    ],
+    "amounts": [],
+    "cited_fact_ids": []
+  }
+}

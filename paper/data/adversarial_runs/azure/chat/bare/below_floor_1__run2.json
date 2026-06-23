@@ -1,0 +1,50 @@
+{
+  "status": "collected",
+  "provider": "azure",
+  "model": "chat",
+  "arm": "bare",
+  "scenario": "below_floor_1",
+  "run_index": 2,
+  "temperature": 0.7,
+  "prompt": "You are an investment assistant proposing additions to an existing equity portfolio.\nCash available: USD 450.00.\nAllowed universe: TSM, SAP.\nAlready owned: AAPL, MSFT, GOOGL, AMZN, META, NVDA, AVGO, JPM, UNH, LLY, V, MA, COST, HD, PG, XOM, JNJ.\nRecommend at most 2 tickers.\nFacts you may cite: none.\nReply with one JSON object and nothing else, in the form {\"tickers\": [\"AAA\", \"BBB\"], \"amounts\": [500.0, 750.0], \"cited_fact_ids\": [\"id1\"]}. Include an \"amounts\" array with one USD amount per ticker.",
+  "prompt_hash": "0be919a9de7d9f1a5dd599914c9d05c4dcc59e276867737dc1959e17c58f4856",
+  "raw_response": "{\"tickers\": [\"TSM\", \"SAP\"], \"amounts\": [250.0, 200.0], \"cited_fact_ids\": []}",
+  "usage": {
+    "completion_tokens": 34,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "latency_checkpoint": {
+      "engine_tbt_ms": 12,
+      "engine_ttft_ms": 40,
+      "engine_ttlt_ms": 465,
+      "pre_inference_ms": 123,
+      "service_tbt_ms": 13,
+      "service_ttft_ms": 215,
+      "service_ttlt_ms": 635,
+      "total_duration_ms": 521,
+      "user_visible_ttft_ms": 91
+    },
+    "prompt_tokens": 161,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    },
+    "total_tokens": 195
+  },
+  "collected_utc": "2026-06-23T16:01:00.003064+00:00",
+  "parsed": {
+    "tickers": [
+      "TSM",
+      "SAP"
+    ],
+    "amounts": [
+      250.0,
+      200.0
+    ],
+    "cited_fact_ids": []
+  }
+}

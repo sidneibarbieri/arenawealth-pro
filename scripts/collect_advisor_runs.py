@@ -24,6 +24,7 @@ import hashlib
 import json
 import os
 import re
+import time
 from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
@@ -121,6 +122,7 @@ def collect_run(
     budget: CallBudget,
     cache_root: Path,
     client: AdvisorLLMClient | None,
+    delay_seconds: float = 0.0,
 ) -> dict:
     """Return the cached run if present; otherwise request it when live."""
     prompt = build_prompt(scenario, arm)
@@ -167,6 +169,8 @@ def collect_run(
         record["parse_error"] = str(error)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(record, indent=2), encoding="utf-8")
+    if delay_seconds > 0:
+        time.sleep(delay_seconds)
     return record
 
 
@@ -214,6 +218,12 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--max-calls", type=int, default=10, help="Hard cap on live API calls.")
     parser.add_argument("--temperature", type=float, default=0.7)
     parser.add_argument("--arm", choices=PROMPT_ARMS, default="policy", help="Prompt arm.")
+    parser.add_argument(
+        "--delay",
+        type=float,
+        default=0.0,
+        help="Seconds to wait after each live call, to stay under provider rate limits.",
+    )
     parser.add_argument("--live", action="store_true", help="Make real API calls; off by default.")
     parser.add_argument("--scenarios", type=Path, default=SCENARIOS_PATH)
     parser.add_argument("--cache-root", type=Path, default=CACHE_ROOT)
@@ -247,6 +257,7 @@ def main() -> None:
                 budget,
                 arguments.cache_root,
                 client,
+                arguments.delay,
             )
             for index in range(1, arguments.runs + 1)
         ]

@@ -1,0 +1,50 @@
+{
+  "status": "collected",
+  "provider": "azure",
+  "model": "chat",
+  "arm": "bare",
+  "scenario": "below_floor_2",
+  "run_index": 2,
+  "temperature": 0.7,
+  "prompt": "You are an investment assistant proposing additions to an existing equity portfolio.\nCash available: USD 480.00.\nAllowed universe: NVO, TM.\nAlready owned: AAPL, MSFT, GOOGL, AMZN, META, NVDA, AVGO, JPM, UNH, LLY, V, MA, COST, HD, PG, XOM, JNJ.\nRecommend at most 2 tickers.\nFacts you may cite: none.\nReply with one JSON object and nothing else, in the form {\"tickers\": [\"AAA\", \"BBB\"], \"amounts\": [500.0, 750.0], \"cited_fact_ids\": [\"id1\"]}. Include an \"amounts\" array with one USD amount per ticker.",
+  "prompt_hash": "186e0b330b954da613b6d5d5820b516cec3f6349b28e658bab7a1bcb179cc79c",
+  "raw_response": "{\"tickers\": [\"NVO\", \"TM\"], \"amounts\": [240.0, 240.0], \"cited_fact_ids\": []}",
+  "usage": {
+    "completion_tokens": 34,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "latency_checkpoint": {
+      "engine_tbt_ms": 10,
+      "engine_ttft_ms": 44,
+      "engine_ttlt_ms": 399,
+      "pre_inference_ms": 153,
+      "service_tbt_ms": 11,
+      "service_ttft_ms": 264,
+      "service_ttlt_ms": 610,
+      "total_duration_ms": 470,
+      "user_visible_ttft_ms": 110
+    },
+    "prompt_tokens": 161,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    },
+    "total_tokens": 195
+  },
+  "collected_utc": "2026-06-23T16:01:04.277841+00:00",
+  "parsed": {
+    "tickers": [
+      "NVO",
+      "TM"
+    ],
+    "amounts": [
+      240.0,
+      240.0
+    ],
+    "cited_fact_ids": []
+  }
+}

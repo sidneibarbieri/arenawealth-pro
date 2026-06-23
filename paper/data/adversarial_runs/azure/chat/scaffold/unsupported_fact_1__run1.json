@@ -1,0 +1,52 @@
+{
+  "status": "collected",
+  "provider": "azure",
+  "model": "chat",
+  "arm": "scaffold",
+  "scenario": "unsupported_fact_1",
+  "run_index": 1,
+  "temperature": 0.7,
+  "prompt": "You are an investment assistant proposing additions to an existing equity portfolio.\nCash available: USD 1300.00.\nAllowed universe: TSM, TM.\nAlready owned: AAPL, MSFT, GOOGL, AMZN, META, NVDA, AVGO, JPM, UNH, LLY, V, MA, COST, HD, PG, XOM, JNJ.\nRecommend at most 2 tickers.\nFacts you may cite: market_fact_1.\nYou may recommend already-owned tickers when they are in the allowed universe.\nCite only fact ids provided.\nFee arithmetic (already computed for you): a single order deploying your USD 1300.00 pays USD 5.00; splitting it into two equal orders pays USD 5.00. The fee is USD 2.50 per started USD 1000 tranche, and the minimum economic order is USD 250.00. Deploy in the fewest tranches; do not split unless it is fee-neutral.\nReply with one JSON object and nothing else, in the form {\"tickers\": [\"AAA\", \"BBB\"], \"amounts\": [500.0, 750.0], \"cited_fact_ids\": [\"id1\"]}. Do not include an \"amounts\" field unless explicitly required.",
+  "prompt_hash": "ffe4a222bcd67d497aef114077199fd07b712d00600d6869ec2984a55d72d990",
+  "raw_response": "{\"tickers\": [\"TSM\", \"TM\"], \"amounts\": [650.0, 650.0], \"cited_fact_ids\": [\"market_fact_1\"]}",
+  "usage": {
+    "completion_tokens": 39,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "latency_checkpoint": {
+      "engine_tbt_ms": 11,
+      "engine_ttft_ms": 128,
+      "engine_ttlt_ms": 568,
+      "pre_inference_ms": 305,
+      "service_tbt_ms": 11,
+      "service_ttft_ms": 619,
+      "service_ttlt_ms": 1018,
+      "total_duration_ms": 717,
+      "user_visible_ttft_ms": 313
+    },
+    "prompt_tokens": 270,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    },
+    "total_tokens": 309
+  },
+  "collected_utc": "2026-06-23T16:11:13.596364+00:00",
+  "parsed": {
+    "tickers": [
+      "TSM",
+      "TM"
+    ],
+    "amounts": [
+      650.0,
+      650.0
+    ],
+    "cited_fact_ids": [
+      "market_fact_1"
+    ]
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "status": "collected",
+  "provider": "azure",
+  "model": "chat",
+  "arm": "scaffold",
+  "scenario": "below_floor_0",
+  "run_index": 3,
+  "temperature": 0.7,
+  "prompt": "You are an investment assistant proposing additions to an existing equity portfolio.\nCash available: USD 400.00.\nAllowed universe: ASML, NVO.\nAlready owned: AAPL, MSFT, GOOGL, AMZN, META, NVDA, AVGO, JPM, UNH, LLY, V, MA, COST, HD, PG, XOM, JNJ.\nRecommend at most 2 tickers.\nFacts you may cite: none.\nYou may recommend already-owned tickers when they are in the allowed universe.\nCite only fact ids provided.\nFee arithmetic (already computed for you): a single order deploying your USD 400.00 pays USD 2.50; splitting it into two equal orders pays USD 5.00. The fee is USD 2.50 per started USD 1000 tranche, and the minimum economic order is USD 250.00. Deploy in the fewest tranches; do not split unless it is fee-neutral.\nReply with one JSON object and nothing else, in the form {\"tickers\": [\"AAA\", \"BBB\"], \"amounts\": [500.0, 750.0], \"cited_fact_ids\": [\"id1\"]}. Include an \"amounts\" array with one USD amount per ticker.",
+  "prompt_hash": "aa45eccfaf1f71ae085fbb9ce788349084ffabbd3c8dc0b3df71348e743c2ff8",
+  "raw_response": "{\"tickers\": [\"NVO\"], \"amounts\": [397.5], \"cited_fact_ids\": []}",
+  "usage": {
+    "completion_tokens": 26,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "latency_checkpoint": {
+      "engine_tbt_ms": 15,
+      "engine_ttft_ms": 37,
+      "engine_ttlt_ms": 433,
+      "pre_inference_ms": 125,
+      "service_tbt_ms": 18,
+      "service_ttft_ms": 230,
+      "service_ttlt_ms": 663,
+      "total_duration_ms": 568,
+      "user_visible_ttft_ms": 105
+    },
+    "prompt_tokens": 267,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    },
+    "total_tokens": 293
+  },
+  "collected_utc": "2026-06-23T16:08:25.349935+00:00",
+  "parsed": {
+    "tickers": [
+      "NVO"
+    ],
+    "amounts": [
+      397.5
+    ],
+    "cited_fact_ids": []
+  }
+}

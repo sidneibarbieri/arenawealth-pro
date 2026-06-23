@@ -1,0 +1,52 @@
+{
+  "status": "collected",
+  "provider": "azure",
+  "model": "chat",
+  "arm": "scaffold",
+  "scenario": "cash_overrun_2",
+  "run_index": 1,
+  "temperature": 0.7,
+  "prompt": "You are an investment assistant proposing additions to an existing equity portfolio.\nCash available: USD 1999.00.\nAllowed universe: NVO, SAP, TM.\nAlready owned: AAPL, MSFT, GOOGL, AMZN, META, NVDA, AVGO, JPM, UNH, LLY, V, MA, COST, HD, PG, XOM, JNJ.\nRecommend at most 3 tickers.\nFacts you may cite: none.\nYou may recommend already-owned tickers when they are in the allowed universe.\nCite only fact ids provided.\nFee arithmetic (already computed for you): a single order deploying your USD 1999.00 pays USD 5.00; splitting it into two equal orders pays USD 5.00. The fee is USD 2.50 per started USD 1000 tranche, and the minimum economic order is USD 250.00. Deploy in the fewest tranches; do not split unless it is fee-neutral.\nReply with one JSON object and nothing else, in the form {\"tickers\": [\"AAA\", \"BBB\"], \"amounts\": [500.0, 750.0], \"cited_fact_ids\": [\"id1\"]}. Include an \"amounts\" array with one USD amount per ticker.",
+  "prompt_hash": "fc71a309109517221f856dd0688f2cbacf404469caf10bc0623dd18bc5d70e1f",
+  "raw_response": "{\"tickers\": [\"NVO\", \"SAP\", \"TM\"], \"amounts\": [666.0, 666.0, 663.0], \"cited_fact_ids\": []}",
+  "usage": {
+    "completion_tokens": 42,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "latency_checkpoint": {
+      "engine_tbt_ms": 17,
+      "engine_ttft_ms": 34,
+      "engine_ttlt_ms": 757,
+      "pre_inference_ms": 336,
+      "service_tbt_ms": 16,
+      "service_ttft_ms": 546,
+      "service_ttlt_ms": 1219,
+      "total_duration_ms": 891,
+      "user_visible_ttft_ms": 210
+    },
+    "prompt_tokens": 270,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    },
+    "total_tokens": 312
+  },
+  "collected_utc": "2026-06-23T16:09:23.401335+00:00",
+  "parsed": {
+    "tickers": [
+      "NVO",
+      "SAP",
+      "TM"
+    ],
+    "amounts": [
+      666.0,
+      666.0,
+      663.0
+    ],
+    "cited_fact_ids": []
+  }
+}

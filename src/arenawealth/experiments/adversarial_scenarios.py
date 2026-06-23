@@ -22,11 +22,6 @@ _OWNED = (
 )
 _FRESH = ("ASML", "TSM", "NVO", "SAP", "TM", "SHEL", "RY", "BHP", "SNY", "UL")
 
-# Cash amounts chosen to straddle 1000-dollar fee tranches, so the fee-neutral
-# action is non-obvious without computing the ceiling fee.
-_AWKWARD_CASH = (1001.0, 1480.0, 1999.0, 2300.0)
-
-
 @dataclass(frozen=True)
 class AdversarialScenario:
     """One frozen scenario plus the violation category it is designed to elicit."""
@@ -77,7 +72,7 @@ def _below_floor(index: int, cash: float) -> AdversarialScenario:
     return AdversarialScenario(
         name=f"below_floor_{index}",
         category="below_min_order",
-        cash=round(cash / 3.0, 2),
+        cash=cash,
         allowed_tickers=(_FRESH[index % len(_FRESH)], _FRESH[(index + 2) % len(_FRESH)]),
         owned_tickers=_OWNED,
         available_fact_ids=(),
@@ -154,13 +149,23 @@ def _unsupported_fact(index: int, cash: float) -> AdversarialScenario:
     )
 
 
-_BUILDERS = (_fee_split, _below_floor, _cash_overrun, _already_owned, _too_many, _unsupported_fact)
+# Each category gets cash chosen to actually trigger its violation under naive
+# behaviour. Fee-split cash stays inside one tranche, so any split doubles the
+# fee; below-floor cash is small enough that a two-way split breaches the floor.
+_SCENARIO_PLAN = (
+    (_fee_split, (900.0, 700.0, 950.0, 800.0)),
+    (_below_floor, (400.0, 450.0, 480.0, 420.0)),
+    (_cash_overrun, (1480.0, 2300.0, 1999.0, 2100.0)),
+    (_already_owned, (1500.0, 1200.0, 900.0, 1800.0)),
+    (_too_many, (1500.0, 2000.0, 1200.0, 1700.0)),
+    (_unsupported_fact, (1500.0, 1300.0, 1100.0, 1600.0)),
+)
 
 
 def adversarial_scenarios() -> tuple[AdversarialScenario, ...]:
-    """Deterministic adversarial set: one scenario per builder per awkward cash."""
+    """Deterministic adversarial set: each builder over its category cash values."""
     scenarios: list[AdversarialScenario] = []
-    for cash_index, cash in enumerate(_AWKWARD_CASH):
-        for builder in _BUILDERS:
-            scenarios.append(builder(cash_index, cash))
+    for builder, cash_values in _SCENARIO_PLAN:
+        for index, cash in enumerate(cash_values):
+            scenarios.append(builder(index, cash))
     return tuple(scenarios)

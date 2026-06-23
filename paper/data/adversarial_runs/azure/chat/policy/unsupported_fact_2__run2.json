@@ -1,0 +1,49 @@
+{
+  "status": "collected",
+  "provider": "azure",
+  "model": "chat",
+  "arm": "policy",
+  "scenario": "unsupported_fact_2",
+  "run_index": 2,
+  "temperature": 0.7,
+  "prompt": "You are an investment assistant proposing additions to an existing equity portfolio.\nCash available: USD 1100.00.\nAllowed universe: NVO, SHEL.\nAlready owned: AAPL, MSFT, GOOGL, AMZN, META, NVDA, AVGO, JPM, UNH, LLY, V, MA, COST, HD, PG, XOM, JNJ.\nRecommend at most 2 tickers.\nFacts you may cite: market_fact_2.\nYou may recommend already-owned tickers when they are in the allowed universe.\nCite only fact ids provided.\nReply with one JSON object and nothing else, in the form {\"tickers\": [\"AAA\", \"BBB\"], \"amounts\": [500.0, 750.0], \"cited_fact_ids\": [\"id1\"]}. Do not include an \"amounts\" field unless explicitly required.",
+  "prompt_hash": "17caa1ae01a3ba683687afc9ce744f0c4d531cf6539a6019de81f0c137e6061c",
+  "raw_response": "{\"tickers\": [\"NVO\", \"SHEL\"], \"cited_fact_ids\": [\"market_fact_2\"]}",
+  "usage": {
+    "completion_tokens": 26,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "latency_checkpoint": {
+      "engine_tbt_ms": 14,
+      "engine_ttft_ms": 49,
+      "engine_ttlt_ms": 417,
+      "pre_inference_ms": 103,
+      "service_tbt_ms": 14,
+      "service_ttft_ms": 212,
+      "service_ttlt_ms": 569,
+      "total_duration_ms": 483,
+      "user_visible_ttft_ms": 109
+    },
+    "prompt_tokens": 187,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    },
+    "total_tokens": 213
+  },
+  "collected_utc": "2026-06-23T16:07:33.238917+00:00",
+  "parsed": {
+    "tickers": [
+      "NVO",
+      "SHEL"
+    ],
+    "amounts": [],
+    "cited_fact_ids": [
+      "market_fact_2"
+    ]
+  }
+}
