@@ -222,3 +222,34 @@ Next:
 3. Expand to 20 scenarios before making any paper-level claim about real LLMs.
 4. Use price/backtest outcomes only after validity filtering, not as the first
    metric.
+
+## Runtime verification and governance for LLM actions (SOTA positioning)
+
+Studied in full (2026-06): the true intellectual home of this work is runtime
+verification and neuro-symbolic governance of LLM-generated actions, not only
+AI-for-finance. Four anchors:
+
+- **AgentSpec** (Wang, Poskitt, Sun; ICSE 2026; arXiv:2503.18666). A DSL for
+  runtime enforcement: rules are `trigger + check(predicate) + enforce`, hooked
+  pre-execution. Its motivating example is a financial transfer. Closest mechanism
+  to our typed contract.
+- **VeriGuard** (Miculicich et al., Google; arXiv:2510.05156). Offline-synthesised,
+  formally-verified policy plus an online monitor that validates each action before
+  execution. Mirrors our verified-contract + per-action check.
+- **Formal Methods Meet LLMs / TRAC** (Alamdari, Klassen, McIlraith; FAccT 2026;
+  arXiv:2605.16198). LTL trajectory monitoring; the key result that small or
+  deterministic labelers match or exceed frontier LLM judges directly supports our
+  rejection of LLM-as-judge.
+- **ProbGuard** (Wang, Poskitt, Wei, Sun; arXiv:2508.00500). Probabilistic,
+  predictive monitoring via a DTMC with PAC-style guarantees.
+
+**Our delta vs all four (the unquestionable contribution):** (1) executable
+*financial* actions under an economic admissibility contract referenced to declared
+quantities (subadditive tranche fee, economic floor, concentration), not generic
+safety rules; (2) the empirical benchmark result that *agreement can be high while
+validity is low* (0.42 agreement-only false-positive rate), which none of them
+report; (3) the *arithmetic-not-judgment* localization with the bare/policy/scaffold
+arms (validity 0.58 -> 0.93 when the fee arithmetic is pre-computed); (4) a fully
+deterministic, replayable verifier (no LLM labeler as in TRAC, no probabilistic
+prediction as in ProbGuard, no LLM-synthesised code as in VeriGuard). Position the
+paper as the action-level, deterministic, financial instance of this lineage.

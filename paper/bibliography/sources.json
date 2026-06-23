@@ -473,6 +473,58 @@
       "status": "manual",
       "source_url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5447274",
       "notes": "SSRN access is often interactive; download manually if needed."
+    },
+    {
+      "bib_key": "wang2025agentspec",
+      "title": "AgentSpec: Customizable Runtime Enforcement for Safe and Reliable LLM Agents",
+      "authors": "Wang, Poskitt, Sun",
+      "year": 2026,
+      "publication": "ICSE 2026 (arXiv:2503.18666)",
+      "role": "runtime enforcement DSL over agent actions (closest mechanism)",
+      "thread": "runtime-verification-governance",
+      "filename": "wang2025agentspec.pdf",
+      "status": "manual",
+      "source_url": "https://arxiv.org/abs/2503.18666",
+      "notes": "DSL trigger+predicate+enforce, pre-execution hook; motivating example is a financial transfer. Delta: our deterministic financial-admissibility contract + empirical agreement-not-validity + arithmetic-not-judgment."
+    },
+    {
+      "bib_key": "miculicich2025veriguard",
+      "title": "VeriGuard: Enhancing LLM Agent Safety via Verified Code Generation",
+      "authors": "Miculicich, Parmar, Palangi, Dvijotham, Montanari, Pfister, Le",
+      "year": 2025,
+      "publication": "arXiv:2510.05156 (Google Cloud AI / DeepMind)",
+      "role": "offline-verified policy + online action monitor",
+      "thread": "runtime-verification-governance",
+      "filename": "miculicich2025veriguard.pdf",
+      "status": "manual",
+      "source_url": "https://arxiv.org/abs/2510.05156",
+      "notes": "Dual-stage: offline synthesize+formally-verify policy, online validate each action pre-execution. Ours is a hand-specified deterministic contract referenced to declared quantities, not LLM-synthesized verified code."
+    },
+    {
+      "bib_key": "alamdari2026formalmethods",
+      "title": "Formal Methods Meet LLMs: Auditing, Monitoring, and Intervention for Compliance of Advanced AI Systems",
+      "authors": "Alamdari, Klassen, McIlraith",
+      "year": 2026,
+      "publication": "FAccT 2026 (arXiv:2605.16198)",
+      "role": "LTL trajectory-level compliance monitoring; deterministic >= LLM-judge",
+      "thread": "runtime-verification-governance",
+      "filename": "alamdari2026formalmethods.pdf",
+      "status": "manual",
+      "source_url": "https://arxiv.org/abs/2605.16198",
+      "notes": "TRAC: LTL progression over I/O propositions; offline audit + online monitor + predictor/intervenor. Key result: small-model/deterministic labelers match or exceed frontier LLM judges -> supports our anti-LLM-judge stance. Their unit is the temporal trajectory; ours is single-action admissibility (decidable)."
+    },
+    {
+      "bib_key": "wang2026probguard",
+      "title": "ProbGuard: Probabilistic Runtime Monitoring for LLM Agent Safety",
+      "authors": "Wang, Poskitt, Wei, Sun",
+      "year": 2026,
+      "publication": "arXiv:2508.00500",
+      "role": "predictive/probabilistic runtime monitoring (DTMC, PAC)",
+      "thread": "runtime-verification-governance",
+      "filename": "wang2026probguard.pdf",
+      "status": "manual",
+      "source_url": "https://arxiv.org/abs/2508.00500",
+      "notes": "Proactive: predicts violations ahead via a DTMC with PAC-style guarantees. Same group as AgentSpec. Ours is deterministic and exact (replayable), not probabilistic prediction."
     }
   ]
 }
