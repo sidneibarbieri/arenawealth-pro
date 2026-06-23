@@ -38,6 +38,9 @@ rm -f "${work}/scripts/package_artifact.sh"
 # Bibliography curation notes are development input, not part of the runtime artifact.
 rm -rf "${work}/paper/bibliography"
 
+# Maintainer-only release/history-scrub runbook: not part of the reviewer artifact.
+rm -f "${work}/docs/PUBLIC_RELEASE.md"
+
 # The manuscript is the separately-submitted paper. It is referenced by the
 # artifact through its anonymous URL but never published with it, so drop the LaTeX
 # sources, the vendored template, and the paper README. Keep paper/figures (the
