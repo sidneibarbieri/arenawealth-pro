@@ -139,6 +139,8 @@ Ungrounded cited fact & fact id $\notin$ scenario set \\
   \end{tabular}
 \end{table}
 
+A single trace fixes the mechanism. In the sub-tranche scenario the advisor has \$900 to deploy under a \$2.50 fee per \$1{,}000 tranche. One \$900 order is admissible and pays a single tranche fee; a bare model instead splits the cash into two \$450 legs. The verifier evaluates the split row of Table~\ref{tab:taxonomy}, $\lceil 450/1000\rceil + \lceil 450/1000\rceil = 2 > 1 = \lceil 900/1000\rceil$, and returns a fee-worsening split before any price is observed. The advisor's text has become a typed action, the contract has decided it exactly, and the verdict replays from the logged inputs.
+
 The three axes do not substitute for one another. We show this with seven deterministic archetype controls: failure modes by construction, not model outputs (Figure~\ref{fig:audit}). The decisive control is the naive diversifier: it agrees with the baseline and is perfectly stable, yet is invalid because it splits sub-tranche cash and pays an avoidable fee. The mirror image is a valid-but-disagreeing control: fully valid and stable, but with zero agreement. An overlap-only benchmark would rank the first above the second, which reverses their operational quality.
 
 For an advisor that returns ticker sets $r_1,\dots,r_n$ over repeated runs of a scenario with baseline top-$k$ set $b$, the metrics are:
