@@ -100,19 +100,19 @@ A large fraction of reported strategy performance does not survive out of sample
 \section{Artifact and Audit Protocol}
 \label{sec:audit}
 
+\begin{figure*}[t]
+  \centering
+  \resizebox{0.82\textwidth}{!}{\input{figures/audit_boundary.tikz}}
+\caption{The audit boundary turns advisor text into executable orders and typed violations before any return is computed.}
+\Description{A mechanism diagram showing frozen scenario data and advisor output entering a normalizer and deterministic verifier, which applies policy rules and emits admissible orders, violation traces, and audit metrics.}
+  \label{fig:workflow}
+\end{figure*}
+
 The backend separates API data-transfer objects, portfolio importers, provider adapters, analytics scoring, and deployment planning. Network access is isolated behind provider abstractions. The scoring and deployment modules perform no I/O: a recommendation is a pure function of the tuple.
 \[
 (\text{holdings},\ \text{fundamentals},\ \text{cash},\ \text{policy version}).
 \]
 Referential transparency is what makes the rest of this paper possible. Every quantitative result is backed by an offline driver in the reviewer path: \texttt{run\_experiments.py} for the experiment JSON and figures, \texttt{run\_ai\_advisor\_audit.py} for the advisor-audit panel, and \texttt{collect\_advisor\_runs.py} for the frontier-model audit. None depends on live data or hidden state. Purity is enforced, not asserted: a replay test feeds the same input tuple twice and checks that orders, exclusions, and ranked candidates are byte-identical, so any past recommendation can be regenerated and diffed from its logged inputs. Determinism is engineered: the engine draws no random numbers and ties break by ticker. The verdicts avoid fragile floating-point equality, since fees and the floor are integer tranche counts, validity and agreement are set memberships, and stability is a ratio of those sets, so a low-order bit difference cannot flip an outcome. Figure~\ref{fig:workflow} shows where this boundary sits: the model proposes text, while deterministic code emits executable orders or typed violations.
-
-\begin{figure}[tb]
-  \centering
-  \resizebox{\columnwidth}{!}{\input{figures/audit_boundary.tikz}}
-\caption{The audit boundary turns advisor text into executable orders and typed violations before any return is computed.}
-\Description{A mechanism diagram showing frozen scenario data and advisor output entering a normalizer and deterministic verifier, which applies policy rules and emits admissible orders, violation traces, and audit metrics.}
-  \label{fig:workflow}
-\end{figure}
 
 The composite score is the bounded linear functional $s=w_m\,\mathrm{moat}+w_c\,\mathrm{comp}+w_v\,\mathrm{val}$, with sub-scores in $[0,100]$ and weights $(w_m,w_c,w_v)=(0.40,0.35,0.25)$. Holdings already above $1.3\times$ equal weight, or in a theme at its concentration cap, are excluded; the planner then ranks the remainder by $s$ and sizes orders against available cash.
 
