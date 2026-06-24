@@ -11,20 +11,23 @@
   "raw_response": "{\"tickers\":[\"TSM\",\"TM\"],\"cited_fact_ids\":[\"market_fact_1\"]}",
   "usage": {
     "prompt_tokens": 163,
-    "completion_tokens": 314,
-    "total_tokens": 477,
+    "completion_tokens": 433,
+    "total_tokens": 596,
     "prompt_tokens_details": {
       "cached_tokens": 0,
       "audio_tokens": 0
     },
     "completion_tokens_details": {
-      "reasoning_tokens": 284,
+      "reasoning_tokens": 403,
       "audio_tokens": 0,
       "accepted_prediction_tokens": 0,
       "rejected_prediction_tokens": 0
     }
   },
-  "collected_utc": "2026-06-23T16:26:38.402425+00:00",
+  "truncated": false,
+  "attempts": 1,
+  "latency_seconds": 6.863,
+  "collected_utc": "2026-06-24T02:00:30.542461+00:00",
   "parsed": {
     "tickers": [
       "TSM",

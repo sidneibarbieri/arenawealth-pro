@@ -11,20 +11,23 @@
   "raw_response": "{\"tickers\":[\"ASML\",\"SAP\"],\"cited_fact_ids\":[\"market_fact_0\"]}",
   "usage": {
     "prompt_tokens": 163,
-    "completion_tokens": 262,
-    "total_tokens": 425,
+    "completion_tokens": 164,
+    "total_tokens": 327,
     "prompt_tokens_details": {
       "cached_tokens": 0,
       "audio_tokens": 0
     },
     "completion_tokens_details": {
-      "reasoning_tokens": 232,
+      "reasoning_tokens": 134,
       "audio_tokens": 0,
       "accepted_prediction_tokens": 0,
       "rejected_prediction_tokens": 0
     }
   },
-  "collected_utc": "2026-06-23T16:26:13.623070+00:00",
+  "truncated": false,
+  "attempts": 1,
+  "latency_seconds": 3.205,
+  "collected_utc": "2026-06-24T02:00:04.530770+00:00",
   "parsed": {
     "tickers": [
       "ASML",

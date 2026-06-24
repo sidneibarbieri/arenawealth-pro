@@ -24,7 +24,10 @@
       "rejected_prediction_tokens": 0
     }
   },
-  "collected_utc": "2026-06-23T16:21:50.235477+00:00",
+  "truncated": false,
+  "attempts": 1,
+  "latency_seconds": 2.169,
+  "collected_utc": "2026-06-24T01:55:34.611013+00:00",
   "parsed": {
     "tickers": [
       "NVO",

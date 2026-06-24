@@ -60,17 +60,23 @@ a { color: var(--navy); }
     <thead><tr><th>Model</th><th>Arm</th><th>Valid rate</th><th>Valid/runs</th>
     <th>Violations</th><th>Evidence</th></tr></thead>
     <tbody id="rows">
-<tr data-arm="bare"><td>chat</td><td><span class="pill bare">bare</span></td><td class="num bad">0.58</td><td class="num">42/72</td><td class="muted">below_min_order (23), unnecessary_split_fee (30)</td><td><a href="adversarial_runs/azure/chat/bare/audit_summary.json">raw JSON</a></td></tr>
-<tr data-arm="policy"><td>chat</td><td><span class="pill policy">policy</span></td><td class="num bad">0.64</td><td class="num">46/72</td><td class="muted">below_min_order (20), unnecessary_split_fee (26)</td><td><a href="adversarial_runs/azure/chat/policy/audit_summary.json">raw JSON</a></td></tr>
-<tr data-arm="scaffold"><td>chat</td><td><span class="pill scaffold">scaffold</span></td><td class="num ok">0.93</td><td class="num">67/72</td><td class="muted">unnecessary_split_fee (5)</td><td><a href="adversarial_runs/azure/chat/scaffold/audit_summary.json">raw JSON</a></td></tr>
-<tr data-arm="bare"><td>claude-opus-4-8</td><td><span class="pill bare">bare</span></td><td class="num bad">0.51</td><td class="num">37/72</td><td class="muted">already_owned (1), amounts_required (31), unnecessary_split_fee (3)</td><td><a href="adversarial_runs/anthropic/claude-opus-4-8/bare/audit_summary.json">raw JSON</a></td></tr>
-<tr data-arm="bare"><td>gpt-5.5</td><td><span class="pill bare">bare</span></td><td class="num bad">0.57</td><td class="num">41/72</td><td class="muted">already_owned (2), below_min_order (19), unnecessary_split_fee (29)</td><td><a href="adversarial_runs/openai/gpt-5.5/bare/audit_summary.json">raw JSON</a></td></tr>
+<tr data-arm="bare"><td>claude-opus-4-8</td><td><span class="pill bare">bare</span></td><td class="num bad">0.53</td><td class="num">38/72</td><td class="muted">amounts_required (30), unnecessary_split_fee (4)</td><td><a href="adversarial_runs/anthropic/claude-opus-4-8/bare/audit_summary.json">raw JSON</a></td></tr>
+<tr data-arm="policy"><td>claude-opus-4-8</td><td><span class="pill policy">policy</span></td><td class="num bad">0.57</td><td class="num">41/72</td><td class="muted">amounts_required (13), below_min_order (16), unnecessary_split_fee (18)</td><td><a href="adversarial_runs/anthropic/claude-opus-4-8/policy/audit_summary.json">raw JSON</a></td></tr>
+<tr data-arm="scaffold"><td>claude-opus-4-8</td><td><span class="pill scaffold">scaffold</span></td><td class="num ok">0.99</td><td class="num">71/72</td><td class="muted">already_owned (1)</td><td><a href="adversarial_runs/anthropic/claude-opus-4-8/scaffold/audit_summary.json">raw JSON</a></td></tr>
+<tr data-arm="bare"><td>gpt-5.5</td><td><span class="pill bare">bare</span></td><td class="num bad">0.60</td><td class="num">43/72</td><td class="muted">below_min_order (18), unnecessary_split_fee (29)</td><td><a href="adversarial_runs/openai/gpt-5.5/bare/audit_summary.json">raw JSON</a></td></tr>
+<tr data-arm="policy"><td>gpt-5.5</td><td><span class="pill policy">policy</span></td><td class="num bad">0.58</td><td class="num">42/72</td><td class="muted">below_min_order (23), unnecessary_split_fee (30)</td><td><a href="adversarial_runs/openai/gpt-5.5/policy/audit_summary.json">raw JSON</a></td></tr>
+<tr data-arm="scaffold"><td>gpt-5.5</td><td><span class="pill scaffold">scaffold</span></td><td class="num ok">1.00</td><td class="num">72/72</td><td class="muted">none</td><td><a href="adversarial_runs/openai/gpt-5.5/scaffold/audit_summary.json">raw JSON</a></td></tr>
     </tbody>
   </table>
 
   <h2>Reproducibility and provenance</h2>
   <div class="cards">
-<p class='muted'>No run manifests found.</p>
+<div class="card"><h4>claude-opus-4-8 / bare</h4><p>scenarios hash <code>48c32883f75b0488</code></p><p>temperature 1.0 &middot; 72 calls &middot; 0 retries</p><p>wall clock 235.963 s &middot; python 3.11.15</p></div>
+<div class="card"><h4>claude-opus-4-8 / policy</h4><p>scenarios hash <code>48c32883f75b0488</code></p><p>temperature 1.0 &middot; 72 calls &middot; 0 retries</p><p>wall clock 227.609 s &middot; python 3.11.15</p></div>
+<div class="card"><h4>claude-opus-4-8 / scaffold</h4><p>scenarios hash <code>48c32883f75b0488</code></p><p>temperature 1.0 &middot; 72 calls &middot; 0 retries</p><p>wall clock 224.741 s &middot; python 3.11.15</p></div>
+<div class="card"><h4>gpt-5.5 / bare</h4><p>scenarios hash <code>48c32883f75b0488</code></p><p>temperature 1.0 &middot; 72 calls &middot; 0 retries</p><p>wall clock 379.064 s &middot; python 3.11.15</p></div>
+<div class="card"><h4>gpt-5.5 / policy</h4><p>scenarios hash <code>48c32883f75b0488</code></p><p>temperature 1.0 &middot; 72 calls &middot; 0 retries</p><p>wall clock 380.18 s &middot; python 3.11.15</p></div>
+<div class="card"><h4>gpt-5.5 / scaffold</h4><p>scenarios hash <code>48c32883f75b0488</code></p><p>temperature 1.0 &middot; 72 calls &middot; 0 retries</p><p>wall clock 655.12 s &middot; python 3.11.15</p></div>
   </div>
 </main>
 <script>

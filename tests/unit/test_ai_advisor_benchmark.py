@@ -1,3 +1,5 @@
+from dataclasses import replace
+
 from arenawealth.experiments.ai_advisor import (
     AdvisorRecommendation,
     AdvisorScenario,
@@ -51,6 +53,28 @@ def test_constraint_report_flags_invalid_ai_recommendations() -> None:
         "already_owned:MSFT",
         "ticker_not_allowed:NVDA",
     )
+
+
+def test_restricted_list_predicate_adds_a_governance_rule_modularly() -> None:
+    # Modularity: the same scenario with an added restricted list grows the
+    # contract by one predicate. An otherwise-admissible pick becomes invalid
+    # only because of the new rule; every other check behaves identically.
+    base = AdvisorScenario(
+        name="restricted_demo",
+        cash=1500.0,
+        allowed_tickers=("MA", "ADBE", "ANET"),
+        owned_tickers=("TSM",),
+        max_recommendations=3,
+    )
+    recommendation = AdvisorRecommendation(run_id="run_1", tickers=("MA", "ADBE"))
+
+    assert check_constraints(base, recommendation).is_valid
+
+    governed = replace(base, restricted_tickers=("ADBE",))
+    report = check_constraints(governed, recommendation)
+
+    assert not report.is_valid
+    assert report.violations == ("restricted_ticker:ADBE",)
 
 
 def test_policy_comparison_measures_overlap_and_extras() -> None:
@@ -259,7 +283,7 @@ def test_scenario_bank_has_stable_size_categories_and_manifest() -> None:
     # so the manifest the paper cites stays checkable without trusting prose.
     assert (
         manifest_sha256(records)
-        == "3a9f7562eea88292c8d78996afc5cd1f8454194f6960bcc58626d4717c6a96c7"
+        == "94ddf1920f5a3616d1063951259e6d8863e04c3bf2806dfa9248fd145a5312ee"
     )
     assert {record.category for record in records} >= {
         "new_cash_deployment",

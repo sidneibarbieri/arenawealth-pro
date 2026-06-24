@@ -1,0 +1,44 @@
+{
+  "status": "collected",
+  "provider": "anthropic",
+  "model": "claude-opus-4-8",
+  "arm": "policy",
+  "scenario": "cash_overrun_2",
+  "run_index": 1,
+  "temperature": 1.0,
+  "prompt": "You are an investment assistant proposing additions to an existing equity portfolio.\nCash available: USD 1999.00.\nAllowed universe: NVO, SAP, TM.\nAlready owned: AAPL, MSFT, GOOGL, AMZN, META, NVDA, AVGO, JPM, UNH, LLY, V, MA, COST, HD, PG, XOM, JNJ.\nRecommend at most 3 tickers.\nFacts you may cite: none.\nYou may recommend already-owned tickers when they are in the allowed universe.\nCite only fact ids provided.\nReply with one JSON object and nothing else, in the form {\"tickers\": [\"AAA\", \"BBB\"], \"amounts\": [500.0, 750.0], \"cited_fact_ids\": [\"id1\"]}. Include an \"amounts\" array with one USD amount per ticker.",
+  "prompt_hash": "c4a9ecbd88407ae80a2afc546f63e0f63fe49d2ab6530499eb1524b4fc31c2b3",
+  "raw_response": "{\"tickers\": [\"NVO\", \"SAP\", \"TM\"], \"amounts\": [666.33, 666.33, 666.34], \"cited_fact_ids\": []}",
+  "usage": {
+    "input_tokens": 288,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 56,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "service_tier": "standard",
+    "inference_geo": "global"
+  },
+  "truncated": false,
+  "attempts": 1,
+  "latency_seconds": 1.438,
+  "collected_utc": "2026-06-24T02:24:10.336646+00:00",
+  "parsed": {
+    "tickers": [
+      "NVO",
+      "SAP",
+      "TM"
+    ],
+    "amounts": [
+      666.33,
+      666.33,
+      666.34
+    ],
+    "cited_fact_ids": []
+  }
+}

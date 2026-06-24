@@ -24,7 +24,10 @@
     "service_tier": "standard",
     "inference_geo": "global"
   },
-  "collected_utc": "2026-06-23T16:27:35.002912+00:00",
+  "truncated": false,
+  "attempts": 1,
+  "latency_seconds": 1.268,
+  "collected_utc": "2026-06-24T02:18:50.356911+00:00",
   "parsed": {
     "tickers": [],
     "amounts": [],

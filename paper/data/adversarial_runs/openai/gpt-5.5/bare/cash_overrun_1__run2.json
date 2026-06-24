@@ -11,20 +11,23 @@
   "raw_response": "{\"tickers\":[\"TSM\",\"NVO\",\"SAP\"],\"amounts\":[900.0,800.0,600.0],\"cited_fact_ids\":[]}",
   "usage": {
     "prompt_tokens": 164,
-    "completion_tokens": 124,
-    "total_tokens": 288,
+    "completion_tokens": 146,
+    "total_tokens": 310,
     "prompt_tokens_details": {
       "cached_tokens": 0,
       "audio_tokens": 0
     },
     "completion_tokens_details": {
-      "reasoning_tokens": 81,
+      "reasoning_tokens": 103,
       "audio_tokens": 0,
       "accepted_prediction_tokens": 0,
       "rejected_prediction_tokens": 0
     }
   },
-  "collected_utc": "2026-06-23T16:23:28.021780+00:00",
+  "truncated": false,
+  "attempts": 1,
+  "latency_seconds": 4.277,
+  "collected_utc": "2026-06-24T01:57:15.236902+00:00",
   "parsed": {
     "tickers": [
       "TSM",

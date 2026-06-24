@@ -1,0 +1,21 @@
+{
+  "provider": "anthropic",
+  "model": "claude-opus-4-8",
+  "arm": "bare",
+  "temperature": 1.0,
+  "runs_per_scenario": 3,
+  "scenarios": 24,
+  "scenarios_file": "paper/data/adversarial_scenarios.json",
+  "scenarios_sha256": "48c32883f75b04882fa6d88e52c3c2df1d43e57a9aca6df588c087621574f460",
+  "live_calls": 72,
+  "truncated_runs": 0,
+  "retries": 0,
+  "total_latency_seconds": 127.57,
+  "wall_clock_seconds": 235.963,
+  "started_utc": "2026-06-24T02:18:34.398237+00:00",
+  "finished_utc": "2026-06-24T02:22:30.361619+00:00",
+  "environment": {
+    "python": "3.11.15",
+    "platform": "darwin"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "provider": "openai",
+  "model": "gpt-5.5",
+  "arm": "policy",
+  "temperature": 1.0,
+  "runs_per_scenario": 3,
+  "scenarios": 24,
+  "scenarios_file": "paper/data/adversarial_scenarios.json",
+  "scenarios_sha256": "48c32883f75b04882fa6d88e52c3c2df1d43e57a9aca6df588c087621574f460",
+  "live_calls": 72,
+  "truncated_runs": 0,
+  "retries": 0,
+  "total_latency_seconds": 271.584,
+  "wall_clock_seconds": 380.18,
+  "started_utc": "2026-06-24T02:01:18.444804+00:00",
+  "finished_utc": "2026-06-24T02:07:38.625215+00:00",
+  "environment": {
+    "python": "3.11.15",
+    "platform": "darwin"
+  }
+}

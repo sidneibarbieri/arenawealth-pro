@@ -13,7 +13,14 @@ from typing import Any, Protocol
 
 import httpx
 
-ADVISOR_MAX_OUTPUT_TOKENS = 500
+# Generous so the cap never binds. For reasoning models the OpenAI
+# `max_completion_tokens` budget covers *reasoning + visible output together*, so a
+# tight value (e.g. 500) lets internal reasoning starve the answer and we would
+# measure truncation, not model behavior. Non-reasoning models stop well before
+# this ceiling, so a shared high value keeps every model on an equal footing while
+# guaranteeing no completion is cut off. Truncation is asserted to be zero in the
+# collected runs.
+ADVISOR_MAX_OUTPUT_TOKENS = 4000
 DEFAULT_OPENAI_MODEL = "gpt-5.5"
 DEFAULT_ANTHROPIC_MODEL = "claude-opus-4-8"
 
@@ -22,11 +29,20 @@ DEFAULT_ANTHROPIC_MODEL = "claude-opus-4-8"
 class LLMCompletion:
     text: str
     usage: dict[str, Any]
+    # True when the provider stopped the completion at the token ceiling rather
+    # than because the model finished. A truncated run measures the cap, not the
+    # model, so the collector records this and the audit asserts it never happens.
+    truncated: bool = False
 
 
 class AdvisorLLMClient(Protocol):
-    provider: str
-    model: str
+    # Read-only members so frozen dataclasses and Azure's computed `model`
+    # property satisfy the protocol.
+    @property
+    def provider(self) -> str: ...
+
+    @property
+    def model(self) -> str: ...
 
     def complete(self, prompt: str, temperature: float) -> LLMCompletion:
         """Return one completion. HTTP errors are intentionally not masked."""
@@ -90,6 +106,7 @@ class AzureOpenAIClient:
         return LLMCompletion(
             text=body["choices"][0]["message"]["content"],
             usage=body.get("usage", {}),
+            truncated=_chat_truncated(body),
         )
 
 
@@ -128,6 +145,7 @@ class OpenAIChatClient:
         return LLMCompletion(
             text=body["choices"][0]["message"]["content"],
             usage=body.get("usage", {}),
+            truncated=_chat_truncated(body),
         )
 
 
@@ -166,7 +184,17 @@ class AnthropicMessagesClient:
         )
         response.raise_for_status()
         body = response.json()
-        return LLMCompletion(text=_anthropic_text(body), usage=body.get("usage", {}))
+        return LLMCompletion(
+            text=_anthropic_text(body),
+            usage=body.get("usage", {}),
+            truncated=body.get("stop_reason") == "max_tokens",
+        )
+
+
+def _chat_truncated(body: dict[str, Any]) -> bool:
+    """True when an OpenAI/Azure chat completion stopped at the token ceiling."""
+    choices = body.get("choices") or [{}]
+    return bool(choices[0].get("finish_reason") == "length")
 
 
 def _anthropic_text(body: dict[str, Any]) -> str:

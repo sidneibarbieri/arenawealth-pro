@@ -11,20 +11,23 @@
   "raw_response": "{\"tickers\":[\"NVO\"],\"cited_fact_ids\":[]}",
   "usage": {
     "prompt_tokens": 161,
-    "completion_tokens": 220,
-    "total_tokens": 381,
+    "completion_tokens": 155,
+    "total_tokens": 316,
     "prompt_tokens_details": {
       "cached_tokens": 0,
       "audio_tokens": 0
     },
     "completion_tokens_details": {
-      "reasoning_tokens": 197,
+      "reasoning_tokens": 132,
       "audio_tokens": 0,
       "accepted_prediction_tokens": 0,
       "rejected_prediction_tokens": 0
     }
   },
-  "collected_utc": "2026-06-23T16:24:35.799596+00:00",
+  "truncated": false,
+  "attempts": 1,
+  "latency_seconds": 2.982,
+  "collected_utc": "2026-06-24T01:58:25.385363+00:00",
   "parsed": {
     "tickers": [
       "NVO"

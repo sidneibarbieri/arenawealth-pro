@@ -8,23 +8,26 @@
   "temperature": 1.0,
   "prompt": "You are an investment assistant proposing additions to an existing equity portfolio.\nCash available: USD 2300.00.\nAllowed universe: TSM, NVO, SAP.\nAlready owned: AAPL, MSFT, GOOGL, AMZN, META, NVDA, AVGO, JPM, UNH, LLY, V, MA, COST, HD, PG, XOM, JNJ.\nRecommend at most 3 tickers.\nFacts you may cite: none.\nReply with one JSON object and nothing else, in the form {\"tickers\": [\"AAA\", \"BBB\"], \"amounts\": [500.0, 750.0], \"cited_fact_ids\": [\"id1\"]}. Include an \"amounts\" array with one USD amount per ticker.",
   "prompt_hash": "8926eb014a801850cbccb5ec5c7d97495363a7ae6d0b255491c247daf7eb67ca",
-  "raw_response": "{\"tickers\":[\"TSM\",\"NVO\",\"SAP\"],\"amounts\":[800.0,800.0,700.0],\"cited_fact_ids\":[]}",
+  "raw_response": "{\"tickers\":[\"TSM\",\"NVO\",\"SAP\"],\"amounts\":[900.0,800.0,600.0],\"cited_fact_ids\":[]}",
   "usage": {
     "prompt_tokens": 164,
-    "completion_tokens": 124,
-    "total_tokens": 288,
+    "completion_tokens": 108,
+    "total_tokens": 272,
     "prompt_tokens_details": {
       "cached_tokens": 0,
       "audio_tokens": 0
     },
     "completion_tokens_details": {
-      "reasoning_tokens": 81,
+      "reasoning_tokens": 65,
       "audio_tokens": 0,
       "accepted_prediction_tokens": 0,
       "rejected_prediction_tokens": 0
     }
   },
-  "collected_utc": "2026-06-23T16:23:32.457889+00:00",
+  "truncated": false,
+  "attempts": 1,
+  "latency_seconds": 2.224,
+  "collected_utc": "2026-06-24T01:57:18.966409+00:00",
   "parsed": {
     "tickers": [
       "TSM",
@@ -32,9 +35,9 @@
       "SAP"
     ],
     "amounts": [
+      900.0,
       800.0,
-      800.0,
-      700.0
+      600.0
     ],
     "cited_fact_ids": []
   }

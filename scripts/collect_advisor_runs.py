@@ -212,6 +212,7 @@ def collect_run(
         "prompt_hash": current_prompt_hash,
         "raw_response": outcome.completion.text,
         "usage": outcome.completion.usage,
+        "truncated": outcome.completion.truncated,
         "attempts": outcome.attempts,
         "latency_seconds": round(outcome.latency_seconds, 3),
         "collected_utc": datetime.now(UTC).isoformat(),
@@ -297,6 +298,30 @@ def parse_arguments() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def run_collection(
+    scenarios: list[dict],
+    provider: str,
+    model: str,
+    config: CollectionConfig,
+    budget: CallBudget,
+    client: AdvisorLLMClient | None,
+    runs: int,
+) -> tuple[list[dict], list[dict]]:
+    """Collect and audit every scenario; return (audit reports, raw records)."""
+    audits: list[dict] = []
+    records: list[dict] = []
+    for scenario in scenarios:
+        scenario_records = [
+            collect_run(scenario, provider, model, index, config, budget, client)
+            for index in range(1, runs + 1)
+        ]
+        records.extend(scenario_records)
+        audit = audit_collected(scenario, model, scenario_records)
+        if audit is not None:
+            audits.append(audit)
+    return audits, records
+
+
 def file_sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -336,17 +361,9 @@ def main() -> None:
 
     started = datetime.now(UTC)
     started_clock = time.monotonic()
-    audits: list[dict] = []
-    records: list[dict] = []
-    for scenario in scenarios:
-        scenario_records = [
-            collect_run(scenario, arguments.provider, model, index, config, budget, client)
-            for index in range(1, arguments.runs + 1)
-        ]
-        records.extend(scenario_records)
-        audit = audit_collected(scenario, model, scenario_records)
-        if audit is not None:
-            audits.append(audit)
+    audits, records = run_collection(
+        scenarios, arguments.provider, model, config, budget, client, arguments.runs
+    )
     duration_seconds = time.monotonic() - started_clock
 
     print(f"live calls used: {budget.used} / {arguments.max_calls}")
@@ -357,6 +374,7 @@ def main() -> None:
         )
         return
     collected = [record for record in records if record.get("status") == "collected"]
+    truncated_runs = sum(1 for record in collected if record.get("truncated"))
     manifest = {
         "provider": arguments.provider,
         "model": model,
@@ -367,6 +385,7 @@ def main() -> None:
         "scenarios_file": str(arguments.scenarios),
         "scenarios_sha256": file_sha256(arguments.scenarios),
         "live_calls": budget.used,
+        "truncated_runs": truncated_runs,
         "retries": sum(record.get("attempts", 1) - 1 for record in collected),
         "total_latency_seconds": round(sum(r.get("latency_seconds", 0.0) for r in collected), 3),
         "wall_clock_seconds": round(duration_seconds, 3),
@@ -381,6 +400,11 @@ def main() -> None:
         / safe_slug(config.arm)
     )
     write_outputs(out_dir, audits, manifest)
+    if truncated_runs:
+        print(
+            f"WARNING: {truncated_runs} run(s) hit the token ceiling and were truncated. "
+            "These measure the cap, not the model; raise ADVISOR_MAX_OUTPUT_TOKENS and re-run."
+        )
     source = "live + cache" if arguments.live else "cache only (no API calls)"
     print(
         f"wrote {out_dir}/audit_summary.json + run_manifest.json from {source} "

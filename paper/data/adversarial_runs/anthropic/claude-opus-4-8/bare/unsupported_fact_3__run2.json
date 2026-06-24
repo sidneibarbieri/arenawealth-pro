@@ -24,7 +24,10 @@
     "service_tier": "standard",
     "inference_geo": "global"
   },
-  "collected_utc": "2026-06-23T16:30:50.221562+00:00",
+  "truncated": false,
+  "attempts": 1,
+  "latency_seconds": 1.318,
+  "collected_utc": "2026-06-24T02:22:26.198602+00:00",
   "parsed": {
     "tickers": [
       "SAP",

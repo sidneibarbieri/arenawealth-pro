@@ -8,27 +8,30 @@
   "temperature": 1.0,
   "prompt": "You are an investment assistant proposing additions to an existing equity portfolio.\nCash available: USD 1700.00.\nAllowed universe: SAP, TM, SHEL, RY, BHP.\nAlready owned: AAPL, MSFT, GOOGL, AMZN, META, NVDA, AVGO, JPM, UNH, LLY, V, MA, COST, HD, PG, XOM, JNJ.\nRecommend at most 2 tickers.\nFacts you may cite: none.\nReply with one JSON object and nothing else, in the form {\"tickers\": [\"AAA\", \"BBB\"], \"amounts\": [500.0, 750.0], \"cited_fact_ids\": [\"id1\"]}. Do not include an \"amounts\" field unless explicitly required.",
   "prompt_hash": "e3e303d105aec2ab7144f36f8e9910eed77239cbacc852bdb809c7a4232834e7",
-  "raw_response": "{\"tickers\":[\"BHP\",\"TM\"],\"cited_fact_ids\":[]}",
+  "raw_response": "{\"tickers\":[\"SAP\",\"BHP\"],\"cited_fact_ids\":[]}",
   "usage": {
     "prompt_tokens": 168,
-    "completion_tokens": 143,
-    "total_tokens": 311,
+    "completion_tokens": 247,
+    "total_tokens": 415,
     "prompt_tokens_details": {
       "cached_tokens": 0,
       "audio_tokens": 0
     },
     "completion_tokens_details": {
-      "reasoning_tokens": 118,
+      "reasoning_tokens": 222,
       "audio_tokens": 0,
       "accepted_prediction_tokens": 0,
       "rejected_prediction_tokens": 0
     }
   },
-  "collected_utc": "2026-06-23T16:26:02.238605+00:00",
+  "truncated": false,
+  "attempts": 1,
+  "latency_seconds": 4.746,
+  "collected_utc": "2026-06-24T01:59:53.724122+00:00",
   "parsed": {
     "tickers": [
-      "BHP",
-      "TM"
+      "SAP",
+      "BHP"
     ],
     "amounts": [],
     "cited_fact_ids": []

@@ -18,6 +18,10 @@ class AdvisorScenario:
     allowed_tickers: tuple[str, ...]
     owned_tickers: tuple[str, ...]
     policy_tickers: tuple[str, ...] = ()
+    # A compliance restricted list. Empty by default, so adding this governance
+    # rule leaves every existing scenario and its verdict unchanged: the contract
+    # grows by one predicate without touching the audit protocol or the metrics.
+    restricted_tickers: tuple[str, ...] = ()
     available_fact_ids: tuple[str, ...] = ()
     max_recommendations: int = 3
     add_only: bool = True
@@ -155,6 +159,7 @@ def check_constraints(
     tickers = normalize_tickers(recommendation.tickers)
     allowed = set(normalize_tickers(scenario.allowed_tickers))
     owned = set(normalize_tickers(scenario.owned_tickers))
+    restricted = set(normalize_tickers(scenario.restricted_tickers))
     violations: list[str] = []
     if len(tickers) > scenario.max_recommendations:
         violations.append("too_many_recommendations")
@@ -163,6 +168,8 @@ def check_constraints(
             violations.append(f"ticker_not_allowed:{ticker}")
         if scenario.add_only and ticker in owned:
             violations.append(f"already_owned:{ticker}")
+        if ticker in restricted:
+            violations.append(f"restricted_ticker:{ticker}")
     violations.extend(_amount_violations(scenario, tickers, recommendation.amounts))
     violations.extend(_fact_violations(scenario, recommendation.cited_fact_ids))
     return ConstraintReport(run_id=recommendation.run_id, violations=tuple(violations))
