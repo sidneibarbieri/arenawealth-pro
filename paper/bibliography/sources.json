@@ -529,15 +529,15 @@
     {
       "bib_key": "liang2023helm",
       "title": "Holistic Evaluation of Language Models",
-      "authors": "Bommasani, Liang, Lee",
+      "authors": "Liang, Bommasani, Lee, et al. (50 authors)",
       "year": 2023,
-      "publication": "Annals of the New York Academy of Sciences 1525(1), 140-146 (DOI 10.1111/nyas.15007)",
+      "publication": "Transactions on Machine Learning Research (08/2023), OpenReview iO4LZibEqW",
       "role": "holistic evaluation lineage: parallel desiderata replace a single accuracy number",
       "thread": "behavioral testing / evaluation",
       "filename": "liang2023helm.pdf",
       "status": "manual",
-      "source_url": "https://doi.org/10.1111/nyas.15007",
-      "notes": "Concise NYAS report of HELM (3 authors; the full TMLR version has ~40). Cited for replacing a single accuracy score with parallel desiderata. Delta: ours is a deterministic, executable admissibility contract specialized to a financial action."
+      "source_url": "https://openreview.net/forum?id=iO4LZibEqW",
+      "notes": "Canonical HELM: the full peer-reviewed TMLR article (50 authors, 162 pp.). A 3-author concise report also appeared in Annals of NYAS 1525(1):140-146 (DOI 10.1111/nyas.15007); we cite the primary TMLR version. SEA-HELM (Findings of ACL 2025) is a separate regional benchmark, not a version of HELM. Delta: ours is a deterministic, executable admissibility contract for a financial action."
     }
   ]
 }
