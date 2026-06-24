@@ -60,6 +60,7 @@ experiments`, and `paper/data/` holds the frozen inputs.
 
 | Claim surface | Command or file | Expected evidence |
 | --- | --- | --- |
+| Headline frontier result | `make review` | Re-derives bare/policy/scaffold validity for GPT-5.5 and Opus-4.8 and prints PASS against the paper |
 | Data snapshot integrity | `make verify-data` | SHA-256 hashes match `paper/data/DATA_HASHES.txt` |
 | Privacy/anonymity gate | `make privacy-audit` | Fails on high-confidence author paths, private fixture sentinels, emails, and secret tokens |
 | Implementation safety | `make verify` | Ruff, pytest, frontend build, and ESLint pass |
@@ -102,9 +103,14 @@ The reproducible results use only tracked inputs:
   current-basket study.
 - `paper/data/price_backtest_reference.json` - tracked backtest reference used
   when live price exports are absent.
-- `paper/data/ai_advisor_scenarios.json` - 120 frozen advisor-audit scenarios.
-- `paper/data/advisor_runs/azure/chat/*.json` - cached paid-provider pilot
-  outputs, prompts, hashes, usage metadata, and parsed responses.
+- `paper/data/ai_advisor_scenarios.json` - 120 frozen advisor-audit scenarios;
+  `paper/data/adversarial_scenarios.json` - the 24 adversarial scenarios.
+- `paper/data/adversarial_runs/{openai,anthropic}/.../{bare,policy,scaffold}/` -
+  frozen frontier-model runs for the headline adversarial sweep, each with the
+  prompt, hash, raw response, parsed output, usage, finish reason, and a
+  truncation flag. `make review` re-derives the paper's numbers from these.
+- `paper/data/advisor_runs/*/*.json` - cached three-scenario pilot outputs,
+  prompts, hashes, usage metadata, and parsed responses.
 
 No API key is required for the reported results. Live advisor collection is
 opt-in and budget-capped:
