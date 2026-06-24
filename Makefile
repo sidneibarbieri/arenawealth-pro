@@ -3,7 +3,7 @@ PIP ?= .venv/bin/pip
 UVICORN ?= .venv/bin/uvicorn
 UV_CACHE_DIR ?= .uv-cache
 
-.PHONY: setup verify verify-e2e metrics recommendation price-backtest price-backtest-reference experiments ai-advisor-audit advisor-run-audit bibliography advisor-budget collect-advisor-runs advisor-experiment review-dashboard verify-data privacy-audit figure-audit repro-docker configure-env api ui app run paper all package clean
+.PHONY: setup verify review verify-e2e metrics recommendation price-backtest price-backtest-reference experiments ai-advisor-audit advisor-run-audit bibliography advisor-budget collect-advisor-runs advisor-experiment review-dashboard verify-data privacy-audit figure-audit repro-docker configure-env api ui app run paper all package clean
 
 setup:
 	python3.11 -m venv .venv
@@ -17,6 +17,14 @@ setup:
 
 verify:
 	bash scripts/verify.sh
+
+# One command for a reviewer: re-derive the paper's headline numbers from the
+# frozen data, confirm data integrity, and confirm no private data leaks.
+review:
+	@$(PYTHON) scripts/hash_data.py
+	@$(PYTHON) scripts/reviewer_check.py
+	@$(PYTHON) scripts/check_artifact_privacy.py
+	@echo "Open paper/data/review_dashboard.html for the per-model audit dashboard."
 
 verify-e2e:
 	cd frontend && npm run test:e2e

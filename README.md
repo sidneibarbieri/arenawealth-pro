@@ -11,6 +11,22 @@ The dashboard is optional, but it shows the same contract the paper studies:
 tracked input source, deterministic reviewer mode, proposed orders, guardrails,
 and a decision log. Orders are proposed only; no trade is placed.
 
+## Reviewer? Start here
+
+```bash
+make review     # ~1 min: re-derives the paper's headline numbers from frozen data and prints PASS for each
+```
+
+No API keys and no network are needed: the frozen model runs ship with the
+artifact. See **[REVIEWER_GUIDE.md](REVIEWER_GUIDE.md)** for the paper-to-artifact
+map and the full reproduction.
+
+![Reviewer dashboard](docs/img/review_dashboard.png)
+
+The dashboard (`paper/data/review_dashboard.html`) opens in any browser and
+shows the headline result: validity by model and prompt arm, the violations
+behind each failure, and the provenance hashes.
+
 ## Reviewer Path
 
 Use Docker for the shortest science-only check:
