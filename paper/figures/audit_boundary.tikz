@@ -83,18 +83,18 @@
   {$V,\,S,\,S_w,\,A$\\[1pt]{\tiny audit metrics}};
 
 % input merge: short stub, then equal-length arrow to parse
-\draw[wire] (scenario.east) -- (2.40,.50);
-\draw[wire] (reply.east) -- (2.40,-.50);
-\draw[wire] (2.40,.50) -- (2.40,-.50);
-\draw[arrow] (2.40,0) -- (parse.west);
+\draw[wire] (scenario.east) -- (2.51,.50);
+\draw[wire] (reply.east) -- (2.51,-.50);
+\draw[wire] (2.51,.50) -- (2.51,-.50);
+\draw[arrow] (2.51,0) -- (parse.west);
 
 % parse -> contract (same arrow length)
 \draw[arrow] (parse.east) -- (contract.west);
 
 % output branch: short stub, then equal-length arrows to PASS / FAIL / metrics
-\draw[wire] (contract.east) -- (8.70,0);
-\draw[wire] (8.70,.74) -- (8.70,-.74);
-\draw[arrow] (8.70,.74) -- (pass.west);
-\draw[arrow] (8.70,0) -- (fail.west);
-\draw[arrow] (8.70,-.74) -- (metrics.west);
+\draw[wire] (contract.east) -- (9.04,0);
+\draw[wire] (9.04,.74) -- (9.04,-.74);
+\draw[arrow] (9.04,.74) -- (pass.west);
+\draw[arrow] (9.04,0) -- (fail.west);
+\draw[arrow] (9.04,-.74) -- (metrics.west);
 \end{tikzpicture}
