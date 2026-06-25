@@ -132,14 +132,14 @@ def figure_fee_premium_pdf(landscape, path: Path) -> None:
     ax.set_ylabel("Extra fee (USD)")
     ax.text(1180, 2.58, "naive split: +$2.50 bands", color=RED, fontsize=6.5)
     ax.text(
-        4940,
-        0.52,
-        "fee-aware:\nzero premium",
+        4985,
+        0.30,
+        "fee-aware:\n$0 premium",
         color=GREEN,
         ha="right",
         va="bottom",
-        linespacing=1.0,
-        fontsize=6.5,
+        linespacing=1.1,
+        fontsize=6.3,
     )
     save_pdf(fig, path)
 
