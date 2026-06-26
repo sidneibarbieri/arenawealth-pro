@@ -14,7 +14,7 @@ Recent strong papers share a pattern:
 4. They report failure modes, not only performance.
 5. Their contribution is narrow enough to test, but broad enough to matter.
 
-This is the pattern ArenaWealth should follow. A fee-aware deterministic planner
+This is the pattern the paper should follow. A fee-aware deterministic planner
 is useful, but the stronger research object is a benchmark for AI investment
 recommendations under replayable inputs and explicit constraints.
 
@@ -23,7 +23,7 @@ recommendations under replayable inputs and explicit constraints.
 Open-access PDFs are stored in `paper/bibliography/pdfs/` and are ignored by
 Git. The BibTeX source of truth is `paper/references.bib`.
 
-| BibKey | Role for ArenaWealth | Takeaway |
+| BibKey | Role for the paper | Takeaway |
 | --- | --- | --- |
 | `gu2024spoofability` | Award-level style reference | Defines a focused market-mechanism question, controls a simulator, varies liquidity, and explains why a behavior appears. The paper wins by making a hidden financial risk observable. |
 | `lee2024stockrec` | Closest non-LLM stock recommendation comparator | Frames individual stock recommendation around user preferences, diversification, temporal dynamics, and ROI. This directly challenges us to test user-specific constraints rather than only generic quality scores. |
@@ -54,7 +54,7 @@ The 2025 program has a high density of papers on:
 
 Serendipity: the program already contains both sides of our planned story:
 LLM-based investment advice and concerns about bias, instability, and
-faithfulness. ArenaWealth can become the deterministic harness that evaluates
+faithfulness. The artifact can become the deterministic harness that evaluates
 that advice.
 
 ## Gap we can credibly target
@@ -72,7 +72,7 @@ following together:
   quality/moat baselines;
 - decision logs that can reproduce the final recommendation.
 
-This is the gap ArenaWealth can fill.
+This is the gap the paper can fill.
 
 The newest papers reinforce rather than replace this gap. Trustworthiness
 benchmarks are broad, live trading arenas are operational, and long-horizon
