@@ -4,8 +4,9 @@
 
 This artifact is the reproducibility package for *Auditing AI Investment
 Recommendations as Executable Actions*. You do not need to read any code. Every
-number, figure, and table in the paper is regenerated offline from frozen
-inputs, and the commands below confirm it.
+number, figure, and table in the paper is regenerated from frozen inputs. The
+trust check is offline; full host reproduction requires the usual Python and
+frontend dependencies to be installed or cached.
 
 ## In 60 seconds
 
@@ -21,7 +22,7 @@ inputs, and the commands below confirm it.
 
 ```bash
 make review         # ~1 min: re-derives the paper's numbers, no network, no API keys
-make all            # ~10 min: tests, regenerates every figure/table, rebuilds the PDF
+make all            # ~10 min after setup: tests and regenerates every figure/table
 open paper/data/review_dashboard.html   # per-model audit dashboard (offline HTML)
 ```
 
@@ -54,7 +55,7 @@ records a truncation flag, and writes a hashed manifest.
 
 You only need Docker (or Python 3.11). Open a terminal in this folder and type
 `make review`. Read the lines it prints: each `[PASS]` means a number in the
-paper was recomputed from the saved data and matched. Nothing contacts the
-internet, and no money or trade is ever involved. The optional dashboard
+paper was recomputed from the saved data and matched. The trust check does not
+contact the internet, and no money or trade is ever involved. The optional dashboard
 (`paper/data/review_dashboard.html`) opens in any browser and shows, per model
 and prompt, how often the advice was valid and which rules it broke.

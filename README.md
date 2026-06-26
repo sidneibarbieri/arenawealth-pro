@@ -17,9 +17,11 @@ and a decision log. Orders are proposed only; no trade is placed.
 make review     # ~1 min: re-derives the paper's headline numbers from frozen data and prints PASS for each
 ```
 
-No API keys and no network are needed: the frozen model runs ship with the
-artifact. See **[REVIEWER_GUIDE.md](REVIEWER_GUIDE.md)** for the paper-to-artifact
-map and the full reproduction.
+No API keys are needed for the reported results, and `make review` itself does
+not contact the network: the frozen model runs ship with the artifact. Full host
+reproduction installs Python and frontend dependencies unless they are already
+available locally. See **[REVIEWER_GUIDE.md](REVIEWER_GUIDE.md)** for the
+paper-to-artifact map and the full reproduction.
 
 ![Reviewer dashboard](docs/img/review_dashboard.png)
 
