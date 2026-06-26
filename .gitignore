@@ -32,6 +32,7 @@ env/
 .private/
 .claude/
 arenawealth-pro.worktrees/
+project-framework/
 
 # System
 .DS_Store
