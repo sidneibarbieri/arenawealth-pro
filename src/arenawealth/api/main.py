@@ -1,4 +1,4 @@
-"""FastAPI application for the ArenaWealth dashboard."""
+"""FastAPI application for the ActionAudit dashboard."""
 
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
@@ -34,7 +34,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 
 app = FastAPI(
-    title="ArenaWealth API",
+    title="ActionAudit API",
     description="Portfolio analysis API with persistent storage",
     version="0.2.0",
     lifespan=lifespan,

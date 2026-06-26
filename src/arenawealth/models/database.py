@@ -10,7 +10,9 @@ from sqlmodel import Field, Session, SQLModel, create_engine
 
 ROOT = Path(__file__).resolve().parents[3]
 DATABASE_PATH = Path(
-    os.getenv("ARENAWEALTH_DATABASE_PATH", str(ROOT / "data" / "arenawealth.db"))
+    os.getenv("ACTIONAUDIT_DATABASE_PATH")
+    or os.getenv("ARENAWEALTH_DATABASE_PATH")
+    or str(ROOT / "data" / "actionaudit.db")
 ).expanduser()
 DATABASE_PATH.parent.mkdir(parents=True, exist_ok=True)
 DATABASE_URL = f"sqlite:///{DATABASE_PATH}"

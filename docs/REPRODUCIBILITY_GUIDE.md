@@ -1,6 +1,6 @@
 # Reproducibility Guide
 
-This guide describes the supported reviewer workflow for ArenaWealth.
+This guide describes the supported reviewer workflow for ActionAudit.
 
 ## Environment
 
@@ -63,8 +63,8 @@ log:
 
 ```bash
 rm -f tmp/reviewer-dashboard.db
-ARENAWEALTH_PORTFOLIO_INBOX="$PWD/tests/fixtures" \
-ARENAWEALTH_DATABASE_PATH="$PWD/tmp/reviewer-dashboard.db" \
+ACTIONAUDIT_PORTFOLIO_INBOX="$PWD/tests/fixtures" \
+ACTIONAUDIT_DATABASE_PATH="$PWD/tmp/reviewer-dashboard.db" \
 ./run.sh
 ```
 
@@ -118,7 +118,7 @@ curl http://127.0.0.1:8000/api/v1/data-sources/health
 curl "http://127.0.0.1:8000/api/v1/data-sources/health?live=true"
 ```
 
-Optional keys can be stored in `.env` or `~/.arenawealth/credentials.env`.
+Optional keys can be stored in `.env` or `~/.actionaudit/credentials.env`.
 Reviewer runs do not require them.
 
 ## Cached Advisor Outputs

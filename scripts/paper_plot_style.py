@@ -21,7 +21,7 @@ GREEN = "#3D7157"
 RED = "#A14C5D"
 
 PDF_METADATA = {
-    "Creator": "ArenaWealth deterministic figure pipeline",
+        "Creator": "ActionAudit deterministic figure pipeline",
     "CreationDate": datetime(2026, 1, 1, tzinfo=UTC),
     "ModDate": datetime(2026, 1, 1, tzinfo=UTC),
 }

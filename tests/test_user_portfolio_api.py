@@ -181,7 +181,7 @@ def test_manual_trade_writes_local_inbox_portfolio(
     seed = inbox / "portfolio.csv"
     seed.write_text("ticker,name,shares,cost_basis_per_share,current_price\nAAPL,Apple,1,100,110\n")
     manual = inbox / "manual-portfolio.csv"
-    monkeypatch.setenv("ARENAWEALTH_PORTFOLIO_INBOX", str(inbox))
+    monkeypatch.setenv("ACTIONAUDIT_PORTFOLIO_INBOX", str(inbox))
     monkeypatch.setattr(user_portfolio, "MANUAL_PORTFOLIO", manual)
 
     response = api_client.post(
@@ -213,7 +213,7 @@ def test_manual_sell_rejects_fee_above_gross_proceeds(
     seed = inbox / "portfolio.csv"
     seed.write_text("ticker,name,shares,cost_basis_per_share,current_price\nAAPL,Apple,1,100,110\n")
     manual = inbox / "manual-portfolio.csv"
-    monkeypatch.setenv("ARENAWEALTH_PORTFOLIO_INBOX", str(inbox))
+    monkeypatch.setenv("ACTIONAUDIT_PORTFOLIO_INBOX", str(inbox))
     monkeypatch.setattr(user_portfolio, "MANUAL_PORTFOLIO", manual)
 
     response = api_client.post(
@@ -242,7 +242,7 @@ def test_portfolio_source_reports_manual_override(
     inbox.mkdir()
     manual = inbox / "manual-portfolio.csv"
     manual.write_text("ticker,name,shares,cost_basis_per_share,current_price\nAAPL,Apple,1,100,110\n")
-    monkeypatch.setenv("ARENAWEALTH_PORTFOLIO_INBOX", str(inbox))
+    monkeypatch.setenv("ACTIONAUDIT_PORTFOLIO_INBOX", str(inbox))
     monkeypatch.setattr(user_portfolio, "MANUAL_PORTFOLIO", manual)
 
     response = api_client.get("/api/v1/portfolio/user/source")
@@ -267,7 +267,7 @@ def test_clear_manual_portfolio_restores_broker_export(
     broker.write_text("ticker,name,shares,cost_basis_per_share,current_price\nMSFT,Microsoft,1,200,210\n")
     manual = inbox / "manual-portfolio.csv"
     manual.write_text("ticker,name,shares,cost_basis_per_share,current_price\nAAPL,Apple,1,100,110\n")
-    monkeypatch.setenv("ARENAWEALTH_PORTFOLIO_INBOX", str(inbox))
+    monkeypatch.setenv("ACTIONAUDIT_PORTFOLIO_INBOX", str(inbox))
     monkeypatch.setattr(user_portfolio, "MANUAL_PORTFOLIO", manual)
 
     response = api_client.delete("/api/v1/portfolio/user/source/manual")
@@ -287,7 +287,7 @@ def test_upload_broker_csv_becomes_active_source(
 
     inbox = tmp_path / "inbox"
     inbox.mkdir()
-    monkeypatch.setenv("ARENAWEALTH_PORTFOLIO_INBOX", str(inbox))
+    monkeypatch.setenv("ACTIONAUDIT_PORTFOLIO_INBOX", str(inbox))
     monkeypatch.setattr(user_portfolio, "MANUAL_PORTFOLIO", inbox / "manual-portfolio.csv")
 
     broker_csv = (
@@ -316,7 +316,7 @@ def test_upload_rejects_csv_without_ticker_column(
 
     inbox = tmp_path / "inbox"
     inbox.mkdir()
-    monkeypatch.setenv("ARENAWEALTH_PORTFOLIO_INBOX", str(inbox))
+    monkeypatch.setenv("ACTIONAUDIT_PORTFOLIO_INBOX", str(inbox))
     monkeypatch.setattr(user_portfolio, "MANUAL_PORTFOLIO", inbox / "manual-portfolio.csv")
 
     response = api_client.post(
@@ -338,7 +338,7 @@ def test_upload_rejects_empty_file(
 
     inbox = tmp_path / "inbox"
     inbox.mkdir()
-    monkeypatch.setenv("ARENAWEALTH_PORTFOLIO_INBOX", str(inbox))
+    monkeypatch.setenv("ACTIONAUDIT_PORTFOLIO_INBOX", str(inbox))
     monkeypatch.setattr(user_portfolio, "MANUAL_PORTFOLIO", inbox / "manual-portfolio.csv")
 
     response = api_client.post(

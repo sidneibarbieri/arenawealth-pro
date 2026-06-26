@@ -10,10 +10,10 @@ if [ -f .env ]; then
 fi
 
 cat > .env <<'ENV'
-# ArenaWealth local configuration. Do not commit this file.
+# ActionAudit local configuration. Do not commit this file.
 
 # SEC EDGAR is free and only requires contact identification.
-SEC_USER_AGENT="ArenaWealth User user@example.com"
+SEC_USER_AGENT="ActionAudit Reviewer user@example.com"
 
 # Optional free API keys. Leave blank unless you want live provider checks.
 FRED_API_KEY=

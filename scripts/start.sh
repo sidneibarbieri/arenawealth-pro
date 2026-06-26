@@ -70,28 +70,28 @@ kill_port "$UI_PORT"
 
 echo "Starting API on ${API_URL}"
 .venv/bin/python -m uvicorn arenawealth.api.main:app --host "$API_HOST" --port "$API_PORT" \
-  > /tmp/arenawealth-api.log 2>&1 &
+  > /tmp/actionaudit-api.log 2>&1 &
 API_PID="$!"
 
 wait_for_url "${API_URL}/api/v1/health" "API"
 
 echo "Starting UI on ${UI_URL}"
 npm --prefix frontend run dev -- --host "$API_HOST" --port "$UI_PORT" \
-  > /tmp/arenawealth-ui.log 2>&1 &
+  > /tmp/actionaudit-ui.log 2>&1 &
 UI_PID="$!"
 
 wait_for_url "$UI_URL" "UI"
 
 cat <<EOF
 
-ArenaWealth is running.
+ActionAudit is running.
   App:      ${UI_URL}
   API:      ${API_URL}
   API docs: ${API_URL}/docs
 
 Logs:
-  API: /tmp/arenawealth-api.log
-  UI:  /tmp/arenawealth-ui.log
+  API: /tmp/actionaudit-api.log
+  UI:  /tmp/actionaudit-ui.log
 
 Press Ctrl+C to stop.
 EOF

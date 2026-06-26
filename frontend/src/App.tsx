@@ -298,7 +298,7 @@ function App() {
         <div className="brand-lockup">
           <img className="brand-mark" src="/favicon.svg" alt="" aria-hidden="true" />
           <div>
-            <p className="eyebrow">ArenaWealth</p>
+            <p className="eyebrow">ActionAudit</p>
             <p className="brand-subtitle">Research desk</p>
           </div>
         </div>
@@ -330,7 +330,7 @@ function App() {
         <header className="topbar">
           <div>
             <p className="eyebrow">Moat and compounding workbench</p>
-            <h1>ArenaWealth</h1>
+            <h1>ActionAudit</h1>
           </div>
           <button className="icon-button" type="button" onClick={refreshWorkspace}>
             <RefreshCw size={17} />

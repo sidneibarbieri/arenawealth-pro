@@ -8,7 +8,7 @@ from sqlmodel import create_engine
 
 @pytest.fixture
 def api_client(tmp_path, monkeypatch):
-    """FastAPI TestClient with empty SQLite DB (no shared arenawealth.db)."""
+    """FastAPI TestClient with empty SQLite DB (no shared application DB)."""
     import arenawealth.models.database as db_mod
 
     db_file = tmp_path / "test_api.db"

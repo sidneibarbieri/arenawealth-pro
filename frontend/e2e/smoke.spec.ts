@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test.describe('ArenaWealth workbench', () => {
+test.describe('ActionAudit workbench', () => {
   test.describe.configure({ mode: 'serial' });
 
   test.beforeEach(async ({ page }) => {
@@ -9,7 +9,7 @@ test.describe('ArenaWealth workbench', () => {
   });
 
   test('loads the reviewer workbench', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: 'ArenaWealth' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'ActionAudit' })).toBeVisible();
     await expect(page.locator('aside[aria-label="Workspace navigation"]')).toBeVisible();
     await expect(page.getByText('Allocation queue')).toBeVisible();
     const evidencePanel = page.getByLabel('Reviewer evidence');
@@ -45,7 +45,7 @@ test.describe('ArenaWealth workbench', () => {
   test('renders on a mobile viewport', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/?offline_demo=true');
-    await expect(page.getByRole('heading', { name: 'ArenaWealth' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'ActionAudit' })).toBeVisible();
     await expect(page.getByText('Deploy cash')).toBeVisible();
   });
 });

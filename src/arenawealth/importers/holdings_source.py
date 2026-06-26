@@ -12,7 +12,10 @@ FIXTURE_HOLDINGS = ROOT / "tests" / "fixtures" / "seed_portfolio_broker.csv"
 
 
 def holdings_inbox() -> Path:
-    return Path(os.getenv("ARENAWEALTH_PORTFOLIO_INBOX", str(DEFAULT_INBOX))).expanduser()
+    configured = os.getenv("ACTIONAUDIT_PORTFOLIO_INBOX") or os.getenv(
+        "ARENAWEALTH_PORTFOLIO_INBOX"
+    )
+    return Path(configured or str(DEFAULT_INBOX)).expanduser()
 
 
 MANUAL_PORTFOLIO_NAME = "manual-portfolio.csv"

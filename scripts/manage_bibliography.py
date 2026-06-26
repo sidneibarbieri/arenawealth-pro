@@ -121,7 +121,7 @@ def download_pdf(paper: Paper, overwrite: bool) -> str:
 
     request = urllib.request.Request(
         paper.pdf_url,
-        headers={"User-Agent": "ArenaWealth bibliography manager (research use)"},
+        headers={"User-Agent": "ActionAudit bibliography manager (research use)"},
     )
     temporary_path = paper.pdf_path.with_suffix(".tmp")
     try:

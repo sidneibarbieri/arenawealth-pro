@@ -12,7 +12,7 @@ if [ -n "$(git status --porcelain)" ]; then
 fi
 
 stamp=$(date +%Y%m%d)
-name="arenawealth-artifact-${stamp}"
+name="deterministic-replay-audit-${stamp}"
 work="dist/${name}"
 
 # Author name to strip, read from the manifest so nothing is hardcoded here.
@@ -37,6 +37,7 @@ rm -f "${work}/scripts/package_artifact.sh"
 
 # Bibliography curation notes are development input, not part of the runtime artifact.
 rm -rf "${work}/paper/bibliography"
+rm -f "${work}/scripts/manage_bibliography.py"
 
 # Maintainer-only release/history-scrub runbook: not part of the reviewer artifact.
 rm -f "${work}/docs/PUBLIC_RELEASE.md"
@@ -45,6 +46,13 @@ rm -f "${work}/docs/PUBLIC_RELEASE.md"
 # docs) and the local change log: helpful while building, not for reviewers.
 rm -rf "${work}/docs/dev"
 rm -f "${work}/CORRECTIONS.md"
+
+# Keep the reviewer path austere. The root README and REVIEWER_GUIDE are the
+# supported documentation; older guides and internal reviewer notes are removed
+# to avoid stale claims and duplicated instructions.
+rm -f "${work}/AUDIT_PROTOCOL.md" "${work}/REVIEWERS.md"
+find "${work}/docs" -type f ! -path "${work}/docs/img/review_dashboard.png" -delete
+find "${work}/docs" -type d -empty -delete
 
 # The manuscript is the separately-submitted paper. It is referenced by the
 # artifact through its anonymous URL but never published with it, so drop the LaTeX

@@ -1,4 +1,4 @@
-"""Application settings loaded from environment or ~/.arenawealth/credentials.env.
+"""Application settings loaded from environment or ~/.actionaudit/credentials.env.
 
 Uses pydantic-settings pattern: environment variables override .env file values.
 All keys are optional - the product works without any of them.
@@ -10,7 +10,7 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-CREDENTIAL_VAULT = Path.home() / ".arenawealth" / "credentials.env"
+CREDENTIAL_VAULT = Path.home() / ".actionaudit" / "credentials.env"
 
 
 class ProviderKeys(BaseModel):

@@ -1,8 +1,8 @@
-# ArenaWealth
+# ActionAudit Reproducibility Artifact
 
-ArenaWealth is a reviewer artifact for auditing AI investment recommendations
-against a deterministic, replayable portfolio baseline. The artifact does not
-try to prove a new stock-picking alpha. It asks a narrower question first:
+This is a reviewer artifact for auditing AI investment recommendations against
+a deterministic, replayable portfolio baseline. The artifact does not try to
+prove a new stock-picking alpha. It asks a narrower question first:
 before a recommendation earns any return statistic, is it executable, stable
 across repeated runs, grounded in the frozen scenario, and consistent with the
 portfolio's fee and concentration constraints?
@@ -77,8 +77,8 @@ does not depend on local broker exports or prior decision logs:
 
 ```bash
 rm -f tmp/reviewer-dashboard.db
-ARENAWEALTH_PORTFOLIO_INBOX="$PWD/tests/fixtures" \
-ARENAWEALTH_DATABASE_PATH="$PWD/tmp/reviewer-dashboard.db" \
+ACTIONAUDIT_PORTFOLIO_INBOX="$PWD/tests/fixtures" \
+ACTIONAUDIT_DATABASE_PATH="$PWD/tmp/reviewer-dashboard.db" \
 ./run.sh
 ```
 
@@ -136,7 +136,7 @@ After any promoted data change, rerun `python scripts/hash_data.py --write`,
 
 Agreement is not validity. A model can match the baseline tickers while
 splitting sub-tranche cash into fee-worsening orders, citing unsupported facts,
-or overspending cash. ArenaWealth separates three axes that a single return or
+or overspending cash. ActionAudit separates three axes that a single return or
 overlap score conflates:
 
 - `validity`: every recommendation satisfies deterministic constraints;

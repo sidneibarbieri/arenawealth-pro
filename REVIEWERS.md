@@ -60,8 +60,8 @@ against the tracked fixture and a clean temporary SQLite database:
 
 ```bash
 rm -f tmp/reviewer-dashboard.db
-ARENAWEALTH_PORTFOLIO_INBOX="$PWD/tests/fixtures" \
-ARENAWEALTH_DATABASE_PATH="$PWD/tmp/reviewer-dashboard.db" \
+ACTIONAUDIT_PORTFOLIO_INBOX="$PWD/tests/fixtures" \
+ACTIONAUDIT_DATABASE_PATH="$PWD/tmp/reviewer-dashboard.db" \
 ./run.sh
 ```
 

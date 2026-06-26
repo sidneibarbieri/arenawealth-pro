@@ -4,8 +4,8 @@
 # Frontend and LaTeX are out of scope here: this image reproduces the science,
 # not the product UI or the typeset PDF.
 #
-#   docker build -f Dockerfile.repro -t arenawealth-repro .
-#   docker run --rm arenawealth-repro
+#   docker build -f Dockerfile.repro -t actionaudit-repro .
+#   docker run --rm actionaudit-repro
 #
 # Equivalent: make repro-docker
 

@@ -82,8 +82,8 @@ figure-audit:
 	bash scripts/check_figure_vectors.sh
 
 repro-docker:
-	docker build -f Dockerfile.repro -t arenawealth-repro .
-	docker run --rm arenawealth-repro
+	docker build -f Dockerfile.repro -t actionaudit-repro .
+	docker run --rm actionaudit-repro
 
 configure-env:
 	bash scripts/configure_env.sh
