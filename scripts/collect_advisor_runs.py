@@ -146,6 +146,22 @@ def cache_path(
     )
 
 
+def legacy_cache_path(
+    provider: str,
+    model: str,
+    scenario_name: str,
+    run_index: int,
+    cache_root: Path = CACHE_ROOT,
+) -> Path:
+    """Return the pre-prompt-arm cache path used by the preserved pilot runs."""
+    return (
+        cache_root
+        / safe_slug(provider)
+        / safe_slug(model)
+        / f"{safe_slug(scenario_name)}__run{run_index}.json"
+    )
+
+
 def prompt_hash(prompt: str) -> str:
     return hashlib.sha256(prompt.encode("utf-8")).hexdigest()
 
@@ -180,10 +196,23 @@ def collect_run(
     prompt = build_prompt(scenario, config.arm)
     current_prompt_hash = prompt_hash(prompt)
     path = cache_path(provider, model, scenario["name"], run_index, config.arm, config.cache_root)
-    if path.exists():
-        cached = json.loads(path.read_text(encoding="utf-8"))
-        if cached.get("prompt_hash") == current_prompt_hash:
-            return cached
+    candidates = [path]
+    if config.arm == "policy":
+        candidates.append(
+            legacy_cache_path(provider, model, scenario["name"], run_index, config.cache_root)
+        )
+    for candidate in candidates:
+        if candidate.exists():
+            cached = json.loads(candidate.read_text(encoding="utf-8"))
+            if cached.get("prompt_hash") == current_prompt_hash:
+                return cached
+            if not config.live and cached.get("status") == "collected":
+                cached["prompt_hash_mismatch"] = {
+                    "cached": cached.get("prompt_hash"),
+                    "current": current_prompt_hash,
+                    "path": str(candidate),
+                }
+                return cached
     if not config.live:
         return {
             "status": "would_call",
@@ -295,6 +324,12 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--live", action="store_true", help="Make real API calls; off by default.")
     parser.add_argument("--scenarios", type=Path, default=SCENARIOS_PATH)
     parser.add_argument("--cache-root", type=Path, default=CACHE_ROOT)
+    parser.add_argument(
+        "--out-dir",
+        type=Path,
+        default=None,
+        help="Directory for regenerated audit summaries. Defaults to the cache arm directory.",
+    )
     return parser.parse_args()
 
 
@@ -375,6 +410,7 @@ def main() -> None:
         return
     collected = [record for record in records if record.get("status") == "collected"]
     truncated_runs = sum(1 for record in collected if record.get("truncated"))
+    prompt_hash_mismatches = sum(1 for record in collected if record.get("prompt_hash_mismatch"))
     manifest = {
         "provider": arguments.provider,
         "model": model,
@@ -386,6 +422,7 @@ def main() -> None:
         "scenarios_sha256": file_sha256(arguments.scenarios),
         "live_calls": budget.used,
         "truncated_runs": truncated_runs,
+        "prompt_hash_mismatches": prompt_hash_mismatches,
         "retries": sum(record.get("attempts", 1) - 1 for record in collected),
         "total_latency_seconds": round(sum(r.get("latency_seconds", 0.0) for r in collected), 3),
         "wall_clock_seconds": round(duration_seconds, 3),
@@ -393,7 +430,7 @@ def main() -> None:
         "finished_utc": datetime.now(UTC).isoformat(),
         "environment": environment_fingerprint(),
     }
-    out_dir = (
+    out_dir = arguments.out_dir or (
         arguments.cache_root
         / safe_slug(arguments.provider)
         / safe_slug(model)
@@ -404,6 +441,11 @@ def main() -> None:
         print(
             f"WARNING: {truncated_runs} run(s) hit the token ceiling and were truncated. "
             "These measure the cap, not the model; raise ADVISOR_MAX_OUTPUT_TOKENS and re-run."
+        )
+    if prompt_hash_mismatches:
+        print(
+            f"WARNING: {prompt_hash_mismatches} cached run(s) used a preserved prompt hash "
+            "that differs from the current prompt builder; audited outputs are frozen evidence."
         )
     source = "live + cache" if arguments.live else "cache only (no API calls)"
     print(

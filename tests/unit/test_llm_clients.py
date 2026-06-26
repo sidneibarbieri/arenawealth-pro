@@ -1,7 +1,18 @@
 """Unit tests for provider-agnostic advisor collection clients."""
 
+import json
+
 import pytest
-from scripts.collect_advisor_runs import cache_path, model_label, prompt_hash, safe_slug
+from scripts.collect_advisor_runs import (
+    CallBudget,
+    CollectionConfig,
+    cache_path,
+    collect_run,
+    legacy_cache_path,
+    model_label,
+    prompt_hash,
+    safe_slug,
+)
 
 from arenawealth.experiments.llm_clients import (
     AnthropicMessagesClient,
@@ -70,6 +81,43 @@ def test_cache_path_separates_prompt_arms(tmp_path):
     scaffold = cache_path("azure", "chat", "s", 1, "scaffold", tmp_path)
 
     assert bare != scaffold
+
+
+def test_collect_run_reaudits_legacy_cache_with_prompt_drift(tmp_path):
+    scenario = {
+        "name": "legacy pilot",
+        "cash": 900.0,
+        "allowed_tickers": ["TSM"],
+        "owned_tickers": [],
+        "max_recommendations": 1,
+        "available_fact_ids": [],
+        "amounts_required": True,
+    }
+    path = legacy_cache_path("azure", "chat", scenario["name"], 1, tmp_path)
+    path.parent.mkdir(parents=True)
+    path.write_text(
+        json.dumps(
+            {
+                "status": "collected",
+                "prompt_hash": "preserved-prompt",
+                "parsed": {"tickers": ["TSM"], "amounts": [900.0], "cited_fact_ids": []},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    record = collect_run(
+        scenario,
+        "azure",
+        "chat",
+        1,
+        CollectionConfig(arm="policy", cache_root=tmp_path),
+        CallBudget(1),
+        None,
+    )
+
+    assert record["status"] == "collected"
+    assert record["prompt_hash_mismatch"]["cached"] == "preserved-prompt"
 
 
 def test_model_label_defaults_from_provider_env(monkeypatch):

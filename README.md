@@ -36,7 +36,7 @@ make repro-docker
 ```
 
 Use the host path when you want the Python tests, frontend checks, regenerated
-figures, cached advisor audit, data hashes, and local paper build:
+figures, cached advisor audit, and data hashes:
 
 ```bash
 make setup
@@ -109,7 +109,7 @@ The reproducible results use only tracked inputs:
   frozen frontier-model runs for the headline adversarial sweep, each with the
   prompt, hash, raw response, parsed output, usage, finish reason, and a
   truncation flag. `make review` re-derives the paper's numbers from these.
-- `paper/data/advisor_runs/*/*.json` - cached three-scenario pilot outputs,
+- `paper/data/advisor_runs/*/*/*.json` - cached three-scenario pilot outputs,
   prompts, hashes, usage metadata, and parsed responses.
 
 No API key is required for the reported results. Live advisor collection is
