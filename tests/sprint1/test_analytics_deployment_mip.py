@@ -1,14 +1,13 @@
 """Test suite for MIP-based optimal cash deployment (Sprint 1).
 
 Validates:
-- MIP deploys more cash than greedy heuristic
-- All constraints respected (concentration, overweight, economic floor)
+- MIP supplies an upper bound on deployable cash
+- The economic floor is respected
 - Deterministic and reproducible
 - Performance within SLA (< 500ms)
 - Solver metadata tracking
 """
 
-import dataclasses
 import time
 
 import pytest
@@ -119,7 +118,6 @@ class TestMIPDeploymentOptimality:
             candidates,
             cash_available,
             fee_params_standard,
-            concentration_limits_standard,
         )
         mip_deployed = sum(o.amount for o in mip_orders)
 
@@ -129,72 +127,20 @@ class TestMIPDeploymentOptimality:
         )
         assert metadata.status == "OPTIMAL"
 
-    def test_mip_respects_theme_caps(self, fee_params_standard, concentration_limits_standard):
-        """MIP respects theme concentration caps."""
-        candidates = [
-            _make_position_analysis("TECH1", score=0.80, theme="TECH"),
-            _make_position_analysis("TECH2", score=0.75, theme="TECH"),
-            _make_position_analysis("UTIL1", score=0.70, theme="UTILITY"),
-        ]
-
-        cash_available = 1500.0
-        limits = dataclasses.replace(
-            concentration_limits_standard,
-            theme_concentration_cap_pct=20.0,
+    def test_mip_uses_fee_schedule_floor(self):
+        """A nondefault fee schedule changes the economic floor."""
+        fee_params = FeeParameters(
+            tranche_size_usd=1000.0,
+            fee_per_tranche_usd=5.0,
+            max_fee_impact_pct=1.0,
         )
+        candidates = [_make_position_analysis("A", score=0.70)]
 
-        mip_orders, metadata = plan_deployment_mip(
-            candidates,
-            cash_available,
-            fee_params_standard,
-            limits,
-        )
+        orders, metadata = plan_deployment_mip(candidates, 400.0, fee_params)
 
-        # Calculate theme totals
-        theme_totals = {}
-        for order in mip_orders:
-            theme_totals[order.ticker] = theme_totals.get(order.ticker, 0) + order.amount
-
-        total_portfolio_value = sum(c.market_value for c in candidates if c.market_value)
-        assert total_portfolio_value > 0
-
-        # Verify theme caps not violated
-        # (Note: simplified - real check needs theme aggregation)
-        assert metadata.status == "OPTIMAL"
-        assert len(mip_orders) > 0
-
-    def test_mip_respects_overweight_limits(
-        self, fee_params_standard, concentration_limits_standard
-    ):
-        """MIP respects individual position overweight limits."""
-        candidates = [
-            _make_position_analysis("LIN", score=0.85, current_shares=30, current_price=500),
-            _make_position_analysis("MSFT", score=0.75, current_shares=20, current_price=380),
-        ]
-
-        cash_available = 5000.0
-        limits = dataclasses.replace(
-            concentration_limits_standard,
-            overweight_multiple=1.3,
-        )
-
-        mip_orders, metadata = plan_deployment_mip(
-            candidates,
-            cash_available,
-            fee_params_standard,
-            limits,
-        )
-
-        # Each order should not exceed overweight limit
-        for i, order in enumerate(mip_orders):
-            candidate = candidates[i]
-            current_value = candidate.market_value
-            max_allowed = current_value * 1.3
-            assert order.amount <= max_allowed * 1.01, (
-                f"Order ${order.amount:.2f} exceeds limit ${max_allowed:.2f}"
-            )
-
-        assert metadata.status == "OPTIMAL"
+        assert orders == ()
+        assert metadata.status == "NOT_SOLVED"
+        assert "$500.00" in metadata.explanation
 
 
 class TestMIPPerformance:
@@ -215,7 +161,6 @@ class TestMIPPerformance:
             candidates,
             cash_available,
             fee_params_standard,
-            concentration_limits_standard,
             max_solve_time_seconds=5,
         )
         elapsed = time.time() - start
@@ -237,7 +182,6 @@ class TestMIPPerformance:
             candidates,
             500.0,
             fee_params_standard,
-            concentration_limits_standard,
         )
 
         assert isinstance(metadata, MIPDeploymentMetadata)
@@ -264,13 +208,11 @@ class TestMIPPerformance:
             candidates,
             cash_available,
             fee_params_standard,
-            concentration_limits_standard,
         )
         orders2, meta2 = plan_deployment_mip(
             candidates,
             cash_available,
             fee_params_standard,
-            concentration_limits_standard,
         )
 
         # Should be identical
@@ -295,7 +237,6 @@ class TestMIPEdgeCases:
             candidates,
             100.0,  # Below $250 minimum
             fee_params_standard,
-            concentration_limits_standard,
         )
 
         assert len(mip_orders) == 0
@@ -310,7 +251,6 @@ class TestMIPEdgeCases:
             [],
             1000.0,
             fee_params_standard,
-            concentration_limits_standard,
         )
 
         # Should return empty with explanation
@@ -335,13 +275,11 @@ class TestMIPIntegration:
             candidates,
             cash_available,
             fee_params_standard,
-            concentration_limits_standard,
         )
         mip_orders, _ = plan_deployment_mip(
             candidates,
             cash_available,
             fee_params_standard,
-            concentration_limits_standard,
         )
 
         # Both should pick same tickers (or subset)

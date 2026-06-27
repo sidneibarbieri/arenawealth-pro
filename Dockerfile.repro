@@ -1,6 +1,6 @@
-# Bit-exact reproduction of the paper's scientific results.
-# Builds a pinned Python environment, verifies data integrity, runs the test
-# suite, and regenerates every figure and JSON report from tracked inputs.
+# Version-locked reproduction of the paper's scientific results.
+# Builds a locked Python environment, verifies data integrity, runs the test
+# suite, and regenerates the empirical figures and core reports from tracked inputs.
 # Frontend and LaTeX are out of scope here: this image reproduces the science,
 # not the product UI or the typeset PDF.
 #
@@ -16,21 +16,25 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     MPLBACKEND=Agg
 
 WORKDIR /artifact
-COPY pyproject.toml README.md ./
+COPY pyproject.toml uv.lock README.md ./
 COPY src ./src
 COPY scripts ./scripts
 COPY tests ./tests
 COPY paper ./paper
 
-RUN pip install --no-cache-dir -e ".[dev]"
+RUN pip install --no-cache-dir uv==0.11.6 \
+    && uv sync --frozen --extra dev
 
 # Data integrity, tests, lint, then regenerate results from tracked inputs.
 CMD set -e; \
-    python scripts/hash_data.py; \
-    python scripts/check_artifact_privacy.py; \
-    ruff check src scripts tests; \
-    pytest -q; \
-    python scripts/price_backtest.py --holdings tests/fixtures/seed_portfolio_broker.csv --return-matrix paper/data/returns_matrix.csv --reference-output paper/data/price_backtest_reference.json --generated-utc 20260604_170710; \
-    python scripts/run_experiments.py; \
-    python scripts/run_ai_advisor_audit.py --reference; \
+    .venv/bin/python scripts/hash_data.py; \
+    .venv/bin/python scripts/check_artifact_privacy.py; \
+    .venv/bin/python scripts/reviewer_check.py; \
+    .venv/bin/ruff check src scripts tests; \
+    .venv/bin/pytest -q; \
+    .venv/bin/python scripts/price_backtest.py --holdings tests/fixtures/seed_portfolio_broker.csv --return-matrix paper/data/returns_matrix.csv --reference-output paper/data/price_backtest_reference.json --generated-utc 20260604_170710; \
+    .venv/bin/python scripts/run_experiments.py; \
+    .venv/bin/python scripts/run_ai_advisor_audit.py --reference; \
+    .venv/bin/python scripts/build_review_dashboard.py; \
+    .venv/bin/python scripts/hash_data.py; \
     echo "Reproduction complete: data verified, tests passed, figures regenerated."

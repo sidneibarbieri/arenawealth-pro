@@ -23,15 +23,14 @@ cleanup() {
 
 trap cleanup EXIT INT TERM
 
-kill_port() {
+require_free_port() {
   local port="$1"
   if command -v lsof >/dev/null 2>&1; then
     local pids
-    pids="$(lsof -ti "tcp:${port}" || true)"
+    pids="$(lsof -tiTCP:"${port}" -sTCP:LISTEN || true)"
     if [ -n "$pids" ]; then
-      echo "Stopping stale process on port ${port}"
-      # shellcheck disable=SC2086
-      kill -9 $pids 2>/dev/null || true
+      echo "Port ${port} is already in use. Set API_PORT or UI_PORT to another port." >&2
+      return 1
     fi
   fi
 }
@@ -51,22 +50,31 @@ wait_for_url() {
 }
 
 if [ ! -d ".venv" ]; then
-  echo "Creating Python environment"
-  python3.11 -m venv .venv
+  echo "Installing Python dependencies"
+  if command -v uv >/dev/null 2>&1; then
+    uv sync --frozen --extra dev
+  else
+    python3.11 -m venv .venv
+    .venv/bin/pip install -e ".[dev]"
+  fi
 fi
 
 if [ ! -x ".venv/bin/uvicorn" ]; then
   echo "Installing Python dependencies"
-  .venv/bin/pip install -e ".[dev]"
+  if command -v uv >/dev/null 2>&1; then
+    uv sync --frozen --extra dev
+  else
+    .venv/bin/pip install -e ".[dev]"
+  fi
 fi
 
 if [ ! -d "frontend/node_modules" ]; then
   echo "Installing frontend dependencies"
-  npm --prefix frontend install
+  npm --prefix frontend ci
 fi
 
-kill_port "$API_PORT"
-kill_port "$UI_PORT"
+require_free_port "$API_PORT"
+require_free_port "$UI_PORT"
 
 echo "Starting API on ${API_URL}"
 .venv/bin/python -m uvicorn arenawealth.api.main:app --host "$API_HOST" --port "$API_PORT" \
@@ -76,7 +84,8 @@ API_PID="$!"
 wait_for_url "${API_URL}/api/v1/health" "API"
 
 echo "Starting UI on ${UI_URL}"
-npm --prefix frontend run dev -- --host "$API_HOST" --port "$UI_PORT" \
+VITE_API_PROXY_TARGET="${VITE_API_PROXY_TARGET:-$API_URL}" \
+  npm --prefix frontend run dev -- --host "$API_HOST" --port "$UI_PORT" \
   > /tmp/actionaudit-ui.log 2>&1 &
 UI_PID="$!"
 

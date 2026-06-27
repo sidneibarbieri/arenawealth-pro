@@ -159,7 +159,8 @@ a {{ color: var(--navy); }}
 <main>
   <h2>Validity by model and prompt arm</h2>
   <p class="muted">Valid rate is the fraction of model runs that satisfy every constraint.
-  Higher is better; bare states no rules, scaffold supplies the pre-computed fee arithmetic.</p>
+  Higher is better; policy states the contract, and scaffold additionally supplies
+  the pre-computed fee arithmetic.</p>
   <div class="filters" id="filters">
     <button class="active" data-filter="all">All arms</button>
     <button data-filter="bare">bare</button>

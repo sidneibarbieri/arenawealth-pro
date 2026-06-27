@@ -21,10 +21,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = ROOT / "paper" / "data" / "DATA_HASHES.txt"
 STATIC_INPUTS = (
+    "tests/fixtures/seed_portfolio_broker.csv",
     "paper/data/returns_matrix.csv",
     "paper/data/price_backtest_reference.json",
     "paper/data/ai_advisor_scenarios.json",
     "paper/data/ai_advisor_audit_reference.json",
+    "paper/data/adversarial_scenarios.json",
 )
 ADVISOR_RUNS = ROOT / "paper" / "data" / "advisor_runs"
 
@@ -34,12 +36,16 @@ def sha256(path: Path) -> str:
 
 
 def tracked_inputs() -> tuple[str, ...]:
-    advisor_runs = [
+    run_files = [
         path.relative_to(ROOT).as_posix()
-        for path in sorted(ADVISOR_RUNS.glob("**/*.json"))
+        for runs_root in (
+            ADVISOR_RUNS,
+            ROOT / "paper" / "data" / "adversarial_runs",
+        )
+        for path in sorted(runs_root.glob("**/*.json"))
         if path.is_file()
     ]
-    return (*STATIC_INPUTS, *advisor_runs)
+    return (*STATIC_INPUTS, *run_files)
 
 
 def current_digests() -> dict[str, str]:

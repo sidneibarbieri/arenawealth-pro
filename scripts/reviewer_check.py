@@ -7,20 +7,24 @@ reading any code. Run with: make review
 
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import dataclass
 from pathlib import Path
 
+from arenawealth.experiments.advisor_prompts import build_prompt, parse_response
+
 ROOT = Path(__file__).resolve().parent.parent
 RUNS = ROOT / "paper" / "data" / "adversarial_runs"
+SCENARIOS = ROOT / "paper" / "data" / "adversarial_scenarios.json"
 
 # What the paper claims, checked against the frozen runs (Section 3).
 EXPECTED_VALIDITY = {
     ("openai", "gpt-5.5", "bare"): 0.60,
-    ("openai", "gpt-5.5", "policy"): 0.58,
+    ("openai", "gpt-5.5", "policy"): 0.94,
     ("openai", "gpt-5.5", "scaffold"): 1.00,
     ("anthropic", "claude-opus-4-8", "bare"): 0.53,
-    ("anthropic", "claude-opus-4-8", "policy"): 0.57,
+    ("anthropic", "claude-opus-4-8", "policy"): 0.94,
     ("anthropic", "claude-opus-4-8", "scaffold"): 0.99,
 }
 RUNS_PER_ARM = 72
@@ -57,7 +61,7 @@ def check_validity_gradient() -> Check:
         )
     return Check(
         ok,
-        "Validity gradient matches the paper (arithmetic-not-judgment)",
+        "Validity gradient matches the paper (bare, policy, computed scaffold)",
         "\n".join(lines),
     )
 
@@ -75,6 +79,46 @@ def check_no_truncation() -> Check:
     )
 
 
+def check_prompt_hashes() -> Check:
+    """Verify every frozen prompt and parsed model response."""
+    scenarios = {
+        scenario["name"]: scenario
+        for scenario in json.loads(SCENARIOS.read_text())["scenarios"]
+    }
+    paths = sorted(RUNS.glob("**/*__run*.json"))
+    mismatches = []
+    for path in paths:
+        record = json.loads(path.read_text())
+        prompt = record.get("prompt", "")
+        actual = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
+        arm = path.parent.name
+        scenario_name = path.stem.rsplit("__run", 1)[0]
+        expected = hashlib.sha256(
+            build_prompt(scenarios[scenario_name], arm).encode("utf-8")
+        ).hexdigest()
+        try:
+            reparsed = {
+                key: list(value)
+                for key, value in parse_response(record["raw_response"]).items()
+            }
+        except (KeyError, TypeError, ValueError):
+            reparsed = None
+        if (
+            actual != record.get("prompt_hash")
+            or actual != expected
+            or reparsed != record.get("parsed")
+        ):
+            mismatches.append(path.relative_to(ROOT).as_posix())
+    expected_records = 2 * 3 * 24 * 3
+    ok = len(paths) == expected_records and not mismatches
+    detail = (
+        f"{len(paths)} prompts and raw responses match the current protocol"
+        if ok
+        else f"expected {expected_records}, found {len(paths)}; mismatches: {mismatches[:5]}"
+    )
+    return Check(ok, "Frozen request/response provenance is intact", detail)
+
+
 def render(checks: list[Check]) -> bool:
     print("ActionAudit -- reviewer self-check\n")
     for check in checks:
@@ -89,7 +133,7 @@ def render(checks: list[Check]) -> bool:
 
 
 def main() -> None:
-    checks = [check_validity_gradient(), check_no_truncation()]
+    checks = [check_validity_gradient(), check_no_truncation(), check_prompt_hashes()]
     raise SystemExit(0 if render(checks) else 1)
 
 

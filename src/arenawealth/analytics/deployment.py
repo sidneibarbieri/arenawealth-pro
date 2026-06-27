@@ -18,26 +18,12 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 
 from arenawealth.analytics.models import DeploymentPlan, Order, PositionAnalysis
+from arenawealth.fee_contract import (
+    FeeParameters,
+    compute_order_fee,
+)
 
 MAX_LARGE_CASH_ORDERS = 6
-
-
-@dataclass(frozen=True)
-class FeeParameters:
-    """Immutable fee model constants.
-
-    Broker charges a fixed cost per started tranche of size T in a single-symbol
-    order. A partially used tranche is billed in full (ceiling, not floor).
-    """
-
-    tranche_size_usd: float = 1000.0
-    fee_per_tranche_usd: float = 2.50
-    max_fee_impact_pct: float = 1.0
-
-    @property
-    def min_order_amount_usd(self) -> float:
-        """Economic order floor: minimum cash where fee impact is tolerable."""
-        return self.fee_per_tranche_usd / (self.max_fee_impact_pct / 100)
 
 
 @dataclass(frozen=True)
@@ -46,23 +32,6 @@ class ConcentrationLimits:
 
     overweight_multiple: float = 1.3
     theme_concentration_cap_pct: float = 20.0
-
-
-def compute_order_fee(amount_usd: float, fee_params: FeeParameters) -> float:
-    """Compute broker fee for a single order.
-
-    Args:
-        amount_usd: Order size in USD.
-        fee_params: Fee model configuration.
-
-    Returns:
-        Fee amount in USD, rounded up to nearest tranche.
-    """
-    if amount_usd <= 0:
-        return 0.0
-    tranches_used = math.ceil(amount_usd / fee_params.tranche_size_usd)
-    return tranches_used * fee_params.fee_per_tranche_usd
-
 
 def compute_theme_weights(
     analyses: Sequence[PositionAnalysis],

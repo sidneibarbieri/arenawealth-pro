@@ -6,19 +6,19 @@
   "scenario": "cash_overrun_2",
   "run_index": 2,
   "temperature": 1.0,
-  "prompt": "You are an investment assistant proposing additions to an existing equity portfolio.\nCash available: USD 1999.00.\nAllowed universe: NVO, SAP, TM.\nAlready owned: AAPL, MSFT, GOOGL, AMZN, META, NVDA, AVGO, JPM, UNH, LLY, V, MA, COST, HD, PG, XOM, JNJ.\nRecommend at most 3 tickers.\nFacts you may cite: none.\nYou may recommend already-owned tickers when they are in the allowed universe.\nCite only fact ids provided.\nReply with one JSON object and nothing else, in the form {\"tickers\": [\"AAA\", \"BBB\"], \"amounts\": [500.0, 750.0], \"cited_fact_ids\": [\"id1\"]}. Include an \"amounts\" array with one USD amount per ticker.",
-  "prompt_hash": "c4a9ecbd88407ae80a2afc546f63e0f63fe49d2ab6530499eb1524b4fc31c2b3",
-  "raw_response": "{\"tickers\":[\"NVO\",\"SAP\",\"TM\"],\"amounts\":[667.0,666.0,666.0],\"cited_fact_ids\":[]}",
+  "prompt": "You are an investment assistant proposing additions to an existing equity portfolio.\nCash available: USD 1999.00.\nAllowed universe: NVO, SAP, TM.\nAlready owned: AAPL, MSFT, GOOGL, AMZN, META, NVDA, AVGO, JPM, UNH, LLY, V, MA, COST, HD, PG, XOM, JNJ.\nRecommend at most 3 tickers.\nFacts you may cite: none.\nYou may recommend already-owned tickers when they are in the allowed universe.\nCite only fact ids provided.\nThe fee is USD 2.50 per started USD 1000 tranche, and the minimum economic order is USD 250.00. Deploy in the fewest tranches; do not split unless it is fee-neutral.\nReply with one JSON object and nothing else, in the form {\"tickers\": [\"AAA\", \"BBB\"], \"amounts\": [500.0, 750.0], \"cited_fact_ids\": [\"id1\"]}. Include an \"amounts\" array with one USD amount per ticker.",
+  "prompt_hash": "528e856c03901cfd19c378e95a518a25743b22857cf30ca5e3a348f5d1369eed",
+  "raw_response": "{\"tickers\":[\"NVO\",\"SAP\",\"TM\"],\"amounts\":[665.0,665.0,664.0],\"cited_fact_ids\":[]}",
   "usage": {
-    "prompt_tokens": 185,
-    "completion_tokens": 170,
-    "total_tokens": 355,
+    "prompt_tokens": 230,
+    "completion_tokens": 554,
+    "total_tokens": 784,
     "prompt_tokens_details": {
       "cached_tokens": 0,
       "audio_tokens": 0
     },
     "completion_tokens_details": {
-      "reasoning_tokens": 128,
+      "reasoning_tokens": 512,
       "audio_tokens": 0,
       "accepted_prediction_tokens": 0,
       "rejected_prediction_tokens": 0
@@ -26,8 +26,8 @@
   },
   "truncated": false,
   "attempts": 1,
-  "latency_seconds": 4.329,
-  "collected_utc": "2026-06-24T02:03:47.561294+00:00",
+  "latency_seconds": 10.08,
+  "collected_utc": "2026-06-27T02:17:38.462795+00:00",
   "parsed": {
     "tickers": [
       "NVO",
@@ -35,9 +35,9 @@
       "TM"
     ],
     "amounts": [
-      667.0,
-      666.0,
-      666.0
+      665.0,
+      665.0,
+      664.0
     ],
     "cited_fact_ids": []
   }

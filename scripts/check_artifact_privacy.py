@@ -74,7 +74,7 @@ TEXT_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("personal handle", re.compile(PRIVATE_HANDLE, re.IGNORECASE)),
     ("local home path", re.compile("/" + "Users" + r"/[^\"'\s:)]+")),
     (
-        "codex attachment path",
+        "local assistant attachment path",
         re.compile(r"\." + "codex" + "/attachments", re.IGNORECASE),
     ),
     (

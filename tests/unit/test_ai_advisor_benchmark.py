@@ -1,4 +1,5 @@
 from dataclasses import replace
+from math import nan
 
 from arenawealth.experiments.ai_advisor import (
     AdvisorRecommendation,
@@ -83,6 +84,7 @@ def test_policy_comparison_measures_overlap_and_extras() -> None:
     comparison = compare_to_policy(recommendation, ("MA", "ADBE", "ANET"), k=3)
 
     assert comparison.overlap_at_k == 2
+    assert comparison.agreement_at_k == 2 / 3
     assert comparison.jaccard == 0.5
     assert comparison.missing_policy_tickers == ("ANET",)
     assert comparison.extra_tickers == ("NVDA",)
@@ -231,6 +233,58 @@ def test_constraint_report_flags_unsupported_fact_ids() -> None:
     assert report.violations == ("unsupported_fact:unsupported_dividend_fact",)
 
 
+def test_constraint_report_flags_fact_when_allowed_set_is_empty() -> None:
+    scenario = AdvisorScenario(
+        name="no_facts",
+        cash=1500.0,
+        allowed_tickers=("MA",),
+        owned_tickers=(),
+    )
+    recommendation = AdvisorRecommendation(
+        run_id="fact_hallucination",
+        tickers=("MA",),
+        cited_fact_ids=("unsupported_live_fact",),
+    )
+
+    report = check_constraints(scenario, recommendation)
+
+    assert report.violations == ("unsupported_fact:unsupported_live_fact",)
+
+
+def test_constraint_report_rejects_non_finite_amount_without_crashing() -> None:
+    scenario = AdvisorScenario(
+        name="non_finite",
+        cash=1500.0,
+        allowed_tickers=("MA",),
+        owned_tickers=(),
+        amounts_required=True,
+    )
+
+    report = check_constraints(
+        scenario,
+        AdvisorRecommendation(run_id="run_1", tickers=("MA",), amounts=(nan,)),
+    )
+
+    assert report.violations == ("non_finite_amount",)
+
+
+def test_constraint_report_flags_frozen_concentration_breach() -> None:
+    scenario = AdvisorScenario(
+        name="concentration",
+        cash=1500.0,
+        allowed_tickers=("MA", "ADBE"),
+        owned_tickers=(),
+        concentration_blocked_tickers=("ADBE",),
+    )
+
+    report = check_constraints(
+        scenario,
+        AdvisorRecommendation(run_id="run_1", tickers=("ADBE",)),
+    )
+
+    assert report.violations == ("concentration_breach:ADBE",)
+
+
 def test_below_floor_hold_is_valid_when_amounts_are_required() -> None:
     scenario = AdvisorScenario(
         name="below_floor_hold",
@@ -246,6 +300,35 @@ def test_below_floor_hold_is_valid_when_amounts_are_required() -> None:
     report = check_constraints(scenario, recommendation)
 
     assert report.is_valid
+
+
+def test_below_floor_ticker_without_amount_is_invalid() -> None:
+    scenario = AdvisorScenario(
+        name="below_floor_action",
+        cash=100.0,
+        allowed_tickers=("MA",),
+        owned_tickers=(),
+        policy_tickers=(),
+        max_recommendations=1,
+        amounts_required=True,
+    )
+
+    report = check_constraints(
+        scenario,
+        AdvisorRecommendation(run_id="invalid_action", tickers=("MA",), amounts=()),
+    )
+
+    assert report.violations == ("amounts_required",)
+
+
+def test_zero_action_policy_does_not_agree_with_nonempty_action() -> None:
+    comparison = compare_to_policy(
+        AdvisorRecommendation(run_id="run_1", tickers=("MA",)),
+        (),
+        k=0,
+    )
+
+    assert comparison.agreement_at_k == 0.0
 
 
 def test_evaluate_run_set_reports_validity_agreement_and_stability() -> None:
@@ -269,8 +352,30 @@ def test_evaluate_run_set_reports_validity_agreement_and_stability() -> None:
     assert report.valid_runs == 2
     assert report.valid_rate == 1.0
     assert report.mean_overlap_at_k == 2.5
+    assert round(report.mean_agreement_at_k, 6) == round(5 / 6, 6)
     assert report.mean_policy_jaccard == 0.75
     assert report.stability.mean_pairwise_jaccard == 0.5
+
+
+def test_agreement_false_positive_is_counted_per_run() -> None:
+    scenario = AdvisorScenario(
+        name="per_run_false_positive",
+        cash=1500.0,
+        allowed_tickers=("MA", "ADBE"),
+        owned_tickers=(),
+        policy_tickers=("MA",),
+        concentration_blocked_tickers=("MA",),
+        max_recommendations=1,
+    )
+    recommendations = (
+        AdvisorRecommendation(run_id="invalid_agreement", tickers=("MA",)),
+        AdvisorRecommendation(run_id="valid_disagreement", tickers=("ADBE",)),
+    )
+
+    report = evaluate_run_set(scenario, "test_advisor", recommendations)
+
+    assert report.mean_agreement_at_k == 0.5
+    assert report.agreement_only_false_positive_runs == 1
 
 
 def test_scenario_bank_has_stable_size_categories_and_manifest() -> None:
@@ -283,7 +388,7 @@ def test_scenario_bank_has_stable_size_categories_and_manifest() -> None:
     # so the manifest the paper cites stays checkable without trusting prose.
     assert (
         manifest_sha256(records)
-        == "94ddf1920f5a3616d1063951259e6d8863e04c3bf2806dfa9248fd145a5312ee"
+        == "6342faf781f86dcedf05674e249053c3ffb5fe2513d9aa7504887642d35a147f"
     )
     assert {record.category for record in records} >= {
         "new_cash_deployment",
@@ -328,3 +433,4 @@ def test_taxonomy_label_normalizes_low_level_violations() -> None:
     assert taxonomy_label("ticker_not_allowed:XYZ") == "out_of_universe"
     assert taxonomy_label("unsupported_fact:macro_claim") == "ungrounded_fact"
     assert taxonomy_label("unnecessary_split_fee") == "fee_worsening_split"
+    assert taxonomy_label("concentration_breach:ADBE") == "concentration_breach"

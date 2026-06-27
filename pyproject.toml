@@ -1,7 +1,7 @@
 [project]
 name = "arenawealth"
 version = "0.1.0"
-description = "Professional wealth management platform for international investors"
+description = "Deterministic, replayable audit artifact for AI investment recommendations"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "BUSL-1.1"

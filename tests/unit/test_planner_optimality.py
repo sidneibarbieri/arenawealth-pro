@@ -19,13 +19,10 @@ def test_planner_matches_mip_and_fee_floor_in_design_regime():
         assert point.fee_planner == point.fee_lower_bound
 
 
-def test_mip_deploys_more_when_concentration_binds():
-    # A single candidate whose 1.3x value cap is below the cash forces the MIP to
-    # leave cash undeployed too, but the planner must never deploy beyond the cap.
+def test_mip_upper_bound_matches_planner_with_one_candidate():
     tight = (
-        reference_scenario()[0],  # ample headroom
+        reference_scenario()[0],
     )
     report = planner_optimality(tight, (250.0, 500.0))
     for point in report.points:
-        # With one ample-headroom name, planner and MIP agree exactly.
         assert point.deployment_gap == 0.0

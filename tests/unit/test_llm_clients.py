@@ -12,6 +12,7 @@ from scripts.collect_advisor_runs import (
     model_label,
     prompt_hash,
     safe_slug,
+    validate_cached_prompt,
 )
 
 from arenawealth.experiments.llm_clients import (
@@ -93,13 +94,15 @@ def test_collect_run_reaudits_legacy_cache_with_prompt_drift(tmp_path):
         "available_fact_ids": [],
         "amounts_required": True,
     }
+    frozen_prompt = "preserved pilot prompt"
     path = legacy_cache_path("azure", "chat", scenario["name"], 1, tmp_path)
     path.parent.mkdir(parents=True)
     path.write_text(
         json.dumps(
             {
                 "status": "collected",
-                "prompt_hash": "preserved-prompt",
+                "prompt": frozen_prompt,
+                "prompt_hash": prompt_hash(frozen_prompt),
                 "parsed": {"tickers": ["TSM"], "amounts": [900.0], "cited_fact_ids": []},
             }
         ),
@@ -117,7 +120,15 @@ def test_collect_run_reaudits_legacy_cache_with_prompt_drift(tmp_path):
     )
 
     assert record["status"] == "collected"
-    assert record["prompt_hash_mismatch"]["cached"] == "preserved-prompt"
+    assert record["frozen_prompt_record"] is True
+
+
+def test_cached_prompt_hash_mismatch_is_rejected(tmp_path):
+    path = tmp_path / "run.json"
+    record = {"prompt": "changed", "prompt_hash": prompt_hash("original")}
+
+    with pytest.raises(ValueError, match="cached prompt hash mismatch"):
+        validate_cached_prompt(record, path)
 
 
 def test_model_label_defaults_from_provider_env(monkeypatch):

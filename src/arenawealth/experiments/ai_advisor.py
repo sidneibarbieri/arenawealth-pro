@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from itertools import combinations
+from math import isfinite
 from statistics import mean
 
-from arenawealth.analytics.deployment import MIN_ORDER_AMOUNT, order_fee
+from arenawealth.fee_contract import MIN_ORDER_AMOUNT, order_fee
 
 
 @dataclass(frozen=True)
@@ -22,6 +23,9 @@ class AdvisorScenario:
     # rule leaves every existing scenario and its verdict unchanged: the contract
     # grows by one predicate without touching the audit protocol or the metrics.
     restricted_tickers: tuple[str, ...] = ()
+    # Tickers whose projected post-trade position or theme weight breaches a
+    # concentration limit computed from the frozen scenario.
+    concentration_blocked_tickers: tuple[str, ...] = ()
     available_fact_ids: tuple[str, ...] = ()
     max_recommendations: int = 3
     add_only: bool = True
@@ -54,6 +58,7 @@ class ConstraintReport:
 class PolicyComparison:
     run_id: str
     overlap_at_k: int
+    agreement_at_k: float
     jaccard: float
     missing_policy_tickers: tuple[str, ...]
     extra_tickers: tuple[str, ...]
@@ -76,7 +81,9 @@ class AdvisorRunSetReport:
     violation_counts: tuple[tuple[str, int], ...]
     stability: StabilityReport
     mean_overlap_at_k: float
+    mean_agreement_at_k: float
     mean_policy_jaccard: float
+    agreement_only_false_positive_runs: int
     mean_cash_used: float | None
     mean_fee: float | None
 
@@ -160,6 +167,9 @@ def check_constraints(
     allowed = set(normalize_tickers(scenario.allowed_tickers))
     owned = set(normalize_tickers(scenario.owned_tickers))
     restricted = set(normalize_tickers(scenario.restricted_tickers))
+    concentration_blocked = set(
+        normalize_tickers(scenario.concentration_blocked_tickers)
+    )
     violations: list[str] = []
     if len(tickers) > scenario.max_recommendations:
         violations.append("too_many_recommendations")
@@ -170,6 +180,8 @@ def check_constraints(
             violations.append(f"already_owned:{ticker}")
         if ticker in restricted:
             violations.append(f"restricted_ticker:{ticker}")
+        if ticker in concentration_blocked:
+            violations.append(f"concentration_breach:{ticker}")
     violations.extend(_amount_violations(scenario, tickers, recommendation.amounts))
     violations.extend(_fact_violations(scenario, recommendation.cited_fact_ids))
     return ConstraintReport(run_id=recommendation.run_id, violations=tuple(violations))
@@ -181,12 +193,19 @@ def _amount_violations(
     amounts: tuple[float, ...],
 ) -> list[str]:
     if not amounts:
-        if scenario.amounts_required and scenario.cash < scenario.min_order_amount:
+        if (
+            scenario.amounts_required
+            and not tickers
+            and scenario.cash < scenario.min_order_amount
+        ):
             return []
         return ["amounts_required"] if scenario.amounts_required else []
     violations: list[str] = []
     if len(amounts) != len(tickers):
         violations.append("amount_count_mismatch")
+        return violations
+    if any(not isfinite(amount) for amount in amounts):
+        violations.append("non_finite_amount")
         return violations
     cash_used = sum(amounts)
     if cash_used > scenario.cash + 0.01:
@@ -208,7 +227,7 @@ def _amount_violations(
 
 
 def _fact_violations(scenario: AdvisorScenario, cited_fact_ids: tuple[str, ...]) -> list[str]:
-    if not cited_fact_ids or not scenario.available_fact_ids:
+    if not cited_fact_ids:
         return []
     available = set(scenario.available_fact_ids)
     return [
@@ -219,13 +238,19 @@ def _fact_violations(scenario: AdvisorScenario, cited_fact_ids: tuple[str, ...])
 def compare_to_policy(
     recommendation: AdvisorRecommendation, policy_tickers: tuple[str, ...], k: int
 ) -> PolicyComparison:
-    advisor_top = normalize_tickers(recommendation.tickers)[:k]
+    normalized_advisor = normalize_tickers(recommendation.tickers)
+    advisor_top = normalized_advisor[:k]
     policy_top = normalize_tickers(policy_tickers)[:k]
     advisor_set = set(advisor_top)
     policy_set = set(policy_top)
+    if k == 0:
+        agreement_at_k = 1.0 if not normalized_advisor else 0.0
+    else:
+        agreement_at_k = len(advisor_set & policy_set) / k
     return PolicyComparison(
         run_id=recommendation.run_id,
         overlap_at_k=len(advisor_set & policy_set),
+        agreement_at_k=agreement_at_k,
         jaccard=jaccard(advisor_top, policy_top),
         missing_policy_tickers=tuple(ticker for ticker in policy_top if ticker not in advisor_set),
         extra_tickers=tuple(ticker for ticker in advisor_top if ticker not in policy_set),
@@ -269,6 +294,12 @@ def evaluate_run_set(
         )
         for recommendation in recommendations
     ]
+    agreement_false_positives = sum(
+        comparison.agreement_at_k == 1.0 and not constraint_report.is_valid
+        for comparison, constraint_report in zip(
+            comparisons, constraint_reports, strict=True
+        )
+    )
     cash_values = [
         sum(recommendation.amounts) for recommendation in recommendations if recommendation.amounts
     ]
@@ -285,7 +316,11 @@ def evaluate_run_set(
         violation_counts=_count_violations(constraint_reports),
         stability=stability(recommendations),
         mean_overlap_at_k=_mean([comparison.overlap_at_k for comparison in comparisons]),
+        mean_agreement_at_k=_mean(
+            [comparison.agreement_at_k for comparison in comparisons]
+        ),
         mean_policy_jaccard=_mean([comparison.jaccard for comparison in comparisons]),
+        agreement_only_false_positive_runs=agreement_false_positives,
         mean_cash_used=_mean(cash_values) if cash_values else None,
         mean_fee=_mean(fee_values) if fee_values else None,
     )

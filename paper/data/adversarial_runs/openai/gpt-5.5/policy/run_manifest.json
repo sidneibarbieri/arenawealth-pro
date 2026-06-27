@@ -9,13 +9,15 @@
   "scenarios_sha256": "48c32883f75b04882fa6d88e52c3c2df1d43e57a9aca6df588c087621574f460",
   "live_calls": 72,
   "truncated_runs": 0,
-  "retries": 0,
-  "total_latency_seconds": 271.584,
-  "wall_clock_seconds": 380.18,
-  "started_utc": "2026-06-24T02:01:18.444804+00:00",
-  "finished_utc": "2026-06-24T02:07:38.625215+00:00",
+  "prompt_hash_mismatches": 0,
+  "retries": 1,
+  "total_latency_seconds": 942.7119999999999,
+  "wall_clock_seconds": 767.696,
+  "started_utc": "2026-06-27T02:10:51.296871+00:00",
+  "finished_utc": "2026-06-27T02:23:38.992820+00:00",
   "environment": {
     "python": "3.11.15",
     "platform": "darwin"
-  }
+  },
+  "collection_mode": "parallel cached shards"
 }

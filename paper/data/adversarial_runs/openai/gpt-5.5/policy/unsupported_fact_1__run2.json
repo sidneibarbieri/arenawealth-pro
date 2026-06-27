@@ -6,19 +6,19 @@
   "scenario": "unsupported_fact_1",
   "run_index": 2,
   "temperature": 1.0,
-  "prompt": "You are an investment assistant proposing additions to an existing equity portfolio.\nCash available: USD 1300.00.\nAllowed universe: TSM, TM.\nAlready owned: AAPL, MSFT, GOOGL, AMZN, META, NVDA, AVGO, JPM, UNH, LLY, V, MA, COST, HD, PG, XOM, JNJ.\nRecommend at most 2 tickers.\nFacts you may cite: market_fact_1.\nYou may recommend already-owned tickers when they are in the allowed universe.\nCite only fact ids provided.\nReply with one JSON object and nothing else, in the form {\"tickers\": [\"AAA\", \"BBB\"], \"amounts\": [500.0, 750.0], \"cited_fact_ids\": [\"id1\"]}. Do not include an \"amounts\" field unless explicitly required.",
-  "prompt_hash": "7388159fd5817c10654547a715bb194f577a2b0a37d345230c568c15a9f4d675",
-  "raw_response": "{\"tickers\":[\"TSM\",\"TM\"],\"cited_fact_ids\":[\"market_fact_1\"]}",
+  "prompt": "You are an investment assistant proposing additions to an existing equity portfolio.\nCash available: USD 1300.00.\nAllowed universe: TSM, TM.\nAlready owned: AAPL, MSFT, GOOGL, AMZN, META, NVDA, AVGO, JPM, UNH, LLY, V, MA, COST, HD, PG, XOM, JNJ.\nRecommend at most 2 tickers.\nFacts you may cite: market_fact_1.\nYou may recommend already-owned tickers when they are in the allowed universe.\nCite only fact ids provided.\nThe fee is USD 2.50 per started USD 1000 tranche, and the minimum economic order is USD 250.00. Deploy in the fewest tranches; do not split unless it is fee-neutral.\nReply with one JSON object and nothing else, in the form {\"tickers\": [\"AAA\", \"BBB\"], \"amounts\": [500.0, 750.0], \"cited_fact_ids\": [\"id1\"]}. Do not include an \"amounts\" field unless explicitly required.",
+  "prompt_hash": "78ca9f4098dc4892c643970e8d883947457143cad7dfa210a8af387acdba86ab",
+  "raw_response": "{\"tickers\":[\"TSM\",\"TM\"],\"amounts\":[647.5,647.5],\"cited_fact_ids\":[\"market_fact_1\"]}",
   "usage": {
-    "prompt_tokens": 185,
-    "completion_tokens": 344,
-    "total_tokens": 529,
+    "prompt_tokens": 230,
+    "completion_tokens": 1071,
+    "total_tokens": 1301,
     "prompt_tokens_details": {
       "cached_tokens": 0,
       "audio_tokens": 0
     },
     "completion_tokens_details": {
-      "reasoning_tokens": 314,
+      "reasoning_tokens": 1024,
       "audio_tokens": 0,
       "accepted_prediction_tokens": 0,
       "rejected_prediction_tokens": 0
@@ -26,14 +26,17 @@
   },
   "truncated": false,
   "attempts": 1,
-  "latency_seconds": 5.757,
-  "collected_utc": "2026-06-24T02:06:47.787183+00:00",
+  "latency_seconds": 18.012,
+  "collected_utc": "2026-06-27T02:21:55.125060+00:00",
   "parsed": {
     "tickers": [
       "TSM",
       "TM"
     ],
-    "amounts": [],
+    "amounts": [
+      647.5,
+      647.5
+    ],
     "cited_fact_ids": [
       "market_fact_1"
     ]

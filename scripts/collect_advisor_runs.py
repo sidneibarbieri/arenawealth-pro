@@ -166,6 +166,19 @@ def prompt_hash(prompt: str) -> str:
     return hashlib.sha256(prompt.encode("utf-8")).hexdigest()
 
 
+def validate_cached_prompt(record: dict, path: Path) -> None:
+    """Verify that a frozen record's prompt still matches its stored hash."""
+    prompt = record.get("prompt")
+    stored_hash = record.get("prompt_hash")
+    if not isinstance(prompt, str) or not isinstance(stored_hash, str):
+        raise ValueError(f"cached record lacks prompt provenance: {path}")
+    actual_hash = prompt_hash(prompt)
+    if actual_hash != stored_hash:
+        raise ValueError(
+            f"cached prompt hash mismatch in {path}: expected {stored_hash}, got {actual_hash}"
+        )
+
+
 def model_label(provider: str, model: str | None) -> str:
     if model:
         return model
@@ -205,13 +218,11 @@ def collect_run(
         if candidate.exists():
             cached = json.loads(candidate.read_text(encoding="utf-8"))
             if cached.get("prompt_hash") == current_prompt_hash:
+                validate_cached_prompt(cached, candidate)
                 return cached
             if not config.live and cached.get("status") == "collected":
-                cached["prompt_hash_mismatch"] = {
-                    "cached": cached.get("prompt_hash"),
-                    "current": current_prompt_hash,
-                    "path": str(candidate),
-                }
+                validate_cached_prompt(cached, candidate)
+                cached["frozen_prompt_record"] = True
                 return cached
     if not config.live:
         return {
@@ -267,6 +278,9 @@ def scenario_from_dict(raw: dict) -> AdvisorScenario:
         allowed_tickers=tuple(raw["allowed_tickers"]),
         owned_tickers=tuple(raw["owned_tickers"]),
         policy_tickers=tuple(raw.get("policy_tickers", ())),
+        concentration_blocked_tickers=tuple(
+            raw.get("concentration_blocked_tickers", ())
+        ),
         available_fact_ids=tuple(raw.get("available_fact_ids", ())),
         max_recommendations=raw.get("max_recommendations", 3),
         add_only=raw.get("add_only", True),
@@ -410,7 +424,7 @@ def main() -> None:
         return
     collected = [record for record in records if record.get("status") == "collected"]
     truncated_runs = sum(1 for record in collected if record.get("truncated"))
-    prompt_hash_mismatches = sum(1 for record in collected if record.get("prompt_hash_mismatch"))
+    frozen_prompt_records = sum(1 for record in collected if record.get("frozen_prompt_record"))
     manifest = {
         "provider": arguments.provider,
         "model": model,
@@ -422,7 +436,7 @@ def main() -> None:
         "scenarios_sha256": file_sha256(arguments.scenarios),
         "live_calls": budget.used,
         "truncated_runs": truncated_runs,
-        "prompt_hash_mismatches": prompt_hash_mismatches,
+        "frozen_prompt_records": frozen_prompt_records,
         "retries": sum(record.get("attempts", 1) - 1 for record in collected),
         "total_latency_seconds": round(sum(r.get("latency_seconds", 0.0) for r in collected), 3),
         "wall_clock_seconds": round(duration_seconds, 3),
@@ -442,10 +456,9 @@ def main() -> None:
             f"WARNING: {truncated_runs} run(s) hit the token ceiling and were truncated. "
             "These measure the cap, not the model; raise ADVISOR_MAX_OUTPUT_TOKENS and re-run."
         )
-    if prompt_hash_mismatches:
+    if frozen_prompt_records:
         print(
-            f"WARNING: {prompt_hash_mismatches} cached run(s) used a preserved prompt hash "
-            "that differs from the current prompt builder; audited outputs are frozen evidence."
+            f"verified {frozen_prompt_records} frozen prompt record(s) against their stored hashes"
         )
     source = "live + cache" if arguments.live else "cache only (no API calls)"
     print(

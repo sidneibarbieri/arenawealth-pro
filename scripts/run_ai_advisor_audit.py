@@ -46,6 +46,9 @@ def scenario_from_payload(payload: dict[str, Any]) -> AdvisorScenario:
         allowed_tickers=tuple(payload["allowed_tickers"]),
         owned_tickers=tuple(payload["owned_tickers"]),
         policy_tickers=tuple(payload.get("policy_tickers", ())),
+        concentration_blocked_tickers=tuple(
+            payload.get("concentration_blocked_tickers", ())
+        ),
         available_fact_ids=tuple(payload.get("available_fact_ids", ())),
         max_recommendations=int(payload.get("max_recommendations", 3)),
         add_only=bool(payload.get("add_only", True)),
@@ -92,7 +95,9 @@ def overall_summary(reports: tuple[AdvisorRunSetReport, ...]) -> dict[str, Any]:
     return {
         "run_sets": len(reports),
         "mean_valid_rate": mean(report.valid_rate for report in reports),
-        "mean_policy_jaccard": mean(report.mean_policy_jaccard for report in reports),
+        "mean_policy_agreement": mean(
+            report.mean_agreement_at_k for report in reports
+        ),
         "mean_stability": mean(report.stability.mean_pairwise_jaccard for report in reports),
         "mean_amount_stability": mean_amount_stability(reports),
         "violation_counts": flatten_violation_counts(reports),
@@ -117,7 +122,9 @@ def summarize_by_advisor(reports: tuple[AdvisorRunSetReport, ...]) -> dict[str, 
         advisor_label: {
             "scenarios": len(items),
             "mean_valid_rate": mean(item.valid_rate for item in items),
-            "mean_policy_jaccard": mean(item.mean_policy_jaccard for item in items),
+            "mean_policy_agreement": mean(
+                item.mean_agreement_at_k for item in items
+            ),
             "mean_stability": mean(item.stability.mean_pairwise_jaccard for item in items),
             "mean_amount_stability": mean_amount_stability(tuple(items)),
             "violation_counts": flatten_violation_counts(tuple(items)),
@@ -152,12 +159,12 @@ def write_markdown(summary: dict[str, Any], path: Path) -> None:
         f"- Scenarios: {summary['scenario_count']}",
         f"- Advisor labels: {summary['advisor_count']}",
         f"- Mean valid rate: {summary['overall']['mean_valid_rate']:.3f}",
-        f"- Mean policy Jaccard: {summary['overall']['mean_policy_jaccard']:.3f}",
+        f"- Mean policy agreement: {summary['overall']['mean_policy_agreement']:.3f}",
         f"- Mean stability: {summary['overall']['mean_stability']:.3f}",
         "",
         "## By Advisor",
         "",
-        "| Advisor | Valid rate | Policy Jaccard | Stability | Violations |",
+        "| Advisor | Valid rate | Policy agreement | Stability | Violations |",
         "| --- | ---: | ---: | ---: | --- |",
     ]
     for advisor_label, values in summary["by_advisor"].items():
@@ -168,7 +175,7 @@ def write_markdown(summary: dict[str, Any], path: Path) -> None:
             violations = "none"
         lines.append(
             f"| {advisor_label} | {values['mean_valid_rate']:.3f} | "
-            f"{values['mean_policy_jaccard']:.3f} | "
+            f"{values['mean_policy_agreement']:.3f} | "
             f"{values['mean_stability']:.3f} | {violations} |"
         )
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -180,7 +187,7 @@ def write_advisor_audit_pdf(summary: dict[str, Any], path: Path) -> None:
         (
             display_label(label),
             summary["by_advisor"][label]["mean_valid_rate"],
-            summary["by_advisor"][label]["mean_policy_jaccard"],
+            summary["by_advisor"][label]["mean_policy_agreement"],
             summary["by_advisor"][label]["mean_stability"],
         )
         for label in labels
@@ -288,7 +295,7 @@ def main() -> None:
     print(
         "AI advisor audit: "
         f"valid={summary['overall']['mean_valid_rate']:.3f} "
-        f"policy_jaccard={summary['overall']['mean_policy_jaccard']:.3f} "
+        f"policy_agreement={summary['overall']['mean_policy_agreement']:.3f} "
         f"stability={summary['overall']['mean_stability']:.3f}"
     )
     print(f"Wrote {output}")

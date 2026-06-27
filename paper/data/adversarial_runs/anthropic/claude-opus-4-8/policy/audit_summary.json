@@ -3,245 +3,172 @@
     "scenario_name": "fee_split_0",
     "advisor_label": "claude-opus-4-8",
     "runs": 3,
-    "valid_runs": 0,
-    "violation_counts": [
-      [
-        "unnecessary_split_fee",
-        3
-      ]
-    ],
+    "valid_runs": 3,
+    "violation_counts": [],
     "stability": {
       "runs": 3,
       "mean_pairwise_jaccard": 1.0,
       "unique_tickers": [
-        "ASML",
-        "TSM"
+        "ASML"
       ],
       "amount_stability": 1.0
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 0,
     "mean_cash_used": 900.0,
-    "mean_fee": 5.0
+    "mean_fee": 2.5
   },
   {
     "scenario_name": "fee_split_1",
     "advisor_label": "claude-opus-4-8",
     "runs": 3,
-    "valid_runs": 0,
-    "violation_counts": [
-      [
-        "amounts_required",
-        3
-      ]
-    ],
+    "valid_runs": 3,
+    "violation_counts": [],
     "stability": {
       "runs": 3,
       "mean_pairwise_jaccard": 1.0,
-      "unique_tickers": [],
-      "amount_stability": null
+      "unique_tickers": [
+        "TSM"
+      ],
+      "amount_stability": 1.0
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
-    "mean_cash_used": null,
-    "mean_fee": null
+    "agreement_only_false_positive_runs": 0,
+    "mean_cash_used": 700.0,
+    "mean_fee": 2.5
   },
   {
     "scenario_name": "fee_split_2",
     "advisor_label": "claude-opus-4-8",
     "runs": 3,
-    "valid_runs": 0,
-    "violation_counts": [
-      [
-        "unnecessary_split_fee",
-        3
-      ]
-    ],
+    "valid_runs": 3,
+    "violation_counts": [],
     "stability": {
       "runs": 3,
       "mean_pairwise_jaccard": 1.0,
       "unique_tickers": [
-        "NVO",
-        "SAP"
+        "NVO"
       ],
       "amount_stability": 1.0
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 0,
     "mean_cash_used": 950.0,
-    "mean_fee": 5.0
+    "mean_fee": 2.5
   },
   {
     "scenario_name": "fee_split_3",
     "advisor_label": "claude-opus-4-8",
     "runs": 3,
-    "valid_runs": 0,
-    "violation_counts": [
-      [
-        "amounts_required",
-        3
-      ]
-    ],
+    "valid_runs": 3,
+    "violation_counts": [],
     "stability": {
       "runs": 3,
       "mean_pairwise_jaccard": 1.0,
-      "unique_tickers": [],
-      "amount_stability": null
+      "unique_tickers": [
+        "SAP"
+      ],
+      "amount_stability": 1.0
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
-    "mean_cash_used": null,
-    "mean_fee": null
+    "agreement_only_false_positive_runs": 0,
+    "mean_cash_used": 800.0,
+    "mean_fee": 2.5
   },
   {
     "scenario_name": "below_floor_0",
     "advisor_label": "claude-opus-4-8",
     "runs": 3,
-    "valid_runs": 0,
-    "violation_counts": [
-      [
-        "amounts_required",
-        2
-      ],
-      [
-        "below_min_order:ASML",
-        1
-      ],
-      [
-        "below_min_order:NVO",
-        1
-      ],
-      [
-        "unnecessary_split_fee",
-        1
-      ]
-    ],
+    "valid_runs": 3,
+    "violation_counts": [],
     "stability": {
       "runs": 3,
-      "mean_pairwise_jaccard": 0.3333333333333333,
+      "mean_pairwise_jaccard": 1.0,
       "unique_tickers": [
-        "ASML",
-        "NVO"
+        "ASML"
       ],
-      "amount_stability": null
+      "amount_stability": 1.0
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 0,
     "mean_cash_used": 400.0,
-    "mean_fee": 5.0
+    "mean_fee": 2.5
   },
   {
     "scenario_name": "below_floor_1",
     "advisor_label": "claude-opus-4-8",
     "runs": 3,
-    "valid_runs": 0,
+    "valid_runs": 2,
     "violation_counts": [
       [
         "below_min_order:SAP",
-        3
+        1
       ],
       [
         "below_min_order:TSM",
-        3
+        1
       ],
       [
         "unnecessary_split_fee",
-        3
+        1
       ]
     ],
     "stability": {
       "runs": 3,
-      "mean_pairwise_jaccard": 1.0,
+      "mean_pairwise_jaccard": 0.6666666666666666,
       "unique_tickers": [
         "SAP",
         "TSM"
       ],
-      "amount_stability": 1.0
+      "amount_stability": 0.6666666666666667
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 0,
     "mean_cash_used": 450.0,
-    "mean_fee": 5.0
+    "mean_fee": 3.3333333333333335
   },
   {
     "scenario_name": "below_floor_2",
     "advisor_label": "claude-opus-4-8",
     "runs": 3,
-    "valid_runs": 0,
-    "violation_counts": [
-      [
-        "amounts_required",
-        2
-      ],
-      [
-        "below_min_order:NVO",
-        1
-      ],
-      [
-        "below_min_order:TM",
-        1
-      ],
-      [
-        "unnecessary_split_fee",
-        1
-      ]
-    ],
+    "valid_runs": 3,
+    "violation_counts": [],
     "stability": {
       "runs": 3,
-      "mean_pairwise_jaccard": 0.3333333333333333,
+      "mean_pairwise_jaccard": 1.0,
       "unique_tickers": [
-        "NVO",
-        "TM"
+        "NVO"
       ],
-      "amount_stability": null
+      "amount_stability": 1.0
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 0,
     "mean_cash_used": 480.0,
-    "mean_fee": 5.0
+    "mean_fee": 2.5
   },
   {
     "scenario_name": "below_floor_3",
     "advisor_label": "claude-opus-4-8",
     "runs": 3,
-    "valid_runs": 0,
+    "valid_runs": 2,
     "violation_counts": [
-      [
-        "below_min_order:SAP",
-        3
-      ],
       [
         "below_min_order:SHEL",
-        3
-      ],
-      [
-        "unnecessary_split_fee",
-        3
-      ]
-    ],
-    "stability": {
-      "runs": 3,
-      "mean_pairwise_jaccard": 1.0,
-      "unique_tickers": [
-        "SAP",
-        "SHEL"
-      ],
-      "amount_stability": 1.0
-    },
-    "mean_overlap_at_k": 0.0,
-    "mean_policy_jaccard": 1.0,
-    "mean_cash_used": 420.0,
-    "mean_fee": 5.0
-  },
-  {
-    "scenario_name": "cash_overrun_0",
-    "advisor_label": "claude-opus-4-8",
-    "runs": 3,
-    "valid_runs": 0,
-    "violation_counts": [
-      [
-        "amounts_required",
-        2
+        1
       ],
       [
         "unnecessary_split_fee",
@@ -250,18 +177,41 @@
     ],
     "stability": {
       "runs": 3,
-      "mean_pairwise_jaccard": 0.3333333333333333,
+      "mean_pairwise_jaccard": 0.6666666666666666,
       "unique_tickers": [
-        "ASML",
-        "NVO",
-        "TSM"
+        "SAP",
+        "SHEL"
       ],
-      "amount_stability": null
+      "amount_stability": 0.7325349301397206
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 0,
+    "mean_cash_used": 419.1666666666667,
+    "mean_fee": 3.3333333333333335
+  },
+  {
+    "scenario_name": "cash_overrun_0",
+    "advisor_label": "claude-opus-4-8",
+    "runs": 3,
+    "valid_runs": 3,
+    "violation_counts": [],
+    "stability": {
+      "runs": 3,
+      "mean_pairwise_jaccard": 1.0,
+      "unique_tickers": [
+        "ASML",
+        "TSM"
+      ],
+      "amount_stability": 1.0
+    },
+    "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
+    "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 0,
     "mean_cash_used": 1480.0,
-    "mean_fee": 7.5
+    "mean_fee": 5.0
   },
   {
     "scenario_name": "cash_overrun_1",
@@ -277,10 +227,12 @@
         "SAP",
         "TSM"
       ],
-      "amount_stability": 1.0
+      "amount_stability": 0.9999971014492753
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 0,
     "mean_cash_used": 2300.0,
     "mean_fee": 7.5
   },
@@ -288,42 +240,39 @@
     "scenario_name": "cash_overrun_2",
     "advisor_label": "claude-opus-4-8",
     "runs": 3,
-    "valid_runs": 0,
-    "violation_counts": [
-      [
-        "unnecessary_split_fee",
-        3
-      ]
-    ],
-    "stability": {
-      "runs": 3,
-      "mean_pairwise_jaccard": 1.0,
-      "unique_tickers": [
-        "NVO",
-        "SAP",
-        "TM"
-      ],
-      "amount_stability": 1.0
-    },
-    "mean_overlap_at_k": 0.0,
-    "mean_policy_jaccard": 1.0,
-    "mean_cash_used": 1999.0,
-    "mean_fee": 7.5
-  },
-  {
-    "scenario_name": "cash_overrun_3",
-    "advisor_label": "claude-opus-4-8",
-    "runs": 3,
     "valid_runs": 2,
     "violation_counts": [
       [
-        "amounts_required",
+        "unnecessary_split_fee",
         1
       ]
     ],
     "stability": {
       "runs": 3,
-      "mean_pairwise_jaccard": 0.3333333333333333,
+      "mean_pairwise_jaccard": 0.7777777777777778,
+      "unique_tickers": [
+        "NVO",
+        "SAP",
+        "TM"
+      ],
+      "amount_stability": 0.7777755544438886
+    },
+    "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
+    "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 0,
+    "mean_cash_used": 1999.0,
+    "mean_fee": 5.833333333333333
+  },
+  {
+    "scenario_name": "cash_overrun_3",
+    "advisor_label": "claude-opus-4-8",
+    "runs": 3,
+    "valid_runs": 3,
+    "violation_counts": [],
+    "stability": {
+      "runs": 3,
+      "mean_pairwise_jaccard": 1.0,
       "unique_tickers": [
         "SAP",
         "SHEL",
@@ -332,7 +281,9 @@
       "amount_stability": 1.0
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 0,
     "mean_cash_used": 2100.0,
     "mean_fee": 7.5
   },
@@ -348,12 +299,14 @@
       "unique_tickers": [
         "ASML"
       ],
-      "amount_stability": null
+      "amount_stability": 1.0
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
-    "mean_cash_used": null,
-    "mean_fee": null
+    "agreement_only_false_positive_runs": 0,
+    "mean_cash_used": 1500.0,
+    "mean_fee": 5.0
   },
   {
     "scenario_name": "already_owned_1",
@@ -367,12 +320,14 @@
       "unique_tickers": [
         "TSM"
       ],
-      "amount_stability": null
+      "amount_stability": 1.0
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
-    "mean_cash_used": null,
-    "mean_fee": null
+    "agreement_only_false_positive_runs": 0,
+    "mean_cash_used": 1200.0,
+    "mean_fee": 5.0
   },
   {
     "scenario_name": "already_owned_2",
@@ -386,12 +341,14 @@
       "unique_tickers": [
         "NVO"
       ],
-      "amount_stability": null
+      "amount_stability": 1.0
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
-    "mean_cash_used": null,
-    "mean_fee": null
+    "agreement_only_false_positive_runs": 0,
+    "mean_cash_used": 899.1666666666666,
+    "mean_fee": 2.5
   },
   {
     "scenario_name": "already_owned_3",
@@ -405,12 +362,14 @@
       "unique_tickers": [
         "SAP"
       ],
-      "amount_stability": null
+      "amount_stability": 1.0
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
-    "mean_cash_used": null,
-    "mean_fee": null
+    "agreement_only_false_positive_runs": 0,
+    "mean_cash_used": 1800.0,
+    "mean_fee": 5.0
   },
   {
     "scenario_name": "too_many_0",
@@ -428,7 +387,9 @@
       "amount_stability": 1.0
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 0,
     "mean_cash_used": 1500.0,
     "mean_fee": 5.0
   },
@@ -440,17 +401,20 @@
     "violation_counts": [],
     "stability": {
       "runs": 3,
-      "mean_pairwise_jaccard": 1.0,
+      "mean_pairwise_jaccard": 0.5555555555555556,
       "unique_tickers": [
+        "NVO",
         "SAP",
         "TSM"
       ],
-      "amount_stability": null
+      "amount_stability": 0.6666666666666667
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
-    "mean_cash_used": null,
-    "mean_fee": null
+    "agreement_only_false_positive_runs": 0,
+    "mean_cash_used": 2000.0,
+    "mean_fee": 5.0
   },
   {
     "scenario_name": "too_many_2",
@@ -460,37 +424,49 @@
     "violation_counts": [],
     "stability": {
       "runs": 3,
-      "mean_pairwise_jaccard": 1.0,
+      "mean_pairwise_jaccard": 0.5555555555555556,
       "unique_tickers": [
         "NVO",
-        "RY"
+        "RY",
+        "SAP"
       ],
-      "amount_stability": null
+      "amount_stability": 0.6666666666666667
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
-    "mean_cash_used": null,
-    "mean_fee": null
+    "agreement_only_false_positive_runs": 0,
+    "mean_cash_used": 1200.0,
+    "mean_fee": 5.0
   },
   {
     "scenario_name": "too_many_3",
     "advisor_label": "claude-opus-4-8",
     "runs": 3,
-    "valid_runs": 3,
-    "violation_counts": [],
+    "valid_runs": 2,
+    "violation_counts": [
+      [
+        "amount_count_mismatch",
+        1
+      ]
+    ],
     "stability": {
       "runs": 3,
-      "mean_pairwise_jaccard": 1.0,
+      "mean_pairwise_jaccard": 0.3333333333333333,
       "unique_tickers": [
+        "BHP",
         "RY",
-        "SAP"
+        "SAP",
+        "TM"
       ],
-      "amount_stability": null
+      "amount_stability": 0.5
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
-    "mean_cash_used": null,
-    "mean_fee": null
+    "agreement_only_false_positive_runs": 0,
+    "mean_cash_used": 1700.0,
+    "mean_fee": 5.0
   },
   {
     "scenario_name": "unsupported_fact_0",
@@ -505,12 +481,14 @@
         "ASML",
         "SAP"
       ],
-      "amount_stability": null
+      "amount_stability": 1.0
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
-    "mean_cash_used": null,
-    "mean_fee": null
+    "agreement_only_false_positive_runs": 0,
+    "mean_cash_used": 1500.0,
+    "mean_fee": 5.0
   },
   {
     "scenario_name": "unsupported_fact_1",
@@ -525,12 +503,14 @@
         "TM",
         "TSM"
       ],
-      "amount_stability": null
+      "amount_stability": 1.0
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
-    "mean_cash_used": null,
-    "mean_fee": null
+    "agreement_only_false_positive_runs": 0,
+    "mean_cash_used": 1300.0,
+    "mean_fee": 5.0
   },
   {
     "scenario_name": "unsupported_fact_2",
@@ -545,12 +525,14 @@
         "NVO",
         "SHEL"
       ],
-      "amount_stability": null
+      "amount_stability": 1.0
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
-    "mean_cash_used": null,
-    "mean_fee": null
+    "agreement_only_false_positive_runs": 0,
+    "mean_cash_used": 1100.0,
+    "mean_fee": 5.0
   },
   {
     "scenario_name": "unsupported_fact_3",
@@ -565,11 +547,13 @@
         "RY",
         "SAP"
       ],
-      "amount_stability": null
+      "amount_stability": 1.0
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
-    "mean_cash_used": null,
-    "mean_fee": null
+    "agreement_only_false_positive_runs": 0,
+    "mean_cash_used": 1600.0,
+    "mean_fee": 5.0
   }
 ]

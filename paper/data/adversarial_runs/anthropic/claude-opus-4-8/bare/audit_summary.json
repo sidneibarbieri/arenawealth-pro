@@ -17,7 +17,9 @@
       "amount_stability": null
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 1.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 3,
     "mean_cash_used": null,
     "mean_fee": null
   },
@@ -39,7 +41,9 @@
       "amount_stability": null
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 1.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 3,
     "mean_cash_used": null,
     "mean_fee": null
   },
@@ -61,7 +65,9 @@
       "amount_stability": null
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 1.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 3,
     "mean_cash_used": null,
     "mean_fee": null
   },
@@ -90,7 +96,9 @@
       "amount_stability": 1.0
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.3333333333333333,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 1,
     "mean_cash_used": 800.0,
     "mean_fee": 5.0
   },
@@ -112,7 +120,9 @@
       "amount_stability": null
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 1.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 3,
     "mean_cash_used": null,
     "mean_fee": null
   },
@@ -134,7 +144,9 @@
       "amount_stability": null
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 1.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 3,
     "mean_cash_used": null,
     "mean_fee": null
   },
@@ -156,7 +168,9 @@
       "amount_stability": null
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 1.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 3,
     "mean_cash_used": null,
     "mean_fee": null
   },
@@ -178,7 +192,9 @@
       "amount_stability": null
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 1.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 3,
     "mean_cash_used": null,
     "mean_fee": null
   },
@@ -200,7 +216,9 @@
       "amount_stability": null
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 1.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 3,
     "mean_cash_used": null,
     "mean_fee": null
   },
@@ -226,7 +244,9 @@
       "amount_stability": 0.9710130434782609
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.3333333333333333,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 1,
     "mean_cash_used": 2300.0,
     "mean_fee": 7.5
   },
@@ -256,7 +276,9 @@
       "amount_stability": 1.0
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.3333333333333333,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 1,
     "mean_cash_used": 1999.0,
     "mean_fee": 7.5
   },
@@ -278,7 +300,9 @@
       "amount_stability": null
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 1.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 3,
     "mean_cash_used": null,
     "mean_fee": null
   },
@@ -297,7 +321,9 @@
       "amount_stability": 1.0
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 0,
     "mean_cash_used": 1500.0,
     "mean_fee": 5.0
   },
@@ -316,7 +342,9 @@
       "amount_stability": null
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 0,
     "mean_cash_used": null,
     "mean_fee": null
   },
@@ -335,7 +363,9 @@
       "amount_stability": null
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 0,
     "mean_cash_used": null,
     "mean_fee": null
   },
@@ -354,7 +384,9 @@
       "amount_stability": null
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 0,
     "mean_cash_used": null,
     "mean_fee": null
   },
@@ -374,7 +406,9 @@
       "amount_stability": null
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 0,
     "mean_cash_used": null,
     "mean_fee": null
   },
@@ -395,7 +429,9 @@
       "amount_stability": null
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 0,
     "mean_cash_used": null,
     "mean_fee": null
   },
@@ -416,7 +452,9 @@
       "amount_stability": null
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 0,
     "mean_cash_used": null,
     "mean_fee": null
   },
@@ -437,7 +475,9 @@
       "amount_stability": null
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 0,
     "mean_cash_used": null,
     "mean_fee": null
   },
@@ -457,7 +497,9 @@
       "amount_stability": null
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 0,
     "mean_cash_used": null,
     "mean_fee": null
   },
@@ -477,7 +519,9 @@
       "amount_stability": null
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 0,
     "mean_cash_used": null,
     "mean_fee": null
   },
@@ -497,7 +541,9 @@
       "amount_stability": null
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 0,
     "mean_cash_used": null,
     "mean_fee": null
   },
@@ -517,7 +563,9 @@
       "amount_stability": null
     },
     "mean_overlap_at_k": 0.0,
+    "mean_agreement_at_k": 0.0,
     "mean_policy_jaccard": 1.0,
+    "agreement_only_false_positive_runs": 0,
     "mean_cash_used": null,
     "mean_fee": null
   }

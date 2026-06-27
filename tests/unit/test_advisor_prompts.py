@@ -1,6 +1,10 @@
 """Unit tests for advisor prompt building and response parsing (no network)."""
 
+import json
+from pathlib import Path
+
 import pytest
+from scripts.collect_advisor_runs import prompt_hash
 
 from arenawealth.experiments.advisor_prompts import build_prompt, parse_response
 
@@ -71,6 +75,22 @@ def test_parse_no_json_raises():
         parse_response("I cannot help with that.")
 
 
+@pytest.mark.parametrize(
+    "reply",
+    (
+        '{"tickers": [123]}',
+        '{"tickers": ["MA"], "amounts": "900"}',
+        '{"tickers": ["MA"], "amounts": [true]}',
+        '{"tickers": ["MA"], "amounts": [NaN]}',
+        '{"tickers": ["MA"], "amounts": [Infinity]}',
+        '{"tickers": ["MA"], "cited_fact_ids": "fact_a"}',
+    ),
+)
+def test_parse_rejects_malformed_or_non_finite_fields(reply):
+    with pytest.raises(ValueError):
+        parse_response(reply)
+
+
 def test_prompt_arms_form_a_hierarchy():
     bare = build_prompt(SCENARIO, arm="bare")
     policy = build_prompt(SCENARIO, arm="policy")
@@ -82,6 +102,8 @@ def test_prompt_arms_form_a_hierarchy():
     assert "Fee arithmetic" not in bare
     assert "Do not recommend already-owned tickers" in policy
     assert "Fee arithmetic" not in policy
+    assert "USD 2.50 per started USD 1000 tranche" in policy
+    assert "minimum economic order is USD 250.00" in policy
     assert "Do not recommend already-owned tickers" in scaffold
     assert "Fee arithmetic" in scaffold
 
@@ -105,3 +127,29 @@ def test_unknown_arm_raises():
 
 def test_default_arm_is_policy():
     assert build_prompt(SCENARIO) == build_prompt(SCENARIO, arm="policy")
+
+
+def test_frozen_adversarial_prompts_match_current_builder():
+    root = Path(__file__).resolve().parents[2]
+    scenarios = json.loads(
+        (root / "paper/data/adversarial_scenarios.json").read_text()
+    )["scenarios"]
+
+    for provider, model in (
+        ("openai", "gpt-5.5"),
+        ("anthropic", "claude-opus-4-8"),
+    ):
+        for arm in ("bare", "policy", "scaffold"):
+            for scenario in scenarios:
+                expected_hash = prompt_hash(build_prompt(scenario, arm))
+                for run_index in range(1, 4):
+                    path = (
+                        root
+                        / "paper/data/adversarial_runs"
+                        / provider
+                        / model
+                        / arm
+                        / f"{scenario['name']}__run{run_index}.json"
+                    )
+                    record = json.loads(path.read_text())
+                    assert record["prompt_hash"] == expected_hash, path

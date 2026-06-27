@@ -9,18 +9,19 @@ PYTHON ?= $(shell \
 PIP ?= .venv/bin/pip
 UVICORN ?= .venv/bin/uvicorn
 UV_CACHE_DIR ?= .uv-cache
+export PYTHONPATH := $(CURDIR)/src:$(CURDIR)
 
-.PHONY: setup verify review verify-e2e metrics recommendation price-backtest price-backtest-reference experiments ai-advisor-audit advisor-run-audit bibliography advisor-budget collect-advisor-runs advisor-experiment review-dashboard verify-data privacy-audit figure-audit repro-docker configure-env api ui app run paper all submission package clean
+.PHONY: setup verify review verify-e2e metrics recommendation price-backtest price-backtest-reference experiments ai-advisor-audit advisor-run-audit advisor-budget collect-advisor-runs advisor-experiment review-dashboard verify-data privacy-audit figure-audit repro-docker configure-env api ui app run paper all submission package clean
 
 setup:
-	python3.11 -m venv .venv
 	if command -v uv >/dev/null 2>&1; then \
-		UV_CACHE_DIR=$(UV_CACHE_DIR) uv pip install --python .venv/bin/python -e ".[dev]"; \
+		UV_CACHE_DIR=$(UV_CACHE_DIR) uv sync --frozen --extra dev; \
 	else \
+		python3.11 -m venv .venv; \
 		.venv/bin/python -m ensurepip --upgrade; \
 		.venv/bin/python -m pip install -e ".[dev]"; \
 	fi
-	cd frontend && npm install
+	cd frontend && npm ci
 
 verify:
 	bash scripts/verify.sh
@@ -56,9 +57,6 @@ ai-advisor-audit:
 
 advisor-run-audit:
 	$(PYTHON) scripts/collect_advisor_runs.py --provider azure --model chat --runs 3 --cache-root paper/data/advisor_runs --out-dir exports/advisor_run_audit/azure_chat_policy
-
-bibliography:
-	$(PYTHON) scripts/manage_bibliography.py
 
 advisor-budget:
 	$(PYTHON) scripts/estimate_advisor_budget.py --runs 3
@@ -103,7 +101,7 @@ run:
 paper:
 	cd paper && latexmk -pdf main.tex
 
-all: setup verify-data privacy-audit verify price-backtest-reference experiments ai-advisor-audit advisor-run-audit verify-data figure-audit
+all: setup review verify price-backtest-reference experiments ai-advisor-audit advisor-run-audit verify-data figure-audit
 	@echo "Artifact reproduced end-to-end: tests, data, cached runs, and figures are up to date."
 
 submission: all paper

@@ -2,19 +2,15 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install uv
-RUN pip install uv
-
-# Copy project files
-COPY pyproject.toml ./
+COPY pyproject.toml uv.lock README.md ./
 COPY src ./src
 COPY data ./data
 
 ENV PYTHONPATH=/app
 
-# Install dependencies using uv
-RUN uv pip install --system -e "."
+RUN pip install --no-cache-dir uv==0.11.6 \
+    && uv sync --frozen
 
 EXPOSE 8000
 
-CMD ["uvicorn", "arenawealth.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD [".venv/bin/uvicorn", "arenawealth.api.main:app", "--host", "0.0.0.0", "--port", "8000"]

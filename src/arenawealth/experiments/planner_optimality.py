@@ -3,13 +3,16 @@
 The deterministic planner is a fast heuristic, so a reviewer reasonably asks how
 far it can fall short of the exact optimum. This module answers that on a small
 cash grid by comparing the planner against two references under the same fee
-schedule and concentration limits:
+schedule:
 
 * Fee: by subadditivity the minimum fee to deploy an amount is the consolidated
   single-order fee ``compute_order_fee(cash)``. We report the planner's fee
   premium over that closed-form lower bound.
-* Deployment: a mixed-integer program maximizes admissibly deployable cash. We
-  report how much less cash the planner deploys than the MIP optimum.
+* Deployment: a mixed-integer program maximizes cash deployment subject only to
+  the budget and economic floor. Its result is therefore an upper bound on any
+  policy with additional portfolio constraints. We report how much less cash
+  the planner deploys than that bound in a regime where concentration does not
+  bind.
 
 Both references use only the public planner inputs, so the check is reproducible
 and adds no modeling assumptions of its own.
@@ -21,7 +24,6 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 
 from arenawealth.analytics.deployment import (
-    ConcentrationLimits,
     FeeParameters,
     compute_order_fee,
     plan_deployment,
@@ -88,17 +90,15 @@ def planner_optimality(
     candidates: Sequence[PositionAnalysis],
     cash_grid: Sequence[float],
     fee_params: FeeParameters | None = None,
-    concentration_limits: ConcentrationLimits | None = None,
 ) -> OptimalityReport:
     """Compare the planner against the fee lower bound and the MIP deployment optimum."""
     fee_params = fee_params or FeeParameters()
-    limits = concentration_limits or ConcentrationLimits()
     points: list[OptimalityPoint] = []
     for cash in cash_grid:
-        plan = plan_deployment(candidates, cash, fee_params, limits)
+        plan = plan_deployment(candidates, cash, fee_params)
         deployed_planner = sum(order.amount for order in plan.orders)
         fee_lower_bound = compute_order_fee(deployed_planner, fee_params)
-        mip_orders, mip_metadata = plan_deployment_mip(list(candidates), cash, fee_params, limits)
+        mip_orders, mip_metadata = plan_deployment_mip(list(candidates), cash, fee_params)
         deployed_mip = mip_metadata.deployed_amount_usd if mip_orders else 0.0
         points.append(
             OptimalityPoint(

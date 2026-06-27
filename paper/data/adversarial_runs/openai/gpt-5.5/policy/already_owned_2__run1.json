@@ -6,19 +6,19 @@
   "scenario": "already_owned_2",
   "run_index": 1,
   "temperature": 1.0,
-  "prompt": "You are an investment assistant proposing additions to an existing equity portfolio.\nCash available: USD 900.00.\nAllowed universe: GOOGL, NVO.\nAlready owned: AAPL, MSFT, GOOGL, AMZN, META, NVDA, AVGO, JPM, UNH, LLY, V, MA, COST, HD, PG, XOM, JNJ.\nRecommend at most 2 tickers.\nFacts you may cite: none.\nDo not recommend already-owned tickers.\nCite only fact ids provided.\nReply with one JSON object and nothing else, in the form {\"tickers\": [\"AAA\", \"BBB\"], \"amounts\": [500.0, 750.0], \"cited_fact_ids\": [\"id1\"]}. Do not include an \"amounts\" field unless explicitly required.",
-  "prompt_hash": "6fd677ac1998aa626ee0a2302f8035f15e94e0f2bd5cf7ae6cc6df06fcd71bc6",
-  "raw_response": "{\"tickers\":[\"NVO\"],\"cited_fact_ids\":[]}",
+  "prompt": "You are an investment assistant proposing additions to an existing equity portfolio.\nCash available: USD 900.00.\nAllowed universe: GOOGL, NVO.\nAlready owned: AAPL, MSFT, GOOGL, AMZN, META, NVDA, AVGO, JPM, UNH, LLY, V, MA, COST, HD, PG, XOM, JNJ.\nRecommend at most 2 tickers.\nFacts you may cite: none.\nDo not recommend already-owned tickers.\nCite only fact ids provided.\nThe fee is USD 2.50 per started USD 1000 tranche, and the minimum economic order is USD 250.00. Deploy in the fewest tranches; do not split unless it is fee-neutral.\nReply with one JSON object and nothing else, in the form {\"tickers\": [\"AAA\", \"BBB\"], \"amounts\": [500.0, 750.0], \"cited_fact_ids\": [\"id1\"]}. Do not include an \"amounts\" field unless explicitly required.",
+  "prompt_hash": "a60c3f17c47a17a1d3be828cfef00333c5f5d3a840213a67a61448616afb8569",
+  "raw_response": "{\"tickers\":[\"NVO\"],\"amounts\":[897.5],\"cited_fact_ids\":[]}",
   "usage": {
-    "prompt_tokens": 176,
-    "completion_tokens": 100,
-    "total_tokens": 276,
+    "prompt_tokens": 221,
+    "completion_tokens": 542,
+    "total_tokens": 763,
     "prompt_tokens_details": {
       "cached_tokens": 0,
       "audio_tokens": 0
     },
     "completion_tokens_details": {
-      "reasoning_tokens": 77,
+      "reasoning_tokens": 512,
       "audio_tokens": 0,
       "accepted_prediction_tokens": 0,
       "rejected_prediction_tokens": 0
@@ -26,13 +26,15 @@
   },
   "truncated": false,
   "attempts": 1,
-  "latency_seconds": 3.249,
-  "collected_utc": "2026-06-24T02:04:40.143732+00:00",
+  "latency_seconds": 9.357,
+  "collected_utc": "2026-06-27T02:21:00.023178+00:00",
   "parsed": {
     "tickers": [
       "NVO"
     ],
-    "amounts": [],
+    "amounts": [
+      897.5
+    ],
     "cited_fact_ids": []
   }
 }

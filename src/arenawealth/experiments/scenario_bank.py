@@ -151,7 +151,9 @@ def taxonomy_label(violation: str) -> str:
         return "out_of_universe"
     if violation.startswith("already_owned:"):
         return "already_owned_violation"
-    if violation in {"amounts_required", "amount_count_mismatch"}:
+    if violation.startswith("concentration_breach:"):
+        return "concentration_breach"
+    if violation in {"amounts_required", "amount_count_mismatch", "non_finite_amount"}:
         return "malformed_amounts"
     if violation == "cash_exceeded":
         return "cash_overrun"
@@ -451,14 +453,13 @@ def _aggregate_advisor(advisor_label: str, reports: list[AdvisorRunSetReport]) -
         for violation, count in report.violation_counts:
             taxonomy = taxonomy_label(violation)
             violation_counts[taxonomy] = violation_counts.get(taxonomy, 0) + count
-        if report.mean_policy_jaccard >= 0.99 and report.valid_runs < report.runs:
-            false_positive_runs += report.runs - report.valid_runs
+        false_positive_runs += report.agreement_only_false_positive_runs
     return AdvisorAggregate(
         advisor_label=advisor_label,
         scenarios=len(reports),
         runs=runs,
         validity_rate=valid_runs / runs if runs else 0.0,
-        mean_agreement=mean(report.mean_policy_jaccard for report in reports),
+        mean_agreement=mean(report.mean_agreement_at_k for report in reports),
         mean_set_stability=mean(report.stability.mean_pairwise_jaccard for report in reports),
         mean_amount_stability=(mean(amount_stability_values) if amount_stability_values else None),
         agreement_only_false_positive_rate=false_positive_runs / runs if runs else 0.0,

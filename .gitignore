@@ -30,8 +30,7 @@ env/
 *.swp
 *.swo
 .private/
-.claude/
-arenawealth-pro.worktrees/
+*.worktrees/
 project-framework/
 
 # System
@@ -62,7 +61,7 @@ paper/old/
 # Local / sensitive data
 data/carteira_atual.csv
 data/inbox/*.csv
-data/arenawealth_universe.db
+data/*_universe.db
 data/*.db
 data/snapshots/
 
@@ -87,13 +86,11 @@ htmlcov/
 *_test_results_*.json
 *_excellence_report_*.md
 archive/
-old_arenawealth-pro/
+old_*/
 /.playwright-mcp/
 /.playwright-cli/
 portfolio-editor-*.png
 
-# Bibliography PDFs: copyrighted, large; track only the catalog and order list
 paper/bibliography/pdfs/
 
-# Personal working list of papers to download (not part of the artifact)
 _orders.txt
