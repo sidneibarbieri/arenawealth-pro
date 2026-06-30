@@ -11,14 +11,14 @@
   "raw_response": "{\"tickers\":[\"TSM\",\"NVO\"],\"amounts\":[350.0,350.0],\"cited_fact_ids\":[]}",
   "usage": {
     "prompt_tokens": 161,
-    "completion_tokens": 110,
-    "total_tokens": 271,
+    "completion_tokens": 103,
+    "total_tokens": 264,
     "prompt_tokens_details": {
       "cached_tokens": 0,
       "audio_tokens": 0
     },
     "completion_tokens_details": {
-      "reasoning_tokens": 73,
+      "reasoning_tokens": 66,
       "audio_tokens": 0,
       "accepted_prediction_tokens": 0,
       "rejected_prediction_tokens": 0
@@ -26,8 +26,8 @@
   },
   "truncated": false,
   "attempts": 1,
-  "latency_seconds": 2.766,
-  "collected_utc": "2026-06-24T01:55:25.824982+00:00",
+  "latency_seconds": 2.649,
+  "collected_utc": "2026-06-30T14:22:07.578835+00:00",
   "parsed": {
     "tickers": [
       "TSM",

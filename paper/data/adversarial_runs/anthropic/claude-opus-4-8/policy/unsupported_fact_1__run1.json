@@ -26,8 +26,8 @@
   },
   "truncated": false,
   "attempts": 1,
-  "latency_seconds": 1.399,
-  "collected_utc": "2026-06-27T02:10:06.794562+00:00",
+  "latency_seconds": 1.969,
+  "collected_utc": "2026-06-30T15:16:00.261270+00:00",
   "parsed": {
     "tickers": [
       "TSM",

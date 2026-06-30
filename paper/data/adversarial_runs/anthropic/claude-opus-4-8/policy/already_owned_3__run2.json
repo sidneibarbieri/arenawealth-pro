@@ -26,8 +26,8 @@
   },
   "truncated": false,
   "attempts": 1,
-  "latency_seconds": 1.233,
-  "collected_utc": "2026-06-27T02:09:31.905667+00:00",
+  "latency_seconds": 4.096,
+  "collected_utc": "2026-06-30T15:06:17.285337+00:00",
   "parsed": {
     "tickers": [
       "SAP"

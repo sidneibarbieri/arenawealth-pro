@@ -26,8 +26,8 @@
   },
   "truncated": false,
   "attempts": 1,
-  "latency_seconds": 1.564,
-  "collected_utc": "2026-06-27T02:09:26.726021+00:00",
+  "latency_seconds": 1.495,
+  "collected_utc": "2026-06-30T14:11:06.877658+00:00",
   "parsed": {
     "tickers": [
       "NVO"

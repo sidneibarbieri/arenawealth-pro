@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 """Collect the frontier audit as one interleaved, multi-run campaign.
 
-Every (model, arm, scenario, run) cell is collected in a single randomized,
-interleaved order and in one time window, so the bare/policy/scaffold comparison
-cannot be confounded by temporal or model-version drift: for any scenario the
-three arms land seconds apart in shuffled order rather than in separate sessions.
+Every (model, arm, scenario, run) cell is collected in one globally shuffled
+order, so temporal or model-version drift is spread across the bare/policy/
+scaffold arms rather than aligned with any one: the global shuffle distributes
+each arm and model roughly uniformly along the order, which mitigates -- it does
+not eliminate -- drift confounding. This is global randomization, not local or
+paired interleaving (a scenario's three arms are not adjacent; their median
+separation is hundreds of positions). Collection may span more than one session
+if resumed; the cache makes that lossless and the consolidated manifest records
+each session, so the spread can be checked after the fact.
 
 The per-cell collector is reused unchanged, so cells are cached, budget-guarded,
 and byte-identical in layout to the existing frozen audit; the only new artifact

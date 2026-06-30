@@ -11,14 +11,14 @@
   "raw_response": "{\"tickers\":[\"NVO\"],\"cited_fact_ids\":[]}",
   "usage": {
     "prompt_tokens": 161,
-    "completion_tokens": 198,
-    "total_tokens": 359,
+    "completion_tokens": 159,
+    "total_tokens": 320,
     "prompt_tokens_details": {
       "cached_tokens": 0,
       "audio_tokens": 0
     },
     "completion_tokens_details": {
-      "reasoning_tokens": 175,
+      "reasoning_tokens": 136,
       "audio_tokens": 0,
       "accepted_prediction_tokens": 0,
       "rejected_prediction_tokens": 0
@@ -26,8 +26,8 @@
   },
   "truncated": false,
   "attempts": 1,
-  "latency_seconds": 3.624,
-  "collected_utc": "2026-06-24T01:58:30.514323+00:00",
+  "latency_seconds": 2.941,
+  "collected_utc": "2026-06-30T15:30:40.112558+00:00",
   "parsed": {
     "tickers": [
       "NVO"

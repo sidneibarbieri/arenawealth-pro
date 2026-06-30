@@ -26,8 +26,8 @@
   },
   "truncated": false,
   "attempts": 1,
-  "latency_seconds": 9.113,
-  "collected_utc": "2026-06-27T02:23:09.084240+00:00",
+  "latency_seconds": 8.825,
+  "collected_utc": "2026-06-30T14:18:08.055029+00:00",
   "parsed": {
     "tickers": [
       "BHP",

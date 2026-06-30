@@ -11,14 +11,14 @@
   "raw_response": "{\"tickers\":[\"ASML\"],\"amounts\":[400.0],\"cited_fact_ids\":[]}",
   "usage": {
     "prompt_tokens": 266,
-    "completion_tokens": 371,
-    "total_tokens": 637,
+    "completion_tokens": 244,
+    "total_tokens": 510,
     "prompt_tokens_details": {
       "cached_tokens": 0,
       "audio_tokens": 0
     },
     "completion_tokens_details": {
-      "reasoning_tokens": 341,
+      "reasoning_tokens": 214,
       "audio_tokens": 0,
       "accepted_prediction_tokens": 0,
       "rejected_prediction_tokens": 0
@@ -26,8 +26,8 @@
   },
   "truncated": false,
   "attempts": 1,
-  "latency_seconds": 6.637,
-  "collected_utc": "2026-06-24T02:09:57.635373+00:00",
+  "latency_seconds": 4.801,
+  "collected_utc": "2026-06-30T15:18:06.964382+00:00",
   "parsed": {
     "tickers": [
       "ASML"

@@ -61,23 +61,23 @@ a { color: var(--navy); }
     <thead><tr><th>Model</th><th>Arm</th><th>Valid rate</th><th>Valid/runs</th>
     <th>Violations</th><th>Evidence</th></tr></thead>
     <tbody id="rows">
-<tr data-arm="bare"><td>claude-opus-4-8</td><td><span class="pill bare">bare</span></td><td class="num bad">0.53</td><td class="num">38/72</td><td class="muted">amounts_required (30), unnecessary_split_fee (4)</td><td><a href="adversarial_runs/anthropic/claude-opus-4-8/bare/audit_summary.json">raw JSON</a></td></tr>
-<tr data-arm="policy"><td>claude-opus-4-8</td><td><span class="pill policy">policy</span></td><td class="num ok">0.94</td><td class="num">68/72</td><td class="muted">amount_count_mismatch (1), below_min_order (3), unnecessary_split_fee (3)</td><td><a href="adversarial_runs/anthropic/claude-opus-4-8/policy/audit_summary.json">raw JSON</a></td></tr>
-<tr data-arm="scaffold"><td>claude-opus-4-8</td><td><span class="pill scaffold">scaffold</span></td><td class="num ok">0.99</td><td class="num">71/72</td><td class="muted">already_owned (1)</td><td><a href="adversarial_runs/anthropic/claude-opus-4-8/scaffold/audit_summary.json">raw JSON</a></td></tr>
-<tr data-arm="bare"><td>gpt-5.5</td><td><span class="pill bare">bare</span></td><td class="num bad">0.60</td><td class="num">43/72</td><td class="muted">below_min_order (18), unnecessary_split_fee (29)</td><td><a href="adversarial_runs/openai/gpt-5.5/bare/audit_summary.json">raw JSON</a></td></tr>
-<tr data-arm="policy"><td>gpt-5.5</td><td><span class="pill policy">policy</span></td><td class="num ok">0.94</td><td class="num">68/72</td><td class="muted">unnecessary_split_fee (4)</td><td><a href="adversarial_runs/openai/gpt-5.5/policy/audit_summary.json">raw JSON</a></td></tr>
-<tr data-arm="scaffold"><td>gpt-5.5</td><td><span class="pill scaffold">scaffold</span></td><td class="num ok">1.00</td><td class="num">72/72</td><td class="muted">none</td><td><a href="adversarial_runs/openai/gpt-5.5/scaffold/audit_summary.json">raw JSON</a></td></tr>
+<tr data-arm="bare"><td>claude-opus-4-8</td><td><span class="pill bare">bare</span></td><td class="num bad">0.51</td><td class="num">61/120</td><td class="muted">amounts_required (52), below_min_order (2), unnecessary_split_fee (7)</td><td><a href="adversarial_runs/anthropic/claude-opus-4-8/bare/audit_summary.json">raw JSON</a></td></tr>
+<tr data-arm="policy"><td>claude-opus-4-8</td><td><span class="pill policy">policy</span></td><td class="num ok">0.93</td><td class="num">112/120</td><td class="muted">unnecessary_split_fee (8)</td><td><a href="adversarial_runs/anthropic/claude-opus-4-8/policy/audit_summary.json">raw JSON</a></td></tr>
+<tr data-arm="scaffold"><td>claude-opus-4-8</td><td><span class="pill scaffold">scaffold</span></td><td class="num ok">0.97</td><td class="num">116/120</td><td class="muted">already_owned (4)</td><td><a href="adversarial_runs/anthropic/claude-opus-4-8/scaffold/audit_summary.json">raw JSON</a></td></tr>
+<tr data-arm="bare"><td>gpt-5.5</td><td><span class="pill bare">bare</span></td><td class="num bad">0.59</td><td class="num">71/120</td><td class="muted">below_min_order (29), unnecessary_split_fee (49)</td><td><a href="adversarial_runs/openai/gpt-5.5/bare/audit_summary.json">raw JSON</a></td></tr>
+<tr data-arm="policy"><td>gpt-5.5</td><td><span class="pill policy">policy</span></td><td class="num ok">0.98</td><td class="num">118/120</td><td class="muted">unnecessary_split_fee (2)</td><td><a href="adversarial_runs/openai/gpt-5.5/policy/audit_summary.json">raw JSON</a></td></tr>
+<tr data-arm="scaffold"><td>gpt-5.5</td><td><span class="pill scaffold">scaffold</span></td><td class="num ok">1.00</td><td class="num">120/120</td><td class="muted">none</td><td><a href="adversarial_runs/openai/gpt-5.5/scaffold/audit_summary.json">raw JSON</a></td></tr>
     </tbody>
   </table>
 
   <h2>Reproducibility and provenance</h2>
   <div class="cards">
-<div class="card"><h4>claude-opus-4-8 / bare</h4><p>scenarios hash <code>48c32883f75b0488</code></p><p>temperature 1.0 &middot; 72 calls &middot; 0 retries</p><p>wall clock 235.963 s &middot; python 3.11.15</p></div>
-<div class="card"><h4>claude-opus-4-8 / policy</h4><p>scenarios hash <code>48c32883f75b0488</code></p><p>temperature 1.0 &middot; 72 calls &middot; 0 retries</p><p>wall clock 147.739 s &middot; python 3.11.15</p></div>
-<div class="card"><h4>claude-opus-4-8 / scaffold</h4><p>scenarios hash <code>48c32883f75b0488</code></p><p>temperature 1.0 &middot; 72 calls &middot; 0 retries</p><p>wall clock 224.741 s &middot; python 3.11.15</p></div>
-<div class="card"><h4>gpt-5.5 / bare</h4><p>scenarios hash <code>48c32883f75b0488</code></p><p>temperature 1.0 &middot; 72 calls &middot; 0 retries</p><p>wall clock 379.064 s &middot; python 3.11.15</p></div>
-<div class="card"><h4>gpt-5.5 / policy</h4><p>scenarios hash <code>48c32883f75b0488</code></p><p>temperature 1.0 &middot; 72 calls &middot; 1 retries</p><p>wall clock 767.696 s &middot; python 3.11.15</p></div>
-<div class="card"><h4>gpt-5.5 / scaffold</h4><p>scenarios hash <code>48c32883f75b0488</code></p><p>temperature 1.0 &middot; 72 calls &middot; 0 retries</p><p>wall clock 655.12 s &middot; python 3.11.15</p></div>
+<div class="card"><h4>claude-opus-4-8 / bare</h4><p>scenarios hash <code>48c32883f75b0488</code></p><p>temperature 1.0 &middot; 120 calls &middot; 0 retries</p><p>wall clock ? s &middot; python 3.11.15</p></div>
+<div class="card"><h4>claude-opus-4-8 / policy</h4><p>scenarios hash <code>48c32883f75b0488</code></p><p>temperature 1.0 &middot; 120 calls &middot; 0 retries</p><p>wall clock ? s &middot; python 3.11.15</p></div>
+<div class="card"><h4>claude-opus-4-8 / scaffold</h4><p>scenarios hash <code>48c32883f75b0488</code></p><p>temperature 1.0 &middot; 120 calls &middot; 0 retries</p><p>wall clock ? s &middot; python 3.11.15</p></div>
+<div class="card"><h4>gpt-5.5 / bare</h4><p>scenarios hash <code>48c32883f75b0488</code></p><p>temperature 1.0 &middot; 120 calls &middot; 0 retries</p><p>wall clock ? s &middot; python 3.11.15</p></div>
+<div class="card"><h4>gpt-5.5 / policy</h4><p>scenarios hash <code>48c32883f75b0488</code></p><p>temperature 1.0 &middot; 120 calls &middot; 0 retries</p><p>wall clock ? s &middot; python 3.11.15</p></div>
+<div class="card"><h4>gpt-5.5 / scaffold</h4><p>scenarios hash <code>48c32883f75b0488</code></p><p>temperature 1.0 &middot; 120 calls &middot; 0 retries</p><p>wall clock ? s &middot; python 3.11.15</p></div>
   </div>
 </main>
 <script>

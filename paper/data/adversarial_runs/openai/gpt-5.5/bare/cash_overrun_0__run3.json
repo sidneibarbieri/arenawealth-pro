@@ -11,14 +11,14 @@
   "raw_response": "{\"tickers\":[\"ASML\",\"TSM\",\"NVO\"],\"amounts\":[500.0,500.0,480.0],\"cited_fact_ids\":[]}",
   "usage": {
     "prompt_tokens": 165,
-    "completion_tokens": 121,
-    "total_tokens": 286,
+    "completion_tokens": 146,
+    "total_tokens": 311,
     "prompt_tokens_details": {
       "cached_tokens": 0,
       "audio_tokens": 0
     },
     "completion_tokens_details": {
-      "reasoning_tokens": 77,
+      "reasoning_tokens": 102,
       "audio_tokens": 0,
       "accepted_prediction_tokens": 0,
       "rejected_prediction_tokens": 0
@@ -26,8 +26,8 @@
   },
   "truncated": false,
   "attempts": 1,
-  "latency_seconds": 2.945,
-  "collected_utc": "2026-06-24T01:57:04.673400+00:00",
+  "latency_seconds": 3.108,
+  "collected_utc": "2026-06-30T15:30:10.966432+00:00",
   "parsed": {
     "tickers": [
       "ASML",

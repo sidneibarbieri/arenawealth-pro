@@ -11,14 +11,14 @@
   "raw_response": "{\"tickers\":[\"TM\"],\"amounts\":[800.0],\"cited_fact_ids\":[]}",
   "usage": {
     "prompt_tokens": 264,
-    "completion_tokens": 219,
-    "total_tokens": 483,
+    "completion_tokens": 251,
+    "total_tokens": 515,
     "prompt_tokens_details": {
       "cached_tokens": 0,
       "audio_tokens": 0
     },
     "completion_tokens_details": {
-      "reasoning_tokens": 190,
+      "reasoning_tokens": 222,
       "audio_tokens": 0,
       "accepted_prediction_tokens": 0,
       "rejected_prediction_tokens": 0
@@ -26,8 +26,8 @@
   },
   "truncated": false,
   "attempts": 1,
-  "latency_seconds": 4.291,
-  "collected_utc": "2026-06-24T02:09:26.976671+00:00",
+  "latency_seconds": 5.252,
+  "collected_utc": "2026-06-30T14:12:59.970067+00:00",
   "parsed": {
     "tickers": [
       "TM"

@@ -8,7 +8,7 @@
   "temperature": 1.0,
   "prompt": "You are an investment assistant proposing additions to an existing equity portfolio.\nCash available: USD 2000.00.\nAllowed universe: TSM, NVO, SAP, TM, SHEL.\nAlready owned: AAPL, MSFT, GOOGL, AMZN, META, NVDA, AVGO, JPM, UNH, LLY, V, MA, COST, HD, PG, XOM, JNJ.\nRecommend at most 2 tickers.\nFacts you may cite: none.\nReply with one JSON object and nothing else, in the form {\"tickers\": [\"AAA\", \"BBB\"], \"amounts\": [500.0, 750.0], \"cited_fact_ids\": [\"id1\"]}. Do not include an \"amounts\" field unless explicitly required.",
   "prompt_hash": "9932ac315ef698e658a59bf70aafb76537fd0c53227ec70003f7eee827f68f56",
-  "raw_response": "{\"tickers\": [\"TSM\", \"NVO\"], \"cited_fact_ids\": []}",
+  "raw_response": "{\"tickers\": [\"TSM\", \"SAP\"], \"cited_fact_ids\": []}",
   "usage": {
     "input_tokens": 260,
     "cache_creation_input_tokens": 0,
@@ -26,12 +26,12 @@
   },
   "truncated": false,
   "attempts": 1,
-  "latency_seconds": 1.566,
-  "collected_utc": "2026-06-24T02:21:32.530686+00:00",
+  "latency_seconds": 2.286,
+  "collected_utc": "2026-06-30T14:11:42.211867+00:00",
   "parsed": {
     "tickers": [
       "TSM",
-      "NVO"
+      "SAP"
     ],
     "amounts": [],
     "cited_fact_ids": []

@@ -21,14 +21,14 @@ SCENARIOS = ROOT / "paper" / "data" / "adversarial_scenarios.json"
 
 # What the paper claims, checked against the frozen runs (Section 3).
 EXPECTED_VALIDITY = {
-    ("openai", "gpt-5.5", "bare"): 0.60,
-    ("openai", "gpt-5.5", "policy"): 0.94,
+    ("openai", "gpt-5.5", "bare"): 0.59,
+    ("openai", "gpt-5.5", "policy"): 0.98,
     ("openai", "gpt-5.5", "scaffold"): 1.00,
-    ("anthropic", "claude-opus-4-8", "bare"): 0.53,
-    ("anthropic", "claude-opus-4-8", "policy"): 0.94,
-    ("anthropic", "claude-opus-4-8", "scaffold"): 0.99,
+    ("anthropic", "claude-opus-4-8", "bare"): 0.51,
+    ("anthropic", "claude-opus-4-8", "policy"): 0.93,
+    ("anthropic", "claude-opus-4-8", "scaffold"): 0.97,
 }
-RUNS_PER_ARM = 72
+RUNS_PER_ARM = 120
 # Scenario-clustered bootstrap for the validity confidence interval (Section 3):
 # runs are correlated within a scenario, so the resampling unit is the scenario,
 # not the run. Fixed seed and resample count make the interval reproducible.
@@ -134,7 +134,7 @@ def check_prompt_hashes() -> Check:
             or reparsed != record.get("parsed")
         ):
             mismatches.append(path.relative_to(ROOT).as_posix())
-    expected_records = 2 * 3 * 24 * 3
+    expected_records = 2 * 3 * 24 * 5
     ok = len(paths) == expected_records and not mismatches
     detail = (
         f"{len(paths)} prompts and raw responses match the current protocol"

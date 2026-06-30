@@ -11,14 +11,14 @@
   "raw_response": "{\"tickers\":[\"SAP\",\"TM\"],\"cited_fact_ids\":[]}",
   "usage": {
     "prompt_tokens": 168,
-    "completion_tokens": 223,
-    "total_tokens": 391,
+    "completion_tokens": 184,
+    "total_tokens": 352,
     "prompt_tokens_details": {
       "cached_tokens": 0,
       "audio_tokens": 0
     },
     "completion_tokens_details": {
-      "reasoning_tokens": 199,
+      "reasoning_tokens": 160,
       "audio_tokens": 0,
       "accepted_prediction_tokens": 0,
       "rejected_prediction_tokens": 0
@@ -26,8 +26,8 @@
   },
   "truncated": false,
   "attempts": 1,
-  "latency_seconds": 3.993,
-  "collected_utc": "2026-06-24T01:59:34.561260+00:00",
+  "latency_seconds": 3.946,
+  "collected_utc": "2026-06-30T15:22:31.387153+00:00",
   "parsed": {
     "tickers": [
       "SAP",

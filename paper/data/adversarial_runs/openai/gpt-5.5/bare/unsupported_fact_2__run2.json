@@ -11,14 +11,14 @@
   "raw_response": "{\"tickers\":[\"NVO\",\"SHEL\"],\"cited_fact_ids\":[\"market_fact_2\"]}",
   "usage": {
     "prompt_tokens": 164,
-    "completion_tokens": 460,
-    "total_tokens": 624,
+    "completion_tokens": 447,
+    "total_tokens": 611,
     "prompt_tokens_details": {
       "cached_tokens": 0,
       "audio_tokens": 0
     },
     "completion_tokens_details": {
-      "reasoning_tokens": 429,
+      "reasoning_tokens": 416,
       "audio_tokens": 0,
       "accepted_prediction_tokens": 0,
       "rejected_prediction_tokens": 0
@@ -26,8 +26,8 @@
   },
   "truncated": false,
   "attempts": 1,
-  "latency_seconds": 7.623,
-  "collected_utc": "2026-06-24T02:00:51.535123+00:00",
+  "latency_seconds": 7.619,
+  "collected_utc": "2026-06-30T15:07:56.923305+00:00",
   "parsed": {
     "tickers": [
       "NVO",

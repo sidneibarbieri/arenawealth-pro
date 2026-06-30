@@ -26,8 +26,8 @@
   },
   "truncated": false,
   "attempts": 1,
-  "latency_seconds": 1.575,
-  "collected_utc": "2026-06-24T02:27:39.693087+00:00",
+  "latency_seconds": 1.859,
+  "collected_utc": "2026-06-30T15:06:33.568617+00:00",
   "parsed": {
     "tickers": [
       "ASML",

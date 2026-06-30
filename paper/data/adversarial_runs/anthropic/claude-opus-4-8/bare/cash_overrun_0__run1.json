@@ -26,8 +26,8 @@
   },
   "truncated": false,
   "attempts": 1,
-  "latency_seconds": 1.953,
-  "collected_utc": "2026-06-24T02:20:06.082243+00:00",
+  "latency_seconds": 2.491,
+  "collected_utc": "2026-06-30T15:05:49.444304+00:00",
   "parsed": {
     "tickers": [],
     "amounts": [],
