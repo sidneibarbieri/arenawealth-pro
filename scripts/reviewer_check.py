@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import random
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -28,6 +29,11 @@ EXPECTED_VALIDITY = {
     ("anthropic", "claude-opus-4-8", "scaffold"): 0.99,
 }
 RUNS_PER_ARM = 72
+# Scenario-clustered bootstrap for the validity confidence interval (Section 3):
+# runs are correlated within a scenario, so the resampling unit is the scenario,
+# not the run. Fixed seed and resample count make the interval reproducible.
+BOOTSTRAP_RESAMPLES = 2000
+BOOTSTRAP_SEED = 20260629
 
 
 @dataclass(frozen=True)
@@ -47,17 +53,36 @@ def arm_validity(provider: str, model: str, arm: str) -> tuple[float, int, int]:
     return valid / total, total, manifest.get("truncated_runs", -1)
 
 
+def arm_validity_ci(provider: str, model: str, arm: str) -> tuple[float, float]:
+    """95% scenario-clustered bootstrap interval for one arm's validity rate."""
+    arm_dir = RUNS / provider / model / arm
+    summary = json.loads((arm_dir / "audit_summary.json").read_text())
+    scenarios = [(row["valid_runs"], row["runs"]) for row in summary]
+    rng = random.Random(BOOTSTRAP_SEED)  # per-arm seed: order-independent
+    rates = []
+    for _ in range(BOOTSTRAP_RESAMPLES):
+        sample = [scenarios[rng.randrange(len(scenarios))] for _ in scenarios]
+        valid = sum(v for v, _ in sample)
+        total = sum(t for _, t in sample)
+        rates.append(valid / total)
+    rates.sort()
+    lo = rates[int(0.025 * BOOTSTRAP_RESAMPLES)]
+    hi = rates[int(0.975 * BOOTSTRAP_RESAMPLES)]
+    return lo, hi
+
+
 def check_validity_gradient() -> Check:
     lines: list[str] = []
     ok = True
     for (provider, model, arm), expected in EXPECTED_VALIDITY.items():
         rate, total, truncated = arm_validity(provider, model, arm)
+        lo, hi = arm_validity_ci(provider, model, arm)
         arm_ok = round(rate, 2) == expected and total == RUNS_PER_ARM and truncated == 0
         ok = ok and arm_ok
         mark = "ok" if arm_ok else "MISMATCH"
         lines.append(
             f"      {model:16s} {arm:9s} {rate:.2f} (paper {expected:.2f}), "
-            f"{total} runs, truncated={truncated}  [{mark}]"
+            f"95% CI [{lo:.2f}, {hi:.2f}], {total} runs, truncated={truncated}  [{mark}]"
         )
     return Check(
         ok,

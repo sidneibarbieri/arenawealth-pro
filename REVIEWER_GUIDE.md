@@ -47,9 +47,9 @@ records a truncation flag, and writes a hashed manifest.
 | Fig. 2 (archetype heatmap) | V/S/A separate | `make ai-advisor-audit` | `paper/figures/ai_advisor_audit.pdf` |
 | Fig. 3 (fee premium) | splitting pays a premium | `make experiments` | `paper/figures/fee_premium.pdf` |
 | Fig. 4 (factor ablation) | weighting is replaceable | `make experiments` | `paper/figures/ablation.pdf` |
-| Fig. 5 (rolling Sharpe) | equal weight competitive | `make price-backtest` | `paper/figures/robustness.pdf` |
-| Table 2 (scenario bank) | agreement-only false positives | `make ai-advisor-audit` | console + experiment JSON |
-| Table 5 (backtest) | no alpha claim | `make price-backtest` | console + `paper/data/` |
+| Fig. 5 (rolling Sharpe) | equal weight competitive | `make experiments` | `paper/figures/robustness.pdf` |
+| Table 3 (scenario bank) | agreement-only false positives | `make ai-advisor-audit` | console + experiment JSON |
+| Table 4 (backtest) | no alpha claim | `make price-backtest-reference` | console + `paper/data/` |
 | Data integrity | inputs unchanged | `make verify-data` | hash match |
 | Request/response provenance | frozen requests and parsed outputs equal current protocol | `make review` | 432 record matches |
 | No private data | safe to publish | `make privacy-audit` | files scanned |
